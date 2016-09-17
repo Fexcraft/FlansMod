@@ -1,6 +1,6 @@
-item.crossbowBolt.name=Crossbow Bolt
-item.crossbow.name=Crossbow
-item.rock.name=Rock
-item.Biplane.name=Biplane
-item.TwoSeatBiplane.name=Two Seat Biplane
-item.leech.name=Leech
+item.flansmod:crossbowBolt.name=Crossbow Bolt
+item.flansmod:crossbow.name=Crossbow
+item.flansmod:rock.name=Rock
+item.flansmod:Biplane.name=Biplane
+item.flansmod:TwoSeatBiplane.name=Two Seat Biplane
+item.flansmod:leech.name=Leech

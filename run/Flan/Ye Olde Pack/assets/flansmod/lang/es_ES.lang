@@ -1,6 +1,6 @@
-item.crossbowBolt.name=Flecha de Ballesta
-item.crossbow.name=Ballesta
-item.rock.name=Roca
-item.Biplane.name=Biplano
-item.TwoSeatBiplane.name=Biplano Doble
-item.leech.name=Sanguijuela
+item.flansmod:crossbowBolt.name=Flecha de Ballesta
+item.flansmod:crossbow.name=Ballesta
+item.flansmod:rock.name=Roca
+item.flansmod:Biplane.name=Biplano
+item.flansmod:TwoSeatBiplane.name=Biplano Doble
+item.flansmod:leech.name=Sanguijuela

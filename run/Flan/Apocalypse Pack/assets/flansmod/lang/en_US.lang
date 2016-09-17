@@ -1,7 +1,7 @@
-tile.flanSkeleton.name=Skeleton
-tile.flanSkeleton2.name=Skeleton
-item.aiChip.name=AI Chip
-item.complicatedCircuit.name=Complicated Circuit
-item.nuclearPowerCore.name=Nuclear Power Core
-tile.flanGunRack.name=Gun Rack
-item.buggy.name=Buggy
+tile.flansmod:flanSkeleton.name=Skeleton
+tile.flansmod:flanSkeleton2.name=Skeleton
+item.flansmod:aiChip.name=AI Chip
+item.flansmod:complicatedCircuit.name=Complicated Circuit
+item.flansmod:nuclearPowerCore.name=Nuclear Power Core
+tile.flansmod:flanGunRack.name=Gun Rack
+item.flansmod:buggy.name=Buggy

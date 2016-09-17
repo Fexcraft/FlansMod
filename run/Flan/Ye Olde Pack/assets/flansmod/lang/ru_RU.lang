@@ -1,6 +1,6 @@
-item.crossbowBolt.name=Арбалетный болт
-item.crossbow.name=Арбалет
-item.rock.name=Камушек
-item.Biplane.name=Биплан
-item.TwoSeatBiplane.name=Двухместный биплан
-item.leech.name=Пиявка
+item.flansmod:crossbowBolt.name=Арбалетный болт
+item.flansmod:crossbow.name=Арбалет
+item.flansmod:rock.name=Камушек
+item.flansmod:Biplane.name=Биплан
+item.flansmod:TwoSeatBiplane.name=Двухместный биплан
+item.flansmod:leech.name=Пиявка

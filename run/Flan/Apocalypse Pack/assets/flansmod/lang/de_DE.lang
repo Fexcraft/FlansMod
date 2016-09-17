@@ -1,7 +1,7 @@
-tile.flanSkeleton.name=Skelett
-tile.flanSkeleton2.name=Skelett
-item.aiChip.name=KI Chip
-item.complicatedCircuit.name=Schwieriger Schaltkreis
-item.nuclearPowerCore.name=Kernkraft-Kern
-tile.flanGunRack.name=Waffenständer
-item.buggy.name=Buggy
+tile.flansmod:flanSkeleton.name=Skelett
+tile.flansmod:flanSkeleton2.name=Skelett
+item.flansmod:aiChip.name=KI Chip
+item.flansmod:complicatedCircuit.name=Schwieriger Schaltkreis
+item.flansmod:nuclearPowerCore.name=Kernkraft-Kern
+tile.flansmod:flanGunRack.name=Waffenständer
+item.flansmod:buggy.name=Buggy
