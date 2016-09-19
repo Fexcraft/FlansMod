@@ -15,10 +15,6 @@ permission from jamioflan.
 
 
 Edit by FEX:
-- Please don't use any of the code updated by me without telling me before, thanks.
+- Please don't use any of the code updated by me without telling me before, thanks.<br>
 (just wanna keep track of stuff ~~ idk where else to leave this info.)
-
-Additional Information:
-- I'm mainly interested in the vehicle part of the mod, don't expect me to fix guns etc.
-- I'll update/fix as much is needed to get the mod working on 1.10.2 with vehicles/planes.
-- Fixing gun render and other gun related stuff isn't my task.
+- https://github.com/Fexcraft/FlansMod/issues/2
