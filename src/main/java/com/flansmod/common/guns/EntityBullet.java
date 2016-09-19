@@ -3,6 +3,7 @@ package com.flansmod.common.guns;
 import java.util.List;
 import java.util.Random;
 
+import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.debug.EntityDebugDot;
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
@@ -29,6 +30,8 @@ import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound.AttenuationType;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -41,6 +44,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -48,6 +52,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -452,11 +457,11 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 		if (this.getDistanceSqToEntity(Minecraft.getMinecraft().thePlayer) < 5 && !playedFlybySound) 
 		{
 			playedFlybySound = true;
-			/*FMLClientHandler.instance().getClient().getSoundHandler()
-					.playSound(new PositionedSoundRecord(FlansModResourceHandler.getSound("bulletFlyby"), 10F,
-							1.0F / (rand.nextFloat() * 0.4F + 0.8F), (float) posX, (float) posY, (float) posZ));
-			//TODO
-			*/
+			FMLClientHandler.instance().getClient().getSoundHandler()
+					.playSound(new PositionedSoundRecord(FlansModResourceHandler.getSound("bulletFlyby"), SoundCategory.HOSTILE, 10F,
+					1.0F / (rand.nextFloat() * 0.4F + 0.8F), false, 0, AttenuationType.NONE, (float) posX, (float) posY, (float) posZ));
+			//TODO check this
+			
 		}
 	}
 
