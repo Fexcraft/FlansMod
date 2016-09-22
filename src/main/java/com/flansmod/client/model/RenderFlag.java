@@ -13,8 +13,9 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderFlag extends Render 
+public class RenderFlag extends Render implements IRenderFactory
 {
 	private static final ResourceLocation texture = new ResourceLocation("flansmod", "teamsMod/Flagpole.png");
 	
@@ -72,5 +73,10 @@ public class RenderFlag extends Render
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return texture;
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderFlag(manager);
 	}
 }

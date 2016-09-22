@@ -1,6 +1,7 @@
 package com.flansmod.apocalypse.client.model;
 
 import com.flansmod.apocalypse.common.blocks.TileEntityPowerCube;
+
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;

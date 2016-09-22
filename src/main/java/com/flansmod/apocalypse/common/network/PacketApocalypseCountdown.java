@@ -1,12 +1,12 @@
 package com.flansmod.apocalypse.common.network;
 
+import com.flansmod.apocalypse.client.ClientProxyApocalypse;
+import com.flansmod.common.network.PacketBase;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-
-import com.flansmod.apocalypse.client.ClientProxyApocalypse;
-import com.flansmod.common.network.PacketBase;
 
 public class PacketApocalypseCountdown extends PacketBase 
 {

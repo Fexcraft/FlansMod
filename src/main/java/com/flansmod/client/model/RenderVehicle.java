@@ -25,9 +25,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderVehicle extends Render //implements IItemRenderer
+public class RenderVehicle extends Render implements IRenderFactory //implements IItemRenderer
 {
 	public RenderVehicle(RenderManager renderManager) 
 	{
@@ -289,6 +290,11 @@ public class RenderVehicle extends Render //implements IItemRenderer
 		GL11.glDisable(GL11.GL_LIGHTING);
 		//Pop
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager){
+		return new RenderVehicle(manager);
 	}
 }
 

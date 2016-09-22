@@ -4,13 +4,15 @@ import org.lwjgl.opengl.GL11;
 
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.guns.EntityGrenade;
+
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderGrenade extends Render// implements IItemRenderer 
+public class RenderGrenade extends Render implements IRenderFactory // implements IItemRenderer 
 {
 	public RenderGrenade(RenderManager renderManager) 
 	{
@@ -63,6 +65,11 @@ public class RenderGrenade extends Render// implements IItemRenderer
 		if(texture == null)
 			return FlansModResourceHandler.getIcon(((EntityGrenade)entity).type);
 		return texture;
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderGrenade(manager);
 	}
 
 	/*@Override

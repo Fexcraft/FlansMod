@@ -31,8 +31,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderMecha extends Render// implements IItemRenderer
+public class RenderMecha extends Render implements IRenderFactory // implements IItemRenderer
 {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
     private static final ItemRenderer renderer = new ItemRenderer(Minecraft.getMinecraft());
@@ -406,6 +407,11 @@ public class RenderMecha extends Render// implements IItemRenderer
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		}
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderMecha(manager);
 	}
 
 	/*@Override

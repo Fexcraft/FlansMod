@@ -9,8 +9,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderDebugAABB extends Render 
+public class RenderDebugAABB extends Render implements IRenderFactory
 {
 	public RenderDebugAABB(RenderManager renderManager) 
 	{
@@ -45,6 +46,11 @@ public class RenderDebugAABB extends Render
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return null;
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderDebugAABB(manager);
 	}
 
 }

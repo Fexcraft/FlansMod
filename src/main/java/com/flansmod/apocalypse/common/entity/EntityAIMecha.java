@@ -1,5 +1,13 @@
 package com.flansmod.apocalypse.common.entity;
 
+import javax.annotation.Nullable;
+
+import com.flansmod.common.driveables.DriveableData;
+import com.flansmod.common.driveables.EnumDriveablePart;
+import com.flansmod.common.driveables.mechas.EntityMecha;
+import com.flansmod.common.driveables.mechas.MechaType;
+import com.flansmod.common.vector.Vector3f;
+
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,14 +18,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
-
-import com.flansmod.common.driveables.DriveableData;
-import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.driveables.mechas.MechaType;
-import com.flansmod.common.vector.Vector3f;
 
 public class EntityAIMecha extends EntityMecha 
 {

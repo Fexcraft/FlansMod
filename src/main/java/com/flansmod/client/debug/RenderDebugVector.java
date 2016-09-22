@@ -8,8 +8,9 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderDebugVector extends Render 
+public class RenderDebugVector extends Render implements IRenderFactory 
 {
 
 	public RenderDebugVector(RenderManager renderManager) 
@@ -43,6 +44,11 @@ public class RenderDebugVector extends Render
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return null;
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderDebugVector(manager);
 	}
 
 }

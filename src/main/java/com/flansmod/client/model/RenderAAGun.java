@@ -9,9 +9,10 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 
-public class RenderAAGun extends Render
+public class RenderAAGun extends Render implements IRenderFactory
 {
 	public RenderAAGun(RenderManager renderManager) 
 	{
@@ -50,5 +51,10 @@ public class RenderAAGun extends Render
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return FlansModResourceHandler.getTexture(((EntityAAGun)entity).type);
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderAAGun(manager);
 	}
 }

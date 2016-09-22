@@ -1,9 +1,10 @@
 package com.flansmod.apocalypse.common.entity;
 
-import net.minecraft.world.World;
 import com.flansmod.common.driveables.DriveableData;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.PlaneType;
+
+import net.minecraft.world.World;
 
 public class EntityFlyByPlane extends EntityPlane 
 {

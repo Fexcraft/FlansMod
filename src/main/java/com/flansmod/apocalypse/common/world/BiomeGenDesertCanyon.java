@@ -1,13 +1,6 @@
 package com.flansmod.apocalypse.common.world;
 
-import java.util.Random;
-
-import com.flansmod.apocalypse.common.entity.EntitySurvivor;
-
-import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPrimer;
 
 public class BiomeGenDesertCanyon extends BiomeGenApocalypse
 {

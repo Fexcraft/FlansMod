@@ -33,7 +33,6 @@ import com.flansmod.client.model.RenderFlag;
 import com.flansmod.client.model.RenderFlagpole;
 import com.flansmod.client.model.RenderGrenade;
 import com.flansmod.client.model.RenderGun;
-import com.flansmod.client.model.RenderGunItem;
 import com.flansmod.client.model.RenderItemHolder;
 import com.flansmod.client.model.RenderMG;
 import com.flansmod.client.model.RenderMecha;
@@ -42,7 +41,6 @@ import com.flansmod.client.model.RenderParachute;
 import com.flansmod.client.model.RenderPlane;
 import com.flansmod.client.model.RenderVehicle;
 import com.flansmod.common.CommonProxy;
-import com.flansmod.common.EntityItemCustomRender;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
@@ -81,7 +79,6 @@ import com.flansmod.common.types.PaintableType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
@@ -229,25 +226,24 @@ public class ClientProxy extends CommonProxy
 	/** Register entity renderers */
 	@Override
 	public void registerRenderers()
-	{		
-		RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+	{
 		
-		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, new RenderBullet(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityGrenade.class, new RenderGrenade(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, new RenderPlane(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, new RenderVehicle(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, new RenderAAGun(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlagpole.class, new RenderFlagpole(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlag.class, new RenderFlag(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, new RenderNull(rm));		
-		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, new RenderNull(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityMG.class, new RenderMG(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityParachute.class, new RenderParachute(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, new RenderDebugDot(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, new RenderDebugVector(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, new RenderDebugAABB(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityMecha.class, new RenderMecha(rm));
-		RenderingRegistry.registerEntityRenderingHandler(EntityItemCustomRender.class, new RenderGunItem(rm, Minecraft.getMinecraft().getRenderItem(), gunRenderer));
+		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, RenderBullet::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityGrenade.class, RenderGrenade::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, RenderPlane::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, RenderVehicle::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, RenderAAGun::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlagpole.class, RenderFlagpole::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlag.class, RenderFlag::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
+		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityMG.class, RenderMG::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityParachute.class, RenderParachute::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityMecha.class, RenderMecha::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityItemCustomRender.class, new RenderGunItem(rm, Minecraft.getMinecraft().getRenderItem(), gunRenderer));
 		
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySpawner.class, new TileEntitySpawnerRenderer());
 	}

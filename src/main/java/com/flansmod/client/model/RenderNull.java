@@ -10,8 +10,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderNull extends Render
+public class RenderNull extends Render implements IRenderFactory
 {
 	private static final ResourceLocation texture = new ResourceLocation("Flan", "null.png");
 
@@ -56,4 +57,9 @@ public class RenderNull extends Render
 	}
 	
 	protected ModelBase model;
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderNull(manager);
+	}
 }

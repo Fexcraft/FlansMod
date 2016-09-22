@@ -11,8 +11,9 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderBullet extends Render
+public class RenderBullet extends Render implements IRenderFactory
 {
 	public RenderBullet(RenderManager renderManager) 
 	{
@@ -45,5 +46,10 @@ public class RenderBullet extends Render
 	protected ResourceLocation getEntityTexture(Entity entity) 
 	{
 		return FlansModResourceHandler.getTexture(((EntityBullet)entity).type);
+	}
+
+	@Override
+	public Render createRenderFor(RenderManager manager) {
+		return new RenderBullet(manager);
 	}
 }
