@@ -229,6 +229,8 @@ public class FlansMod
 
 		//Force Minecraft to reload all resources in order to load content pack resources.
 		proxy.forceReload();
+		
+		proxy.registerRenderers();
 						
 		log("Preinitializing complete.");
 	}
@@ -242,7 +244,7 @@ public class FlansMod
 		
 		//Do proxy loading
 		proxy.load();
-		proxy.registerRenderers();
+		//proxy.registerRenderers();
 				
 		//Initialising handlers
 		packetHandler.initialise();
