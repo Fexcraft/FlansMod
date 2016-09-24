@@ -1,10 +1,6 @@
 package com.flansmod.common.guns.raytracing;
 
-import java.util.ArrayList;
-
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
+import com.flansmod.common.FlansUtils;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.guns.AttachmentType;
 import com.flansmod.common.guns.GunType;
@@ -12,12 +8,14 @@ import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.vector.Vector3f;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
 
 /** This class takes a snapshot of the player's position rotation and held items at a certain point in time. 
  * It is used to handle bullet detection. The server will store a second or two of snapshots so that it 
@@ -73,38 +71,25 @@ public class PlayerSnapshot
 		float originXLeft  = MathHelper.cos(-p.renderYawOffset * 3.14159265F / 180F) * 5.0F / 16F;
 		
 		hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(leftArmAxes), new Vector3f(originXLeft, 1.3F, originZLeft), new Vector3f(-2F / 16F, -0.6F, -2F / 16F), new Vector3f(0.25F, 0.7F, 0.25F), EnumHitboxType.LEFTARM));	
-		hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(-2F / 16F, -0.6F, -2F / 16F), new Vector3f(0.25F, 0.7F, 0.25F), EnumHitboxType.RIGHTARM));	
-		
-		//Add box for right hand shield
-		ItemStack playerRightHandStack = player.getHeldItemMainhand();
-		if(playerRightHandStack != null && playerRightHandStack.getItem() instanceof ItemGun)
+		hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(-2F / 16F, -0.6F, -2F / 16F), new Vector3f(0.25F, 0.7F, 0.25F), EnumHitboxType.RIGHTARM));
+
+
+		for (EnumHandSide handSide : EnumHandSide.values())
 		{
-			GunType gunType = ((ItemGun)playerRightHandStack.getItem()).GetType();
-			if(gunType.shield)
+			ItemStack stack = player.getHeldItem(FlansUtils.getHandForSide(handSide, p));
+			if (stack == null || !(stack.getItem() instanceof ItemGun))
 			{
-				hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(gunType.shieldOrigin.y, -1.05F + gunType.shieldOrigin.x, -1F / 16F + gunType.shieldOrigin.z), new Vector3f(gunType.shieldDimensions.y, gunType.shieldDimensions.x, gunType.shieldDimensions.z), EnumHitboxType.RIGHTITEM));	
+				continue;
 			}
-			
-			//Add left hand shield box
-			PlayerData data = PlayerHandler.getPlayerData(player);
-			if(gunType.oneHanded && data.offHandGunSlot != 0)
+			GunType gunType = ((ItemGun) stack.getItem()).GetType();
+			if (gunType.shield)
 			{
-				ItemStack leftHandStack = null;
-				//Client side other players
-				if(player.worldObj.isRemote && !FlansMod.proxy.isThePlayer(player))
-					leftHandStack = data.offHandGunStack;
-				else leftHandStack = player.inventory.getStackInSlot(data.offHandGunSlot - 1);
-				
-				if(leftHandStack != null && leftHandStack.getItem() instanceof ItemGun)
-				{
-					GunType leftGunType = ((ItemGun)leftHandStack.getItem()).GetType();
-					if(leftGunType.shield)
-					{
-						hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(leftArmAxes), new Vector3f(originXLeft, 1.3F, originZLeft), new Vector3f(leftGunType.shieldOrigin.y, -1.05F + leftGunType.shieldOrigin.x, -1F / 16F + leftGunType.shieldOrigin.z), new Vector3f(leftGunType.shieldDimensions.y, leftGunType.shieldDimensions.x, leftGunType.shieldDimensions.z), EnumHitboxType.LEFTITEM));	
-					}
-				}
+				EnumHitboxType hitboxType = handSide == EnumHandSide.LEFT ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM;
+				hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(gunType.shieldOrigin.y, -1.05F + gunType.shieldOrigin.x, -1F / 16F + gunType.shieldOrigin.z), new Vector3f(gunType.shieldDimensions.y, gunType.shieldDimensions.x, gunType.shieldDimensions.z), hitboxType));
 			}
 		}
+
+
 	}
 	
 	public ArrayList<BulletHit> raytrace(Vector3f origin, Vector3f motion)
@@ -148,9 +133,9 @@ public class PlayerSnapshot
 		return null;
 	}
 	
-	public Vector3f GetMuzzleLocation(GunType gunType, AttachmentType barrelAttachment, boolean isOffHand)
+	public Vector3f GetMuzzleLocation(GunType gunType, AttachmentType barrelAttachment, EnumHandSide handSide)
 	{
-		PlayerHitbox hitbox = GetHitbox(isOffHand ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM);
+		PlayerHitbox hitbox = GetHitbox(handSide == EnumHandSide.LEFT ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM);
 		Vector3f muzzlePos = new Vector3f(hitbox.o.x, hitbox.o.y + hitbox.d.y * 0.5f, hitbox.o.z + hitbox.d.z * 0.5f);
 		
 		if(gunType != null && gunType.model != null)

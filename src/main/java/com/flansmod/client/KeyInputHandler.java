@@ -1,7 +1,5 @@
 package com.flansmod.client;
 
-import org.lwjgl.input.Keyboard;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiTeamScores;
 import com.flansmod.client.gui.GuiTeamSelect;
@@ -13,18 +11,19 @@ import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.network.PacketReload;
 import com.flansmod.common.network.PacketRequestDebug;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 @SideOnly(value = Side.CLIENT)
 public class KeyInputHandler
@@ -117,13 +116,13 @@ public class KeyInputHandler
 					
 					if(item.CanReload(stack, player.inventory))
 					{
-						FlansMod.getPacketHandler().sendToServer(new PacketReload(false, true));
+						FlansMod.getPacketHandler().sendToServer(new PacketReload(EnumHandSide.RIGHT, true));
 	
 						//Set player shoot delay to be the reload delay
 						//Set both gun delays to avoid reloading two guns at once
 						data.shootTimeRight = data.shootTimeLeft = (int)type.getReloadTime(stack);
 						
-						GunAnimations animations = FlansModClient.getGunAnimations(player, false);
+						GunAnimations animations = FlansModClient.getGunAnimations(player, EnumHandSide.RIGHT);
 		
 						int pumpDelay = type.model == null ? 0 : type.model.pumpDelayAfterReload;
 						int pumpTime = type.model == null ? 1 : type.model.pumpTime;

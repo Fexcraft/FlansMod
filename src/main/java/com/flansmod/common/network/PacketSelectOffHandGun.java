@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.relauncher.Side;
 
+@Deprecated
 public class PacketSelectOffHandGun extends PacketBase 
 {
 	public int slot;
@@ -45,14 +46,16 @@ public class PacketSelectOffHandGun extends PacketBase
 		entityID = data.readInt();
 	}
 
+
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
 		PlayerData data = PlayerHandler.getPlayerData(playerEntity, Side.SERVER);
-		data.offHandGunSlot = slot;
+		//data.offHandGunSlot = slot;
 		
 		FlansMod.getPacketHandler().sendToAllAround(new PacketOffHandGunInfo(playerEntity, slot), playerEntity.posX, playerEntity.posY, playerEntity.posZ, 50F, playerEntity.dimension);
 	}
+
 
 	@Override
 	public void handleClientSide(EntityPlayer clientPlayer) 

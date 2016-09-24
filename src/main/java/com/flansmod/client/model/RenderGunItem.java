@@ -1,19 +1,44 @@
 package com.flansmod.client.model;
 
+import com.flansmod.client.ClientProxy;
+import com.flansmod.common.FlansMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-public class RenderGunItem extends RenderEntityItem 
+public class RenderGunItem extends RenderEntityItem implements IRenderFactory
 {
+	@Override
+	public Render createRenderFor(RenderManager manager)
+	{
+		return new RenderGunItem(manager, Minecraft.getMinecraft().getRenderItem(), ClientProxy.gunRenderer);
+	}
+
 	private RenderGun gunRenderer;
-	
+
+	public RenderGunItem(RenderManager manager)
+	{
+		super(manager, Minecraft.getMinecraft().getRenderItem());
+	}
 	public RenderGunItem(RenderManager renderManager, RenderItem renderItem, RenderGun gunRenderer) 
 	{
 		super(renderManager, renderItem);
 		this.gunRenderer = gunRenderer;
 	}
-	
+
+	@Override
+	public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
+	{
+		FlansMod.log("test123");
+		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+
+	}
+
+
 	/*@Override
     public void func_177075_a(EntityItem entity, double x, double y, double z, float p_177075_8_, float partialTicks)
     {

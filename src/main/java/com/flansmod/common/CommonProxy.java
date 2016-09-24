@@ -1,19 +1,6 @@
 package com.flansmod.common;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import com.flansmod.common.driveables.ContainerDriveableInventory;
-import com.flansmod.common.driveables.ContainerDriveableMenu;
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
-import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.EnumDriveablePart;
+import com.flansmod.common.driveables.*;
 import com.flansmod.common.driveables.mechas.ContainerMechaInventory;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.ContainerGunModTable;
@@ -28,7 +15,6 @@ import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.ArmourBoxType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -37,6 +23,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class CommonProxy
 {

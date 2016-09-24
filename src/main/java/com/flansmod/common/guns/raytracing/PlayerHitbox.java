@@ -1,10 +1,7 @@
 package com.flansmod.common.guns.raytracing;
 
 import com.flansmod.client.debug.EntityDebugDot;
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.RotatedAxes;
+import com.flansmod.common.*;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.GunType;
@@ -20,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -190,7 +188,7 @@ public class PlayerHitbox
 		}
 		case RIGHTITEM :
 		{
-			ItemStack currentStack = player.getHeldItemMainhand();
+			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.RIGHT, player);
 			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
 			{
 				GunType gunType = ((ItemGun)currentStack.getItem()).GetType();
@@ -201,20 +199,12 @@ public class PlayerHitbox
 		}
 		case LEFTITEM : 
 		{
-			PlayerData data = PlayerHandler.getPlayerData(player);
-			if(data.offHandGunSlot != 0)
+			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.LEFT, player);
+			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
 			{
-				ItemStack leftHandStack = null;
-				if(player.worldObj.isRemote && !FlansMod.proxy.isThePlayer(player))
-					leftHandStack = data.offHandGunStack;
-				else leftHandStack = player.inventory.getStackInSlot(data.offHandGunSlot - 1);
-				
-				if(leftHandStack != null && leftHandStack.getItem() instanceof ItemGun)
-				{
-					GunType leftGunType = ((ItemGun)leftHandStack.getItem()).GetType();
-					//TODO : Shield damage
-					return penetratingPower - leftGunType.shieldDamageAbsorption;
-				}
+				GunType gunType = ((ItemGun)currentStack.getItem()).GetType();
+				//TODO : Shield damage
+				return penetratingPower - gunType.shieldDamageAbsorption;
 			}
 		}
 		default : return penetratingPower;

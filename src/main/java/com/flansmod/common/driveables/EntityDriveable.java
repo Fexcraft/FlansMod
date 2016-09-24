@@ -1,8 +1,5 @@
 package com.flansmod.common.driveables;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
@@ -12,16 +9,7 @@ import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveableType.ParticleEmitter;
-import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.EntityShootable;
-import com.flansmod.common.guns.EnumFireMode;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.InventoryHelper;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.guns.ItemShootable;
-import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.guns.ShotData;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.guns.ShotData.InstantShotData;
 import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
@@ -35,7 +23,6 @@ import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.vector.Vector3f;
-
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.Block;
@@ -52,11 +39,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -64,6 +47,9 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.List;
 //import cofh.api.energy.IEnergyContainerItem;
 
 public abstract class EntityDriveable extends Entity implements IControllable, IExplodeable, IEntityAdditionalSpawnData
@@ -543,14 +529,14 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 					}
 
 					ShotData shotData = new InstantShotData(-1, type, shootableType, driver, gunVec, firstHit, hitPos, gunType.damage, i < gunType.numBullets * shootableType.numBullets - 1);
-					((ItemGun)gunType.item).ServerHandleShotData(null, -1, worldObj, this, false, shotData);
+					((ItemGun)gunType.item).ServerHandleShotData(null, -1, worldObj, this, shotData);
 				}
 			}
 			// Else, spawn an entity
 			else
 			{
 				ShotData shotData = new SpawnEntityShotData(-1, type, shootableType, driver, lookVector);
-				((ItemGun)gunType.item).ServerHandleShotData(null, -1, worldObj, this, false, shotData);
+				((ItemGun)gunType.item).ServerHandleShotData(null, -1, worldObj, this, shotData);
 			}
 			
 			//Reset the shoot delay

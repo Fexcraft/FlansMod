@@ -1,23 +1,13 @@
 package com.flansmod.common.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.guns.ShotData;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.guns.ShotData.InstantShotData;
 import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,6 +15,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketShotData extends PacketBase 
 {
@@ -119,25 +112,23 @@ public class PacketShotData extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP player) 
 	{
-		PlayerData data = PlayerHandler.getPlayerData(player, Side.SERVER);
-		
 		for(ShotData entry : shotData)
 		{
 			if(entry.slot == -1)
 			{
 				if(entry.shotFrom instanceof GunType)
 				{
-					((ItemGun)entry.shotFrom.item).ServerHandleShotData(null, entry.slot, player.worldObj, player, false, entry);
+					((ItemGun)entry.shotFrom.item).ServerHandleShotData(null, entry.slot, player.worldObj, player, entry);
 				}
 			}
 			else
 			{
-				ItemStack gunStack = player.inventory.getStackInSlot(entry.slot);
+
+				ItemStack gunStack = entry.slot == -2 ? player.getHeldItemOffhand() : player.inventory.getStackInSlot(entry.slot);
 				if(gunStack != null && gunStack.getItem() instanceof ItemGun)
 				{
 					ItemGun gunItem = (ItemGun)gunStack.getItem();
-					boolean isOffHand = (data.offHandGunSlot + 1 == entry.slot);
-					gunItem.ServerHandleShotData(gunStack, entry.slot, player.worldObj, player, isOffHand, entry);
+					gunItem.ServerHandleShotData(gunStack, entry.slot, player.worldObj, player, entry);
 				}
 			}
 		}

@@ -4,9 +4,12 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class EntityItemCustomRender extends EntityItem 
+/**
+ * An Entity that will be spawned instead of the normal EntityItem.
+ */
+public class EntityCustomItem extends EntityItem
 {
-	public EntityItemCustomRender(EntityItem entity) 
+	public EntityCustomItem(EntityItem entity)
 	{
 		super(entity.worldObj, entity.posX, entity.posY, entity.posZ, entity.getEntityItem());
 		this.motionX = entity.motionX;
@@ -15,17 +18,17 @@ public class EntityItemCustomRender extends EntityItem
 		this.setDefaultPickupDelay();
 	}
 
-	public EntityItemCustomRender(World world, double posX, double posY, double posZ, ItemStack stack) 
+	public EntityCustomItem(World world, double posX, double posY, double posZ, ItemStack stack)
 	{
 		super(world, posX, posY, posZ, stack);
 	}
 
-	public EntityItemCustomRender(World world) 
+	public EntityCustomItem(World world)
 	{
 		super(world);
 	}
 
-	public EntityItemCustomRender(World w, double x, double y, double z) 
+	public EntityCustomItem(World w, double x, double y, double z)
 	{
 		super(w, x, y, z);
 	}

@@ -1,47 +1,9 @@
 package com.flansmod.common;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-
-import com.flansmod.common.driveables.EntityPlane;
-import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.EntityVehicle;
-import com.flansmod.common.driveables.EntityWheel;
-import com.flansmod.common.driveables.ItemPlane;
-import com.flansmod.common.driveables.ItemVehicle;
-import com.flansmod.common.driveables.PlaneType;
-import com.flansmod.common.driveables.VehicleType;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.driveables.mechas.ItemMecha;
-import com.flansmod.common.driveables.mechas.ItemMechaAddon;
-import com.flansmod.common.driveables.mechas.MechaItemType;
-import com.flansmod.common.driveables.mechas.MechaType;
+import com.flansmod.common.driveables.*;
+import com.flansmod.common.driveables.mechas.*;
 import com.flansmod.common.eventhandlers.PlayerDeathEventListener;
-import com.flansmod.common.guns.AAGunType;
-import com.flansmod.common.guns.AttachmentType;
-import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.GrenadeType;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemAAGun;
-import com.flansmod.common.guns.ItemAttachment;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGrenade;
-import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.PacketHandler;
@@ -49,30 +11,13 @@ import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
-import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.ArmourType;
-import com.flansmod.common.teams.BlockArmourBox;
-import com.flansmod.common.teams.BlockSpawner;
-import com.flansmod.common.teams.ChunkLoadingHandler;
-import com.flansmod.common.teams.CommandTeams;
-import com.flansmod.common.teams.EntityFlag;
-import com.flansmod.common.teams.EntityFlagpole;
-import com.flansmod.common.teams.EntityGunItem;
-import com.flansmod.common.teams.EntityTeamItem;
-import com.flansmod.common.teams.ItemFlagpole;
-import com.flansmod.common.teams.ItemOpStick;
-import com.flansmod.common.teams.ItemTeamArmour;
-import com.flansmod.common.teams.PlayerClass;
-import com.flansmod.common.teams.Team;
-import com.flansmod.common.teams.TeamsManager;
-import com.flansmod.common.teams.TileEntitySpawner;
+import com.flansmod.common.teams.*;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.tools.ToolType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
-
 import net.fexcraft.mod.lib.util.block.BlockUtil;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -85,6 +30,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -104,15 +50,27 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Mod(modid = FlansMod.MODID, name = "Flan's Mod", version = FlansMod.VERSION, acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+@Mod(modid = FlansMod.MODID, name = FlansMod.NAME, version = FlansMod.VERSION, acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod
 {
 	//Core mod stuff
+	private static Logger logger;
 	public static boolean DEBUG = false;
 	public static Configuration configFile;
 	public static final String MODID = "flansmod";
 	public static final String VERSION = "@VERSION@";
+	public static final String NAME = "Flan's Mod";
 	@Instance(MODID)
 	public static FlansMod INSTANCE;
 	public static int generalConfigInteger = 32;
@@ -164,9 +122,13 @@ public class FlansMod
 	public static BlockPaintjobTable paintjobTable;
 
 	/** The mod pre-initialiser method */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		//Register a logger
+		logger = LogManager.getLogger(NAME);
+
 		log("Preinitialising Flan's mod.");
 		configFile = new Configuration(event.getSuggestedConfigurationFile());
 		syncConfig();
@@ -192,7 +154,6 @@ public class FlansMod
 			log("Flan folder not found. Creating empty folder.");
 			log("You should get some content packs and put them in the Flan folder.");
 			flanDir.mkdirs();
-			flanDir.mkdir();
 		}
 		
 		//Set up mod blocks and items
@@ -227,11 +188,13 @@ public class FlansMod
 		//Read content packs
 		readContentPacks(event);
 
+		proxy.registerRenderers();
+
 		//Force Minecraft to reload all resources in order to load content pack resources.
 		proxy.forceReload();
-		
+
 		proxy.registerRenderers();
-						
+
 		log("Preinitializing complete.");
 	}
 	
@@ -240,12 +203,11 @@ public class FlansMod
 	public void init(FMLInitializationEvent event)
 	{
 		log("Initialising Flan's Mod.");
-		
-		
+
 		//Do proxy loading
 		proxy.load();
 		//proxy.registerRenderers();
-				
+
 		//Initialising handlers
 		packetHandler.initialise();
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CommonGuiHandler());		
@@ -273,7 +235,7 @@ public class FlansMod
 		//EntityRegistry.registerGlobalEntityID(EntityGunItem.class, "GunItem", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(EntityGunItem.class, "GunItem", 98, this, 100, 20, true);
 		//EntityRegistry.registerGlobalEntityID(EntityItemCustomRender.class, "CustomItem", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(EntityItemCustomRender.class, "CustomItem", 89, this, 100, 20, true);
+		EntityRegistry.registerModEntity(EntityCustomItem.class, "CustomItem", 89, this, 100, 20, true);
 		
 		//Register driveables
 		//EntityRegistry.registerGlobalEntityID(EntityPlane.class, "Plane", EntityRegistry.findGlobalUniqueEntityId());
@@ -306,7 +268,7 @@ public class FlansMod
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
 
 		//Config
-		FMLCommonHandler.instance().bus().register(INSTANCE);
+		MinecraftForge.EVENT_BUS.register(INSTANCE);
 		//Starting the EventListener
 		new PlayerDeathEventListener();
 		log("Loading complete.");
@@ -408,8 +370,7 @@ public class FlansMod
 				}
 			}
 		}
-		
-		tickHandler.onEntitySpawn(event);
+		//tickHandler.onEntitySpawn(event);
 	}
 	
 	/** Reads type files from all content packs */
@@ -578,7 +539,8 @@ public class FlansMod
 		Team.spectators = spectators;
 		
 		//Automates JSON adding for old content packs
-		proxy.addMissingJSONs(InfoType.infoTypes);
+		//No longer needed. We use a CustomModelLoader
+		//proxy.addMissingJSONs(InfoType.infoTypes);
 	}
 	
 	public static PacketHandler getPacketHandler()
@@ -597,10 +559,19 @@ public class FlansMod
 			configFile.save();
 	}
 
-	//TODO : Proper logger
-	public static void log(String string) 
+	public static Logger getLogger()
 	{
-		System.out.println("[Flan's Mod] " + string);
+		return logger;
+	}
+
+	public static void log(Object log)
+	{
+		getLogger().info(String.valueOf(log));
+	}
+
+	public static void logError(String message, Throwable e)
+	{
+		getLogger().error(message, e);
 	}
 
 	public static void Assert(boolean b, String string)

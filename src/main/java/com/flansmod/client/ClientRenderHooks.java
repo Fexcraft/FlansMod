@@ -1,16 +1,10 @@
 package com.flansmod.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.Project;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiTeamScores;
-import com.flansmod.client.model.ModelGun;
+import com.flansmod.client.model.ArmModelRenderer;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.EntityDriveable;
@@ -22,52 +16,66 @@ import com.flansmod.common.network.PacketTeamInfo.PlayerScoreData;
 import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.types.InfoType;
-
+import com.flansmod.common.vector.Vector3f;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.event.RenderItemInFrameEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.glu.Project;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
+import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND;
 
 public class ClientRenderHooks 
 {
-	public static final ResourceLocation offHand = new ResourceLocation("flansmod","gui/offHand.png");
+	//public static final ResourceLocation offHand = new ResourceLocation("flansmod","gui/offHand.png");
 	public static final ResourceLocation hitMarker = new ResourceLocation("flansmod", "gui/hitMarker.png");
+	
 	private Minecraft mc;
-	private float fovModifierHandPrev, fovModifierHand;
-	private float equippedProgress, prevEquippedProgress;
-	private ItemStack itemToRender;
+	private float fovModifier, fovModifierPrev;
+	private float equippedProgressMainHand, prevEquippedProgressMainHand;
+	private float equippedProgressOffHand, prevEquippedProgressOffHand;
+	private ItemStack itemToRenderMainHand;
+	private ItemStack itemToRenderOffHand;
 	private int equippedItemSlot;
 	private float partialTicks;
+	
+	private static class SidedStatus
+	{
+		private float fovModifierHandPrev, fovModifierHand;
+		private float equippedProgress, prevEquippedProgress;
+		private ItemStack stackToRender;
+		private int equippedSlot;
+	}
 	
 	private static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
 	private static List<KillMessage> killMessages = new ArrayList<KillMessage>();
@@ -101,32 +109,39 @@ public class ClientRenderHooks
 		}
 	}
 	
-	/** When Minecraft would render a 2D gun item, instead cancel it and render the gun properly. Render the offhand gun too. */
+	/** When Minecraft would render a 2D gun item, render the gun properly. Render the offhand gun too. */
 	public void renderHeldItem(RenderHandEvent event)
 	{
-		//EntityPlayer player = mc.thePlayer;
-		if(itemToRender != null && itemToRender.getItem() instanceof ItemGun && ((ItemGun)itemToRender.getItem()).GetType().model != null)
+
+		//remove custom model if player is in first person.
+		Render playerRenderer = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(Minecraft.getMinecraft().thePlayer);
+		if (Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && playerRenderer instanceof RenderPlayer)
 		{
-			//Cancel the hand render event so that we can do our own.
-			event.setCanceled(true);
-		
-			//Render the gun in hand
-			ItemStack stack = itemToRender;
-			//GunType type = ((ItemGun)stack.getItem()).GetType();
+			//TODO first person model manipulation based on holdingType
+			RenderPlayer renderPlayer = ((RenderPlayer) playerRenderer);
+			ArmModelRenderer.removeRightArm(renderPlayer, renderPlayer.getMainModel());
+			ArmModelRenderer.removeLeftArm(renderPlayer, renderPlayer.getMainModel());
+		}
+
+		boolean hasGunMainHand = itemToRenderMainHand != null && itemToRenderMainHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderMainHand.getItem()).GetType().model != null;
+		boolean hasGunOffHand = itemToRenderOffHand != null && itemToRenderOffHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderOffHand.getItem()).GetType().model != null;
+		//EntityPlayer player = mc.thePlayer;
+		if(hasGunMainHand || hasGunOffHand)
+		{
 			float partialTicks = event.getPartialTicks();
 			int pass = event.getRenderPass();
 			EntityRenderer renderer = mc.entityRenderer;
 			float farPlaneDistance = mc.gameSettings.renderDistanceChunks * 16F;
 			ItemRenderer itemRenderer = mc.getItemRenderer();
-			
+
 			GlStateManager.clear(256);
 			GlStateManager.matrixMode(5889);
 	        GlStateManager.loadIdentity();
-	        
+
 	        float f1 = 0.07F;
 	        if(mc.gameSettings.anaglyph)
 	            GlStateManager.translate((float)(-(pass * 2 - 1)) * f1, 0.0F, 0.0F);
-	        
+
 	        Project.gluPerspective(getFOVModifier(partialTicks), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, farPlaneDistance * 2.0F);
 	        GlStateManager.matrixMode(5888);
 	        GlStateManager.loadIdentity();
@@ -142,10 +157,18 @@ public class ClientRenderHooks
 
 	        boolean flag = mc.getRenderViewEntity() instanceof EntityLivingBase && ((EntityLivingBase)mc.getRenderViewEntity()).isPlayerSleeping();
 
-	        if(mc.gameSettings.thirdPersonView == 0 && !flag && !mc.gameSettings.hideGUI && !mc.playerController.isSpectator())
+	        if(mc.gameSettings.thirdPersonView == 0 && !flag && !mc.gameSettings.hideGUI && mc.playerController != null && !mc.playerController.isSpectator())
 	        {
 	        	renderer.enableLightmap();
-	            renderItemInFirstPerson(stack, itemRenderer, partialTicks);
+				EnumHandSide mainSide = FlansUtils.getSideForHand(EnumHand.MAIN_HAND, mc.thePlayer);
+				if (hasGunMainHand)
+				{
+					renderItemInFirstPerson(itemToRenderMainHand, itemRenderer,  partialTicks, mainSide, EnumHand.MAIN_HAND);
+				}
+				if (hasGunOffHand)
+				{
+					renderItemInFirstPerson(itemToRenderOffHand, itemRenderer,  partialTicks, mainSide.opposite(), EnumHand.OFF_HAND);
+				}
 	            renderer.disableLightmap();
 	        }
 
@@ -164,19 +187,21 @@ public class ClientRenderHooks
 		}
 	}
 	
-	private void renderItemInFirstPerson(ItemStack stack, ItemRenderer renderer, float partialTicks)
+	private void renderItemInFirstPerson(ItemStack stack, ItemRenderer renderer, float partialTicks, EnumHandSide side, EnumHand hand)
 	{
-		float f1 = 1.0F - (prevEquippedProgress + (equippedProgress - prevEquippedProgress) * partialTicks);
-        EntityPlayerSP entityplayersp = this.mc.thePlayer;
-        float f2 = entityplayersp.getSwingProgress(partialTicks);
-        float f3 = entityplayersp.prevRotationPitch + (entityplayersp.rotationPitch - entityplayersp.prevRotationPitch) * partialTicks;
-        float f4 = entityplayersp.prevRotationYaw + (entityplayersp.rotationYaw - entityplayersp.prevRotationYaw) * partialTicks;
+		float progressMovement = hand == EnumHand.MAIN_HAND ? 1.0F - (prevEquippedProgressMainHand + (equippedProgressMainHand - prevEquippedProgressMainHand) * partialTicks)
+				: 1.0F - (prevEquippedProgressOffHand + (equippedProgressOffHand - prevEquippedProgressOffHand) * partialTicks);
+
+		EntityPlayerSP entityplayersp = this.mc.thePlayer;
+        float swingProgress = 0; //entityplayersp.getSwingProgress(partialTicks);
+        float pitch = entityplayersp.prevRotationPitch + (entityplayersp.rotationPitch - entityplayersp.prevRotationPitch) * partialTicks;
+        float yaw = entityplayersp.prevRotationYaw + (entityplayersp.rotationYaw - entityplayersp.prevRotationYaw) * partialTicks;
         
         //Setup lighting
         GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
-        GlStateManager.rotate(f3, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(f4, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
         
@@ -194,22 +219,28 @@ public class ClientRenderHooks
         GlStateManager.pushMatrix();
 
         //Do vanilla weapon swing
-        float f7 = -0.4F * MathHelper.sin(MathHelper.sqrt_float(f2) * (float)Math.PI);
-        float f8 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(f2) * (float)Math.PI * 2.0F);
-        float f9 = -0.2F * MathHelper.sin(f2 * (float)Math.PI);
+
+		float f7 = -0.4F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
+        float f8 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI * 2.0F);
+        float f9 = -0.2F * MathHelper.sin(swingProgress * (float)Math.PI);
         GlStateManager.translate(f7, f8, f9);
         
         GlStateManager.translate(0.56F, -0.52F, -0.71999997F);
-        GlStateManager.translate(0.0F, f1 * -0.6F, 0.0F);
-        GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
-        float f10 = MathHelper.sin(f2 * f2 * (float)Math.PI);
-        float f11 = MathHelper.sin(MathHelper.sqrt_float(f2) * (float)Math.PI);
+
+		GlStateManager.translate(0.0F, progressMovement * -0.6F, 0.0F);
+
+
+		GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
+        float f10 = MathHelper.sin(swingProgress * swingProgress * (float)Math.PI);
+        float f11 = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
         GlStateManager.rotate(f10 * -20.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f11 * -20.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(f11 * -80.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.scale(0.4F, 0.4F, 0.4F);
 
-        //ClientProxy.gunRenderer.renderItem(ItemRenderType.EQUIPPED_FIRST_PERSON, stack, mc.theWorld, mc.thePlayer);
+
+		TransformType transformType = side == EnumHandSide.LEFT ? FIRST_PERSON_LEFT_HAND : FIRST_PERSON_RIGHT_HAND;
+        ClientProxy.gunRenderer.renderItem(transformType, stack, mc.thePlayer);
 
         GlStateManager.popMatrix();
         GlStateManager.disableRescaleNormal();
@@ -298,38 +329,38 @@ public class ClientRenderHooks
             AbstractClientPlayer abstractclientplayer = (AbstractClientPlayer)this.mc.getRenderViewEntity();
             fovModifier = abstractclientplayer.getFovModifier();
         }
+
         //Adjust FOV modifier
-        fovModifierHandPrev = fovModifierHand;
-        fovModifierHand += (fovModifier - fovModifierHand) * 0.5F;
-        //Limit FOV modifier to a certain range
-        if (fovModifierHand > 1.5F)
-            fovModifierHand = 1.5F;
-        if (fovModifierHand < 0.1F)
-            fovModifierHand = 0.1F;
-        
+        fovModifierPrev = this.fovModifier;
+        this.fovModifier += (fovModifier - this.fovModifier) * 0.5F;
+		//Limit FOV modifier to a certain range
+		this.fovModifier = MathHelper.clamp_float(fovModifier,0.1F, 1.5F);
+
         //And update the itemToRender, for item switching
         
-        prevEquippedProgress = equippedProgress;
-        EntityPlayerSP thePlayer = mc.thePlayer;
+        prevEquippedProgressMainHand = equippedProgressMainHand;
+		prevEquippedProgressOffHand = equippedProgressOffHand;
+
+		EntityPlayerSP thePlayer = mc.thePlayer;
         if(thePlayer != null)
         {
-	        ItemStack itemstack = thePlayer.inventory.getCurrentItem();
+        	//MainHand
+	        ItemStack itemStackMainHand = thePlayer.getHeldItemMainhand();
 	        boolean equippedGun = false;
-	
-	        if(itemToRender != null && itemstack != null)
+	        if(itemToRenderMainHand != null && itemStackMainHand != null)
 	        {
-	            if (!itemToRender.isItemEqual(itemstack))
+	            if (!itemToRenderMainHand.isItemEqual(itemStackMainHand))
 	            {
-	                if (!itemToRender.getItem().shouldCauseReequipAnimation(itemToRender, itemstack, equippedItemSlot != thePlayer.inventory.currentItem))
+	                if (!itemToRenderMainHand.getItem().shouldCauseReequipAnimation(itemToRenderMainHand, itemStackMainHand, equippedItemSlot != thePlayer.inventory.currentItem))
 	                {
-	                    itemToRender = itemstack;
+	                    itemToRenderMainHand = itemStackMainHand;
 	                    equippedItemSlot = thePlayer.inventory.currentItem;
 	                    return;
 	                }
 	                equippedGun = true;
 	            }
 	        }
-	        else if(itemToRender == null && itemstack == null)
+	        else if(itemToRenderMainHand == null && itemStackMainHand == null)
 	        {
 	        	equippedGun = false;
 	        }
@@ -340,15 +371,52 @@ public class ClientRenderHooks
 
 	        float maxChange = 0.4F;
 	        float targetProgress = equippedGun ? 0.0F : 1.0F;
-	        float difference = MathHelper.clamp_float(targetProgress - equippedProgress, -maxChange, maxChange);
-	        equippedProgress += difference;
+	        float difference = MathHelper.clamp_float(targetProgress - equippedProgressMainHand, -maxChange, maxChange);
+	        equippedProgressMainHand += difference;
 	
-	        if(equippedProgress < 0.1F)
+	        if(equippedProgressMainHand < 0.1F)
 	        {
-	            itemToRender = itemstack;
+	            itemToRenderMainHand = itemStackMainHand;
 	            equippedItemSlot = thePlayer.inventory.currentItem;
 	        }
-	        
+
+
+			//OffHand
+			ItemStack itemStackOffHand = thePlayer.getHeldItemOffhand();
+			equippedGun = false;
+			if(itemToRenderOffHand != null && itemStackOffHand != null)
+			{
+				if (!itemToRenderOffHand.isItemEqual(itemStackOffHand))
+				{
+					if (!itemToRenderOffHand.getItem().shouldCauseReequipAnimation(itemToRenderOffHand, itemStackOffHand, false))
+					{
+						itemToRenderOffHand = itemStackOffHand;
+						//equippedItemSlot = thePlayer.inventory.currentItem;
+						return;
+					}
+					equippedGun = true;
+				}
+			}
+			else if(itemToRenderOffHand == null && itemStackOffHand == null)
+			{
+				equippedGun = false;
+			}
+			else
+			{
+				equippedGun = true;
+			}
+
+			maxChange = 0.4F;
+			targetProgress = equippedGun ? 0.0F : 1.0F;
+			difference = MathHelper.clamp_float(targetProgress - equippedProgressOffHand, -maxChange, maxChange);
+			equippedProgressOffHand += difference;
+
+			if(equippedProgressOffHand < 0.1F)
+			{
+				itemToRenderOffHand = itemStackOffHand;
+			}
+
+
 			//Render debug boxes for player snapshots
 	        PlayerData data = PlayerHandler.getPlayerData(thePlayer);
 			if(FlansMod.DEBUG && data != null)
@@ -363,153 +431,116 @@ public class ClientRenderHooks
     {
     	partialTicks = dT;
     }
-    
+
+	public void renderThirdPerson(RenderLivingEvent.Pre event)
+	{
+		EntityLivingBase entity = event.getEntity();
+		ItemStack mainHandStack = entity.getHeldItemMainhand();
+		ItemStack offHandStack = entity.getHeldItemOffhand();
+
+		ModelBase mainModel = event.getRenderer().getMainModel();
+		if (!(mainModel instanceof ModelBiped))
+		{
+			return;
+		}
+		ModelBiped modelBase = ((ModelBiped) mainModel);
+
+
+		//if no items or no items that are guns are being held, remove the custom renderer.
+		if ((
+				(mainHandStack == null || !(mainHandStack.getItem() instanceof ItemGun)) &
+						(offHandStack == null || !(offHandStack.getItem() instanceof ItemGun))
+		))
+		{
+			ArmModelRenderer.removeRightArm(event.getRenderer(), modelBase);
+			ArmModelRenderer.removeLeftArm(event.getRenderer(), modelBase);
+			return;
+
+		}
+
+		EnumHandSide mainHandSide = entity.getPrimaryHand();
+		ItemStack rightStack = mainHandSide == EnumHandSide.RIGHT ? mainHandStack : offHandStack;
+		ItemStack leftStack = mainHandSide == EnumHandSide.RIGHT ? offHandStack : mainHandStack;
+
+		GunType gunRight = null;
+		if (rightStack != null && rightStack.getItem() instanceof ItemGun)
+		{
+			gunRight = ((ItemGun) rightStack.getItem()).GetType();
+		}
+		GunType gunLeft = null;
+		if (leftStack != null && leftStack.getItem() instanceof ItemGun)
+		{
+			gunLeft = ((ItemGun) leftStack.getItem()).GetType();
+		}
+
+
+		Pair<Vector3f, Vector3f> rightRotations = null;
+		Pair<Vector3f, Vector3f> leftRotations = null;
+
+		Vector3f looking = new Vector3f(modelBase.bipedHead.rotateAngleX, modelBase.bipedHead.rotateAngleY, modelBase.bipedHead.rotateAngleZ);
+		if (gunRight != null)
+		{
+			rightRotations = gunRight.holdingType.getArmRotations(gunRight, partialTicks, looking, entity, EnumHandSide.RIGHT, leftStack != null);
+		}
+		if (gunLeft != null)
+		{
+			leftRotations = gunLeft.holdingType.getArmRotations(gunLeft, partialTicks, looking, entity, EnumHandSide.LEFT, rightStack != null);
+		}
+		Vector3f rightRotation = null;
+		Vector3f leftRotation = null;
+		if (rightRotations != null)
+		{
+			rightRotation = rightRotations.getLeft();
+			if (leftRotations == null)
+			{
+				leftRotation = rightRotations.getRight();
+			}
+		}
+		if (leftRotations != null)
+		{
+			leftRotation = leftRotations.getLeft();
+			if (rightRotations == null)
+			{
+				rightRotation = leftRotations.getRight();
+			}
+		}
+		List<ArmModelRenderer> rightModels = ArmModelRenderer.getModelsForSide(EnumHandSide.RIGHT, event.getRenderer(), modelBase);
+		List<ArmModelRenderer> leftModels = ArmModelRenderer.getModelsForSide(EnumHandSide.LEFT, event.getRenderer(), modelBase);
+		for (ArmModelRenderer modelRenderer : rightModels)
+		{
+			modelRenderer.setRotationOverrides(rightRotation);
+			modelRenderer.setShouldMakeChanges(true);
+		}
+		for (ArmModelRenderer modelRenderer : leftModels)
+		{
+			modelRenderer.setRotationOverrides(leftRotation);
+			modelRenderer.setShouldMakeChanges(true);
+		}
+	}
+
+
+	/*
 	public void renderThirdPersonWeapons(RenderLivingEvent.Post event)
 	{
 		ModelBase mainModel = event.getRenderer().getMainModel();
 		EntityLivingBase entity = event.getEntity();
-		
-		if(entity.getHeldItemMainhand() != null && entity.getHeldItemMainhand().getItem() instanceof ItemGun && mainModel instanceof ModelBiped)
+		for(EnumHand hand : EnumHand.values())
 		{
+			ItemStack stack = entity.getHeldItem(hand);
+			if(stack == null || !(stack.getItem() instanceof ItemGun))
+			{
+				continue;
+			}
 			ModelBiped biped = (ModelBiped)mainModel;
-			ItemStack stack = entity.getHeldItemMainhand();
+
+
 			GunType type = ((ItemGun)stack.getItem()).GetType();
 			if(type.model == null)
-				return;
-			ModelGun gunModel = type.model;
-			
-			GlStateManager.pushMatrix();
-	        GlStateManager.disableCull();
-	        mainModel.swingProgress = entity.getSwingProgress(partialTicks);
-	        mainModel.isRiding = entity.isRiding();
-	        mainModel.isChild = entity.isChild();
-	
-	        float f2 = this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
-	        float f3 = this.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
-	        float f4 = f3 - f2;
-	        float f5;
-	        
-	        
-	        if(Math.abs(entity.prevRenderYawOffset - entity.renderYawOffset) > 30F)
-	        	f2 = entity.renderYawOffset;
-	        if(Math.abs(entity.prevRotationYawHead - entity.rotationYawHead) > 30F)
-	        	f3 = entity.rotationYawHead;
-	        f4 = f3 - f2;
-	        
-	        //System.out.println(entity.prevRenderYawOffset + "     " + entity.renderYawOffset);
-	        
-	        if (entity.isRiding() && entity.getRidingEntity() instanceof EntityLivingBase)
-	        {
-	            EntityLivingBase entitylivingbase1 = (EntityLivingBase)entity.getRidingEntity();
-	            f2 = this.interpolateRotation(entitylivingbase1.prevRenderYawOffset, entitylivingbase1.renderYawOffset, partialTicks);
-	            f4 = f3 - f2;
-	            f5 = net.fexcraft.mod.lib.util.cls.MathHelper.wrapAngleTo180_float(f4);
-	
-	            if (f5 < -85.0F)
-	            {
-	                f5 = -85.0F;
-	            }
-	
-	            if (f5 >= 85.0F)
-	            {
-	                f5 = 85.0F;
-	            }
-	
-	            f2 = f3 - f5;
-	
-	            if (f5 * f5 > 2500.0F)
-	            {
-	                f2 += f5 * 0.2F;
-	            }
-	        }
-	
-	        float f9 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-	        if(Math.abs(entity.prevRotationPitch - entity.rotationPitch) > 5F)
-	        	f9 = entity.rotationPitch;
-	        GlStateManager.translate(event.getX(), event.getY(), event.getZ());
-	        
-	        f5 = entity.ticksExisted + partialTicks;
-	        //this.rotateCorpse(entity, f5, f2, partialTicks);
-	        GlStateManager.rotate(180.0F - f2, 0.0F, 1.0F, 0.0F);
-	        GlStateManager.enableRescaleNormal();
-	        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-	        //this.preRenderCallback(entity, partialTicks);
-	        float f6 = 0.0625F;
-	        GlStateManager.translate(0.0F, -1.5078125F, 0.0F);
-	        float f7 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
-	        float f8 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
-	
-	        if (entity.isChild())
-	        {
-	            f8 *= 3.0F;
-	        }
-	
-	        if (f7 > 1.0F)
-	        {
-	            f7 = 1.0F;
-	        }
-	
-	        GlStateManager.enableAlpha();
-	        
-	        //biped.isSneak = false;
-	        //TODO ? //biped.heldItemRight = 1;
-	        biped.setLivingAnimations(entity, f8, f7, partialTicks);
-	        biped.setRotationAngles(f8, f7, f5, f4, f9, 0.0625F, entity);
-
-	        //Render main hand gun
-	        {
-		        GlStateManager.pushMatrix();
-
-		        biped.bipedRightArm.postRender(0.0625F);
-		        
-		        GlStateManager.translate(-0.05F, 0.4F, 0.05F);
-	
-		        //ClientProxy.gunRenderer.renderItem(ItemRenderType.EQUIPPED, stack, mc.theWorld, mc.thePlayer);
-		        GlStateManager.popMatrix();
-	        }
-	        
-	        //Render off hand gun
-	        if(entity instanceof EntityPlayer)
-	        {
-		        PlayerData data = PlayerHandler.getPlayerData((EntityPlayer)entity, Side.CLIENT);
-				ItemStack gunStack = null;
-				
-				//Check current stack is a one handed gun
-				if(entity instanceof EntityOtherPlayerMP)
-				{
-					gunStack = data.offHandGunStack;
-				}
-				else if(entity instanceof EntityPlayerSP)
-				{
-					if(type.oneHanded && data.offHandGunSlot != 0)
-						gunStack = ((EntityPlayer)entity).inventory.getStackInSlot(data.offHandGunSlot - 1);
-				}
-						
-				if(gunStack != null && gunStack.getItem() instanceof ItemGun)
-				{
-					//GunType gunType = ((ItemGun)gunStack.getItem()).GetType();
-							
-					//Render!
-					GlStateManager.pushMatrix();			
-					biped.bipedLeftArm.postRender(0.0625F);
-					GlStateManager.rotate(-90F, 1F, 0F, 0F);
-					GlStateManager.rotate(-90F, 0F, 1F, 0F);
-
-					GlStateManager.translate(0.6F, 0F, -0.05F);
-					//ClientProxy.gunRenderer.renderOffHandGun((EntityPlayer)entity, gunStack);
-					GlStateManager.popMatrix();
-				}
-	        }
-	        
-	        GlStateManager.depthMask(true);
-	        GlStateManager.disableRescaleNormal();
-	        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-	        GlStateManager.enableTexture2D();
-	        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-	        GlStateManager.enableCull();
-	        GlStateManager.popMatrix();
+				continue;
 		}
+
 	}
+	*/
 	
 	private float interpolateRotation(float x, float y, float dT)
 	{
@@ -524,6 +555,15 @@ public class ClientRenderHooks
 	//Handle player hiding / name tag removal for teams
 	public void renderPlayer(RenderPlayerEvent.Pre event)
 	{
+		EntityPlayer player = event.getEntityPlayer();
+		ItemStack stackMainHand = player.getHeldItemMainhand();
+		ItemStack stackOffHand = player.getHeldItemOffhand();
+
+		if (stackMainHand != null && stackMainHand.getItem() instanceof ItemGun || stackOffHand != null && stackOffHand.getItem() instanceof ItemGun)
+		{
+			player.swingProgress = 0;
+		}
+
 		PlayerData data = PlayerHandler.getPlayerData(event.getEntityPlayer(), Side.CLIENT);
 					
 		event.getRenderer().NAME_TAG_RANGE = 64F;
@@ -571,8 +611,8 @@ public class ClientRenderHooks
 			}
 		}
 	}
-	
-public void cameraSetup(CameraSetup event)
+
+	public void cameraSetup(CameraSetup event)
 	{
 		if(mc.thePlayer.getRidingEntity() instanceof IControllable)
 		{
@@ -681,7 +721,7 @@ public void cameraSetup(CameraSetup event)
 			
 
 		}
-				
+		/*
 		if(event.isCancelable() && event.getType() == ElementType.HOTBAR)
 		{
 			//Off-hand weapon graphics
@@ -702,7 +742,7 @@ public void cameraSetup(CameraSetup event)
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 72 + 20 * n, j - 3, zLevel, 32D / 64D, 16D / 32D);
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 72 + 20 * n, j - 19, zLevel, 32D / 64D, 0D / 32D);
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 88 + 20 * n, j - 19, zLevel, 16D / 64D, 0D / 32D);
-						tessellator.draw();*/
+						tessellator.draw();
 					}
 					else if(data.isValidOffHandWeapon(mc.thePlayer, n + 1))
 					{					
@@ -711,11 +751,13 @@ public void cameraSetup(CameraSetup event)
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 72 + 20 * n, j - 3, zLevel, 16D / 64D, 16D / 32D);
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 72 + 20 * n, j - 19, zLevel, 16D / 64D, 0D / 32D);
 						tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 88 + 20 * n, j - 19, zLevel, 0D / 64D, 0D / 32D);
-						tessellator.draw();*/
+						tessellator.draw();
 					}
 				}
 			}
+
 		}
+		*/
 		if(!event.isCancelable() && event.getType() == ElementType.HOTBAR)
 		{
 			//Player ammo overlay
@@ -746,7 +788,10 @@ public void cameraSetup(CameraSetup event)
 							x += 16 + mc.fontRendererObj.getStringWidth(s);
 						}
 					}
+
+
 					//Render secondary gun
+					/*
 					PlayerData data = PlayerHandler.getPlayerData(mc.thePlayer, Side.CLIENT);
 					if(gunType.oneHanded && data.offHandGunSlot != 0)
 					{
@@ -781,8 +826,9 @@ public void cameraSetup(CameraSetup event)
 								}
 							}
 						}
-					}
+					}*/
 				}
+
 			}
 			
 			PacketTeamInfo teamInfo = FlansModClient.teamInfo;
@@ -930,7 +976,7 @@ public void cameraSetup(CameraSetup event)
 		}
 		killMessages.add(new KillMessage(headshot, infoType, killer, killed));
 	}
-	
+
 	private static class KillMessage
 	{
 		public KillMessage(boolean head, InfoType infoType, String killer, String killed)

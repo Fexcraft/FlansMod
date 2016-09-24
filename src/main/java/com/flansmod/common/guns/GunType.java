@@ -1,22 +1,21 @@
 package com.flansmod.common.guns;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import com.flansmod.client.model.ModelGun;
 import com.flansmod.client.model.ModelMG;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.types.TypeFile;
 import com.flansmod.common.vector.Vector3f;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class GunType extends PaintableType implements IScope
 {
@@ -148,6 +147,11 @@ public class GunType extends PaintableType implements IScope
 	public ModelGun model;
 	/** For making detailed models and scaling down */
 	public float modelScale = 1F;
+
+	/**
+	 * How should the gun be held by the player?
+	 */
+	public EnumHoldingMode holdingType = EnumHoldingMode.DEFAULT;
 	
 	//Attachment settings
 	/** If this is true, then all attachments are allowed. Otherwise the list is checked */
@@ -419,6 +423,9 @@ public class GunType extends PaintableType implements IScope
 				shieldOrigin = new Vector3f(Float.parseFloat(split[2]) / 16F, Float.parseFloat(split[3]) / 16F, Float.parseFloat(split[4]) / 16F);
 				shieldDimensions = new Vector3f(Float.parseFloat(split[5]) / 16F, Float.parseFloat(split[6]) / 16F, Float.parseFloat(split[7]) / 16F);
 			}
+
+			else if(split[0].equals("HoldingMode"))
+				holdingType = EnumHoldingMode.getHoldingMode(split[1]);
 		} 
 		catch (Exception e)
 		{

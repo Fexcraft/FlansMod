@@ -1,22 +1,14 @@
 package com.flansmod.common.guns.raytracing;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.AttachmentType;
-import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.vector.Vector3f;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -24,12 +16,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class FlansModRaytracer 
 {
@@ -162,24 +159,32 @@ public class FlansModRaytracer
 		
 		return hits;
 	}
-	
-	public static Vector3f GetPlayerMuzzlePosition(EntityPlayer player, boolean isOffHand)
+
+	public static Vector3f GetPlayerMuzzlePosition(EntityPlayer player, EnumHandSide hand)
 	{
 		PlayerSnapshot snapshot = new PlayerSnapshot(player);
-		PlayerData data = PlayerHandler.getPlayerData(player);
-		
-		ItemStack itemstack = (isOffHand && data != null && data.offHandGunSlot != 0 ) 
-				? player.inventory.getStackInSlot(data.offHandGunSlot - 1)
-				: player.getHeldItemMainhand();
-		
-		if(itemstack != null && itemstack.getItem() instanceof ItemGun)
+
+		ItemStack itemstack = FlansUtils.getItemOnSide(hand, player);
+
+		if (itemstack != null && itemstack.getItem() instanceof ItemGun)
 		{
-			GunType gunType = ((ItemGun)itemstack.getItem()).GetType();
+			GunType gunType = ((ItemGun) itemstack.getItem()).GetType();
 			AttachmentType barrelType = gunType.getBarrel(itemstack);
-			
-			return Vector3f.add(new Vector3f(player.posX, player.posY, player.posZ), snapshot.GetMuzzleLocation(gunType, barrelType, isOffHand), null);
+
+			return Vector3f.add(
+					new Vector3f(
+							player.posX,
+							player.posY,
+							player.posZ
+					),
+					snapshot.GetMuzzleLocation(
+							gunType,
+							barrelType,
+							hand),
+					null
+			);
 		}
-		
+
 		return new Vector3f(player.getPositionEyes(0.0f));
 	}
 
