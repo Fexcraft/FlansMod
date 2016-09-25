@@ -1,10 +1,7 @@
 package com.flansmod.common;
 
-import java.util.LinkedList;
-
 import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.teams.TeamsManager;
-
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -14,8 +11,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class CommonTickHandler 
 {
+
 	/** List for storing replacement EntityItemCustomRenderers. Stops concurrent modifications and messing up the entity list. */
-	private LinkedList<EntityItemCustomRender> replacementItemEntities = new LinkedList<EntityItemCustomRender>();
+	//private LinkedList<EntityItemCustomRender> replacementItemEntities = new LinkedList<>();
+
 	
 	public CommonTickHandler()
 	{
@@ -48,14 +47,6 @@ public class CommonTickHandler
 		{
 			//Handle all packets received since last tick
 			FlansMod.getPacketHandler().handleServerPackets();
-
-			//Spawn the replacement item entities for custom rendering
-			while(replacementItemEntities.size() > 0)
-			{
-				EntityItemCustomRender entity = replacementItemEntities.remove();
-				entity.worldObj.spawnEntityInWorld(entity);
-			}
-
 			break;
 		}
 		case END :
@@ -68,24 +59,18 @@ public class CommonTickHandler
 		}
 	}
 
-	
-	public void onEntitySpawn(EntityJoinWorldEvent event) 
+	@SubscribeEvent
+	public void onEntitySpawn(EntityJoinWorldEvent event)
 	{
-		//Replace gun items with custom render gun items
-		if(event.getEntity() instanceof EntityItem && !(event.getEntity() instanceof EntityItemCustomRender))
+		if(event.getEntity() instanceof EntityItem && !(event.getEntity() instanceof EntityCustomItem))
 		{
-			ItemStack stack = getEntityItem((EntityItem)event.getEntity());
-			if(stack != null && stack.getItem() instanceof ItemGun && ((ItemGun)stack.getItem()).GetType().modelString != null)
+			ItemStack stack = ((EntityItem) event.getEntity()).getEntityItem();
+			if(stack.getItem() instanceof ItemGun && ((ItemGun)stack.getItem()).GetType().modelString != null)
 			{
-				//event.world.spawnEntityInWorld(new EntityItemCustomRender((EntityItem)event.entity));
-				replacementItemEntities.add(new EntityItemCustomRender((EntityItem)event.getEntity()));
+				EntityCustomItem replacementItem = new EntityCustomItem((EntityItem)event.getEntity());
+				event.getWorld().spawnEntityInWorld(replacementItem);
 				event.setCanceled(true);
 			}
-		}			
+		}
 	}
-	
-    public ItemStack getEntityItem(EntityItem entity)
-    {
-        return null;//TODO return entity.getDataWatcher().getWatchableObjectItemStack(10);
-    }
 }

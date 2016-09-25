@@ -1,18 +1,14 @@
 package com.flansmod.common.network;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.relauncher.Side;
 
+@Deprecated
 public class PacketOffHandGunInfo extends PacketBase 
 {
 	public int entityID;
@@ -54,12 +50,14 @@ public class PacketOffHandGunInfo extends PacketBase
 	@Override
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
+		/*
 		Entity entity = clientPlayer.worldObj.getEntityByID(entityID);
 		if(entity instanceof EntityPlayer && entity != clientPlayer)
 		{
 			PlayerData data = PlayerHandler.getPlayerData((EntityPlayer) entity, Side.CLIENT);
 			data.offHandGunStack = gunStack;
 		}
+		*/
 	}
 
 }

@@ -1,18 +1,8 @@
 package com.flansmod.common.teams;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.flansmod.common.EntityItemCustomRender;
+import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.guns.ItemShootable;
-import com.flansmod.common.guns.ShootableType;
-
+import com.flansmod.common.guns.*;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +18,12 @@ import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-public class EntityGunItem extends EntityItemCustomRender {
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityGunItem extends EntityCustomItem
+{
 	
 	public List<ItemStack> ammoStacks;
 	private boolean teamsModEnabled = false;

@@ -1,25 +1,16 @@
 package com.flansmod.client;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.gui.GuiTeamScores;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.AttachmentType;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.IScope;
-import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.network.PacketTeamInfo;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3i;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
@@ -28,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -35,6 +27,10 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FlansModClient extends FlansMod
 {
@@ -436,30 +432,27 @@ public class FlansModClient extends FlansMod
 		return fx;
 	}*/
 
-	public static GunAnimations getGunAnimations(EntityLivingBase living, boolean offHand) 
+	private static void addGunAnimations(EntityLivingBase living, EnumHandSide hand, GunAnimations animations)
 	{
-		GunAnimations animations = null;
-		if(offHand)
+		if (hand == EnumHandSide.LEFT)
 		{
-			if(FlansModClient.gunAnimationsLeft.containsKey(living))
-				animations = FlansModClient.gunAnimationsLeft.get(living);
-			else 
-			{
-				animations = new GunAnimations();
-				FlansModClient.gunAnimationsLeft.put(living, animations);
-			}
+			gunAnimationsLeft.put(living, animations);
 		}
 		else
 		{
-			if(FlansModClient.gunAnimationsRight.containsKey(living))
-				animations = FlansModClient.gunAnimationsRight.get(living);
-			else 
-			{
-				animations = new GunAnimations();
-				FlansModClient.gunAnimationsRight.put(living, animations);
-			}
+			gunAnimationsRight.put(living, animations);
 		}
-		return animations;
+	}
+
+	public static GunAnimations getGunAnimations(EntityLivingBase living, EnumHandSide hand)
+	{
+		GunAnimations result = hand == EnumHandSide.LEFT ? gunAnimationsLeft.get(living) : gunAnimationsRight.get(living);
+		if (result == null)
+		{
+			result = new GunAnimations();
+			addGunAnimations(living, hand, result);
+		}
+		return result;
 	}
 	
 	public static void AddHitMarker()

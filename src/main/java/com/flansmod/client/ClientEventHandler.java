@@ -1,34 +1,28 @@
 package com.flansmod.client;
 
-import org.lwjgl.input.Keyboard;
-
 import com.flansmod.client.model.InstantBulletRenderer;
 import com.flansmod.client.model.RenderFlag;
 import com.flansmod.client.model.RenderGun;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.ItemGun;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.event.RenderItemInFrameEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Keyboard;
 
 /** All handled events for the client should go through here and be passed on. Makes it easier to see which events are being handled by the mod */
 public class ClientEventHandler
 {
 	private KeyInputHandler keyInputHandler = new KeyInputHandler();
 	private ClientRenderHooks renderHooks = new ClientRenderHooks();
-	
+
+	/** List for storing replacement EntityItemCustomRenderers. Stops concurrent modifications and messing up the entity list. */
+	//private LinkedList<EntityItemCustomRender> replacementItemEntities = new LinkedList<>();
+
 	@SubscribeEvent
 	public void renderTick(TickEvent.RenderTickEvent event)
 	{
@@ -120,11 +114,17 @@ public class ClientEventHandler
 	{
 		renderHooks.renderHeldItem(event);
 	}
-	
+
+	@SubscribeEvent
+	public void renderThirdPersonWeapons(RenderLivingEvent.Pre event)
+	{
+		renderHooks.renderThirdPerson(event);
+	}
+
 	@SubscribeEvent
 	public void renderThirdPersonWeapons(RenderLivingEvent.Post event)
 	{
-		renderHooks.renderThirdPersonWeapons(event);
+		//renderHooks.renderThirdPersonWeapons(event);
 	}
 	
 	@SubscribeEvent
@@ -144,4 +144,6 @@ public class ClientEventHandler
 	{
 		renderHooks.ModifyHUD(event);
 	}
+
+
 }

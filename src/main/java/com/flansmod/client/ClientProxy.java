@@ -1,64 +1,13 @@
 package com.flansmod.client;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
-import com.flansmod.client.debug.EntityDebugAABB;
-import com.flansmod.client.debug.EntityDebugDot;
-import com.flansmod.client.debug.EntityDebugVector;
-import com.flansmod.client.debug.RenderDebugAABB;
-import com.flansmod.client.debug.RenderDebugDot;
-import com.flansmod.client.debug.RenderDebugVector;
-import com.flansmod.client.gui.GuiArmourBox;
-import com.flansmod.client.gui.GuiDriveableCrafting;
-import com.flansmod.client.gui.GuiDriveableFuel;
-import com.flansmod.client.gui.GuiDriveableInventory;
-import com.flansmod.client.gui.GuiDriveableMenu;
-import com.flansmod.client.gui.GuiDriveableRepair;
-import com.flansmod.client.gui.GuiGunBox;
-import com.flansmod.client.gui.GuiGunModTable;
-import com.flansmod.client.gui.GuiMechaInventory;
-import com.flansmod.client.gui.GuiPaintjobTable;
-import com.flansmod.client.model.RenderAAGun;
-import com.flansmod.client.model.RenderBullet;
-import com.flansmod.client.model.RenderFlag;
-import com.flansmod.client.model.RenderFlagpole;
-import com.flansmod.client.model.RenderGrenade;
-import com.flansmod.client.model.RenderGun;
-import com.flansmod.client.model.RenderItemHolder;
-import com.flansmod.client.model.RenderMG;
-import com.flansmod.client.model.RenderMecha;
-import com.flansmod.client.model.RenderNull;
-import com.flansmod.client.model.RenderParachute;
-import com.flansmod.client.model.RenderPlane;
-import com.flansmod.client.model.RenderVehicle;
-import com.flansmod.common.CommonProxy;
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.TileEntityItemHolder;
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
-import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.EntityPlane;
-import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.EntityVehicle;
-import com.flansmod.common.driveables.EntityWheel;
-import com.flansmod.common.driveables.PlaneType;
+import com.flansmod.client.debug.*;
+import com.flansmod.client.gui.*;
+import com.flansmod.client.model.*;
+import com.flansmod.common.EntityCustomItem;
+import com.flansmod.common.*;
+import com.flansmod.common.driveables.*;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.Paintjob;
+import com.flansmod.common.guns.*;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.BoxType;
 import com.flansmod.common.guns.boxes.GunBoxType;
@@ -67,16 +16,12 @@ import com.flansmod.common.network.PacketBuyWeapon;
 import com.flansmod.common.network.PacketCraftDriveable;
 import com.flansmod.common.network.PacketRepairDriveable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
-import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.BlockArmourBox;
-import com.flansmod.common.teams.EntityFlag;
-import com.flansmod.common.teams.EntityFlagpole;
-import com.flansmod.common.teams.TileEntitySpawner;
+import com.flansmod.common.teams.*;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.types.EnumType;
+import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -84,6 +29,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -92,6 +38,16 @@ import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.common.discovery.ContainerType;
 import net.minecraftforge.fml.common.discovery.ModCandidate;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ClientProxy extends CommonProxy
 {
@@ -103,7 +59,10 @@ public class ClientProxy extends CommonProxy
 	public static RenderPlane planeRenderer;
 	public static RenderVehicle vehicleRenderer;
 	public static RenderMecha mechaRenderer;
-	
+
+
+
+
 	/** The file locations of the content packs, used for loading */
 	public List<File> contentPacks;
 	
@@ -153,7 +112,7 @@ public class ClientProxy extends CommonProxy
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.paintjobTable), 0, new ModelResourceLocation("flansmod:paintjobTable", "inventory"));
 		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.paintjobTable), new String[] {"flansmod:paintjobTable"});
 		
-		gunRenderer = new RenderGun();
+		gunRenderer = new RenderGun(Minecraft.getMinecraft().getRenderManager());
 		grenadeRenderer = new RenderGrenade(Minecraft.getMinecraft().getRenderManager());
 		planeRenderer = new RenderPlane(Minecraft.getMinecraft().getRenderManager());
 		vehicleRenderer = new RenderVehicle(Minecraft.getMinecraft().getRenderManager());
@@ -171,9 +130,11 @@ public class ClientProxy extends CommonProxy
 		for(MechaType mechaType : MechaType.types)
 			MinecraftForgeClient.registerItemRenderer(mechaType.item, mechaRenderer);*/
 
-		
+
+		ModelLoaderRegistry.registerLoader(OverrideVanillaModelLoader.INSTANCE);
+
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemHolder.class, new RenderItemHolder());
-				
+
         // Create one event handler for the client and register it with MC Forge and FML
 		ClientEventHandler eventHandler = new ClientEventHandler();
 		//FMLCommonHandler.instance().bus().register(eventHandler);
@@ -243,8 +204,8 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityMecha.class, RenderMecha::new);
-		//RenderingRegistry.registerEntityRenderingHandler(EntityItemCustomRender.class, new RenderGunItem(rm, Minecraft.getMinecraft().getRenderItem(), gunRenderer));
-		
+		RenderingRegistry.registerEntityRenderingHandler(EntityCustomItem.class, RenderCustomEntityItem::new);
+
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySpawner.class, new TileEntitySpawnerRenderer());
 	}
 	
@@ -271,7 +232,12 @@ public class ClientProxy extends CommonProxy
 			}
 		}
 	}
-	
+
+	public static RenderCustomItem getRenderer(IFlanItem item)
+	{
+		return item.getRenderItemEntity();
+	}
+
 	/** Adds the client side text message regarding mouse control mode switching */
 	@Override
 	public void changeControlMode(EntityPlayer player)

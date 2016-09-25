@@ -1,6 +1,6 @@
 package com.flansmod.common.teams;
 
-import com.flansmod.common.EntityItemCustomRender;
+import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.PlayerHandler;
 
 import io.netty.buffer.ByteBuf;
@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdditionalSpawnData {
+public class EntityTeamItem extends EntityCustomItem implements IEntityAdditionalSpawnData {
 
 	public TileEntitySpawner spawner;
 	public double angle;

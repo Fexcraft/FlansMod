@@ -1,29 +1,23 @@
 package com.flansmod.common.guns;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
+import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModClient;
+import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.debug.EntityDebugDot;
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.client.model.InstantBulletRenderer;
 import com.flansmod.client.model.InstantBulletRenderer.InstantShotTrail;
+import com.flansmod.client.model.OverrideVanillaModelLoader;
+import com.flansmod.client.model.RenderCustomItem;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.ShotData.InstantShotData;
 import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.BlockHit;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.EntityHit;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.*;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.PacketReload;
 import com.flansmod.common.network.PacketSelectOffHandGun;
@@ -36,11 +30,11 @@ import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -56,19 +50,22 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ItemGun extends Item implements IPaintableItem, IItem
 {
@@ -89,9 +86,18 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	private static boolean lastRightMouseHeld;
 	private static boolean leftMouseHeld;
 	private static boolean lastLeftMouseHeld;
-	
-	private static boolean GetMouseHeld(boolean isOffHand) { return isOffHand ? leftMouseHeld : rightMouseHeld; }
-	private static boolean GetLastMouseHeld(boolean isOffHand) { return isOffHand ? lastLeftMouseHeld : lastRightMouseHeld; }
+
+	private static boolean getMouseHeld(EnumHand hand)
+	{
+		//mouse has to depend on EnumHand and not EnumHandSide. If main hand is changed to left in mc-settings,
+		//key-binding for mouse stays the same
+		return hand == EnumHand.OFF_HAND ? leftMouseHeld : rightMouseHeld;
+	}
+
+	private static boolean getLastMouseHeld(EnumHand hand)
+	{
+		return hand == EnumHand.OFF_HAND ? lastLeftMouseHeld : lastRightMouseHeld;
+	}
 	
 	private static List<ShotData> shotsFiredClient = new ArrayList<ShotData>(), shotsFiredServer = new ArrayList<ShotData>();
 	
@@ -105,8 +111,18 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
+        if (type.model != null)
+        {
+			OverrideVanillaModelLoader.INSTANCE.addAcceptedType(this.getRegistryName(), type);
+        }
 	}
-	
+
+	@Override
+	public RenderCustomItem getRenderItemEntity()
+	{
+		return ClientProxy.gunRenderer;
+	}
+
 	/** Get the bullet item stack stored in the gun's NBT data (the loaded magazine / bullets) */
 	public ItemStack getBulletItemStack(ItemStack gun, int id)
 	{
@@ -164,7 +180,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		//Set the tags to match the bullet stack
 		bullet.writeToNBT(ammoTags);
 	}
-	
+
 	/** Method for dropping items on reload and on shoot */
 	public static void dropItem(World world, Entity entity, String itemName)
 	{
@@ -251,7 +267,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	// _____________________________________________________________________________
 	
 	@SideOnly(Side.CLIENT)
-	public void onUpdateClient(ItemStack gunstack, int gunSlot, World world, Entity entity, boolean isOffHand, boolean hasOffHand)
+	public void onUpdateClient(ItemStack gunstack, int gunSlot, World world, EntityLivingBase entity, EnumHandSide handSide)
 	{
 		if(!(entity instanceof EntityPlayer))
 		{			
@@ -281,7 +297,8 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		//boolean secondaryFunctionsEnabled = true;
 		
 		// Update off hand cycling. Controlled by the main gun, since it is always around.
-		if(!isOffHand && type.oneHanded) 
+		/*
+		if(!isOffHand && type.oneHanded)
 		{				
 			//Cycle selection
 			int dWheel = Mouse.getDWheel();
@@ -290,16 +307,18 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 				data.cycleOffHandItem(player, dWheel);
 			}
 		}
+		*/
 		
 		if(type.usableByPlayers)
 		{
+			EnumHand hand = FlansUtils.getHandForSide(handSide, entity);
 			boolean needsToReload = needsToReload(gunstack);
 			boolean shouldShootThisTick = false;
 			switch(type.getFireMode(gunstack))
 			{
 				case BURST:
 				{
-					if(data.GetBurstRoundsRemaining(isOffHand) > 0)
+					if(data.getBurstRoundsRemaining(handSide) > 0)
 					{
 						shouldShootThisTick = true;
 					}
@@ -307,7 +326,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 				}
 				case SEMIAUTO:
 				{
-					if(GetMouseHeld(isOffHand) && !GetLastMouseHeld(isOffHand))
+					if(getMouseHeld(hand) && !getLastMouseHeld(hand))
 					{
 						shouldShootThisTick = true;
 					}
@@ -318,10 +337,10 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 				{
 					if(needsToReload)
 					{
-						needsToReload = GetMouseHeld(isOffHand);
+						needsToReload = getMouseHeld(hand);
 						break;
 					}
-					if(GetMouseHeld(isOffHand))
+					if(getMouseHeld(hand))
 					{
 						data.minigunSpeed += 2.0f;
 						data.minigunSpeed *= 0.9f;
@@ -344,7 +363,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 				}
 				case FULLAUTO:
 				{
-					shouldShootThisTick = GetMouseHeld(isOffHand);
+					shouldShootThisTick = getMouseHeld(hand);
 					if(!shouldShootThisTick)
 					{
 						needsToReload = false;
@@ -359,19 +378,19 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 			// Do reload if we pressed fire.
 			if(needsToReload)
 			{
-				if(Reload(gunstack, world, player, player.inventory, isOffHand, hasOffHand, false, player.capabilities.isCreativeMode))
+				if(Reload(gunstack, world, player, player.inventory, handSide, false, player.capabilities.isCreativeMode))
 				{
 					//Set player shoot delay to be the reload delay
 					//Set both gun delays to avoid reloading two guns at once
 					data.shootTimeRight = data.shootTimeLeft = (int)type.getReloadTime(gunstack);
 					
-					GunAnimations animations = FlansModClient.getGunAnimations(player, isOffHand);
+					GunAnimations animations = FlansModClient.getGunAnimations(player, handSide);
 
 					int pumpDelay = type.model == null ? 0 : type.model.pumpDelayAfterReload;
 					int pumpTime = type.model == null ? 1 : type.model.pumpTime;
 					animations.doReload(type.reloadTime, pumpDelay, pumpTime);
 					
-					if(isOffHand)
+					if(handSide == EnumHandSide.LEFT)
 					{
 						data.reloadingLeft = true;
 						data.burstRoundsRemainingLeft = 0;
@@ -382,13 +401,13 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 						data.burstRoundsRemainingRight = 0;
 					}
 					//Send reload packet to server
-					FlansMod.getPacketHandler().sendToServer(new PacketReload(isOffHand, false));
+					FlansMod.getPacketHandler().sendToServer(new PacketReload(handSide, false));
 				}
 			}
 			// Fire!
 			else if(shouldShootThisTick)
 			{
-				float shootTime = data.GetShootTime(isOffHand);
+				float shootTime = data.getShootTime(handSide);
 									
 				// For each 
 				while(shootTime <= 0.0f)
@@ -426,26 +445,26 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 								//victim = firstHit.GetEntity();
 							}
 							
-							Vector3f gunOrigin = FlansModRaytracer.GetPlayerMuzzlePosition(player, isOffHand);
+							Vector3f gunOrigin = FlansModRaytracer.GetPlayerMuzzlePosition(player, handSide);
 							
 							if(FlansMod.DEBUG)
 							{
 								world.spawnEntityInWorld(new EntityDebugDot(world, gunOrigin, 100, 1.0f, 1.0f, 1.0f));
 							}
 	
-							ShotData shotData = new InstantShotData(gunSlot, type, shootableType, player, gunOrigin, firstHit, hitPos, type.getDamage(gunstack), i < type.numBullets * shootableType.numBullets - 1);
+							ShotData shotData = new InstantShotData(hand, gunSlot, type, shootableType, player, gunOrigin, firstHit, hitPos, type.getDamage(gunstack), i < type.numBullets * shootableType.numBullets - 1);
 							shotsFiredClient.add(shotData);
 						}
 					}
 					// Else, spawn an entity
 					else
 					{
-						ShotData shotData = new SpawnEntityShotData(gunSlot, type, shootableType, player, new Vector3f(player.getLookVec()));
+						ShotData shotData = new SpawnEntityShotData(hand, gunSlot, type, shootableType, player, new Vector3f(player.getLookVec()));
 						shotsFiredClient.add(shotData);
 					}
 
 					// Now do client side things
-					GunAnimations animations = FlansModClient.getGunAnimations(player, isOffHand);
+					GunAnimations animations = FlansModClient.getGunAnimations(player, handSide);
 					
 					int pumpDelay = type.model == null ? 0 : type.model.pumpDelay;
 					int pumpTime = type.model == null ? 1 : type.model.pumpTime;
@@ -457,20 +476,20 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 					// Update burst fire
 					if(type.getFireMode(gunstack) == EnumFireMode.BURST)
 					{
-						int burstRoundsRemaining = data.GetBurstRoundsRemaining(isOffHand);
+						int burstRoundsRemaining = data.getBurstRoundsRemaining(handSide);
 
 						if(burstRoundsRemaining > 0)
 							burstRoundsRemaining--;
 						else burstRoundsRemaining = type.numBurstRounds;
 						
-						data.SetBurstRoundsRemaining(isOffHand, burstRoundsRemaining);
+						data.setBurstRoundsRemaining(handSide, burstRoundsRemaining);
 					}
 				}
 				
-				data.SetShootTime(isOffHand, shootTime);
+				data.setShootTime(handSide, shootTime);
 			}
 			
-			Vector3f gunOrigin = FlansModRaytracer.GetPlayerMuzzlePosition(player, isOffHand);
+			Vector3f gunOrigin = FlansModRaytracer.GetPlayerMuzzlePosition(player, handSide);
 			
 			if(FlansMod.DEBUG)
 			{
@@ -485,12 +504,15 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 			}
 			
 			// Check for scoping in / out
+			//TODO scoping
+			/*
 			IScope currentScope = type.getCurrentScope(gunstack);
 			if(!isOffHand && !hasOffHand && leftMouseHeld && !lastLeftMouseHeld
 					&& (type.secondaryFunction == EnumSecondaryFunction.ADS_ZOOM || type.secondaryFunction == EnumSecondaryFunction.ZOOM) )
 			{
 				FlansModClient.SetScope(currentScope);
 			}
+			*/
 		}
 		
 		// And finally do sounds
@@ -500,7 +522,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		}
 	}
 	
-	public void ServerHandleShotData(ItemStack gunstack, int gunSlot, World world, Entity entity, boolean isOffHand, ShotData shotData)
+	public void ServerHandleShotData(ItemStack gunstack, int gunSlot, World world, Entity entity, ShotData shotData)
 	{
 		// Get useful things
 		if(!(entity instanceof EntityPlayerMP))
@@ -619,12 +641,14 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	@SideOnly(Side.CLIENT)
 	private void PlayShotSound(World world, boolean silenced, float x, float y, float z)
 	{
-		/*FMLClientHandler.instance().getClient().getSoundHandler().playSound(
-				new PositionedSoundRecord(FlansModResourceHandler.getSound(type.shootSound), 
-						silenced ? 5F : 10F, 
-						(type.distortSound ? 1.0F / (world.rand.nextFloat() * 0.4F + 0.8F) : 1.0F) * (silenced ? 2F : 1F), 
-						x, y, z));*/
-		//TODO
+		FMLClientHandler.instance().getClient().getSoundHandler().playSound(new PositionedSoundRecord(
+				new SoundEvent(FlansModResourceHandler.getSound(type.shootSound)),
+				SoundCategory.NEUTRAL,
+				silenced ? 5F : 10F,
+				(type.distortSound ? 1.0F / (world.rand.nextFloat() * 0.4F + 0.8F) : 1.0F) * (silenced ? 2F : 1F),
+				new BlockPos(x, y, z)
+		));
+
 	}
 	
 	public void DoInstantShot(World world, Entity shooter, InfoType shotFrom, BulletType shotType, Vector3f origin, Vector3f hit, BulletHit hitData, float damage)
@@ -702,7 +726,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		}
 	}
 	
-	public void onUpdateServer(ItemStack itemstack, int gunSlot, World world, Entity entity, boolean isOffHand, boolean hasOffHand)
+	public void onUpdateServer(ItemStack itemstack, int gunSlot, World world, Entity entity, EnumHandSide side)
 	{
 		if(!(entity instanceof EntityPlayerMP))
 		{
@@ -719,7 +743,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 			if(player.inventory.getCurrentItem() == null || player.inventory.getCurrentItem().getItem() == null || !(player.inventory.getCurrentItem().getItem() instanceof ItemGun))
 			{
 				data.isShootingRight = data.isShootingLeft = false;
-				data.offHandGunSlot = 0;
+				//data.offHandGunSlot = 0;
 				(new PacketSelectOffHandGun(0)).handleServerSide(player);
 			}
 			return;
@@ -739,50 +763,53 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	{
 		if(entity instanceof EntityPlayer && ((EntityPlayer)entity).inventory.getCurrentItem() == itemstack)
 		{
-			if(world.isRemote)
+			EntityPlayer player = (EntityPlayer) entity;
+			EnumHand hand;
+			if (itemstack == player.getHeldItemMainhand())
+			{
+				hand = EnumHand.MAIN_HAND;
+			}
+			else if (itemstack == player.getHeldItemOffhand())
+			{
+				hand = EnumHand.OFF_HAND;
+			}
+			else
+			{
+				return;
+			}
+			EnumHandSide side = FlansUtils.getSideForHand(hand, player);
+
+			//don't shoot if gui is open
+			if (Minecraft.getMinecraft().currentScreen != null)
+			{
+				rightMouseHeld = false;
+				leftMouseHeld = false;
+				return;
+			}
+
+			if (world.isRemote)
 			{
 				// Get button presses. Do this before splitting into each hand. Prevents second pass wiping the data
 				lastRightMouseHeld = rightMouseHeld;
 				lastLeftMouseHeld = leftMouseHeld;
+				//TODO key-binding
 				rightMouseHeld = Mouse.isButtonDown(1);
 				leftMouseHeld = Mouse.isButtonDown(0);
 			}
 			
-			boolean hasOffHand = false;
-			EntityPlayer player = (EntityPlayer)entity;
-			PlayerData data = PlayerHandler.getPlayerData(player, Side.CLIENT);
-			
-			if(type.oneHanded) 
-			{
-				// If the offhand item is this item, select none
-				if(data.offHandGunSlot == player.inventory.currentItem + 1)
-					data.offHandGunSlot = 0;
-				
-				if(data.offHandGunSlot != 0)
-				{
-					hasOffHand = true;
-					ItemStack offHandGunStack = player.inventory.getStackInSlot(data.offHandGunSlot - 1);
-					if(offHandGunStack != null && offHandGunStack.getItem() instanceof ItemGun)
-					{
-						//GunType offHandGunType = ((ItemGun)offHandGunStack.getItem()).type;
-						((ItemGun)offHandGunStack.getItem()).onUpdateEach(offHandGunStack, data.offHandGunSlot - 1, world, entity, true, hasOffHand);
-					}
-				}
-			}
-			
-			onUpdateEach(itemstack, player.inventory.currentItem, world, entity, false, hasOffHand);
+			onUpdateEach(itemstack, player.inventory.currentItem, world, player, side);
 		}
 	}
 	
 	/** Called once for each weapon we are weilding */
-	private void onUpdateEach(ItemStack itemstack, int gunSlot, World world, Entity entity, boolean isOffHand, boolean hasOffHand)
+	private void onUpdateEach(ItemStack itemstack, int gunSlot, World world, EntityLivingBase entity, EnumHandSide side)
 	{
 		if(world.isRemote)
-			onUpdateClient(itemstack, gunSlot, world, entity, isOffHand, hasOffHand);
-		else onUpdateServer(itemstack, gunSlot, world, entity, isOffHand, hasOffHand);		
+			onUpdateClient(itemstack, gunSlot, world, entity, side);
+		else onUpdateServer(itemstack, gunSlot, world, entity, side);
 	}
-	
-	public boolean Reload(ItemStack gunstack, World world, Entity entity, IInventory inventory, boolean isOffHand, boolean hasOffHand, boolean forceReload, boolean isCreative)
+
+	public boolean Reload(ItemStack gunstack, World world, Entity entity, IInventory inventory, EnumHandSide hand, boolean forceReload, boolean isCreative)
 	{
 		//Deployable guns cannot be reloaded in the inventory
 		if(type.deployable)
@@ -1116,9 +1143,9 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	//
 	// Minecraft base item overrides
 	// _____________________________________________________________________________
-	
+
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips)
+	public void addInformation(ItemStack stack, EntityPlayer player, List<String> lines, boolean advancedTooltips)
 	{
 		if(type.description != null)
 		{
@@ -1197,7 +1224,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 			//Do animation
 			if(entityLiving.worldObj.isRemote)
 			{
-				GunAnimations animations = FlansModClient.getGunAnimations(entityLiving, false);
+				GunAnimations animations = FlansModClient.getGunAnimations(entityLiving, FlansUtils.getSideWithItem(entityLiving, stack));
 				animations.doMelee(type.meleeTime);
 			}
 			//Do custom melee hit detection
@@ -1279,31 +1306,35 @@ public class ItemGun extends Item implements IPaintableItem, IItem
     {
         return 100;
     }
-    
+
+
     @Override
     public EnumAction getItemUseAction(ItemStack par1ItemStack)
     {
         return EnumAction.BOW;
     }
-	
-    @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
-    {
-       	Multimap map = super.getItemAttributeModifiers(equipmentSlot);
-       	if(type.knockbackModifier != 0F)
-       		map.put(SharedMonsterAttributes.KNOCKBACK_RESISTANCE.getAttributeUnlocalizedName(), new AttributeModifier("KnockbackResist", type.knockbackModifier, 0));
-       	if(type.moveSpeedModifier != 1F)
-       		map.put(SharedMonsterAttributes.MOVEMENT_SPEED.getAttributeUnlocalizedName(), new AttributeModifier("MovementSpeed", type.moveSpeedModifier - 1F, 2));
-        if(type.secondaryFunction == EnumSecondaryFunction.MELEE)
-        	map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
-       	return map;
-    }
-	
-	@Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
-    {
-        return slotChanged;
-    }
+
+
+	@Override @Nonnull
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack)
+	{
+		if (slot.getSlotType() != EntityEquipmentSlot.Type.HAND)
+		{
+			//guns can't be worn as armor
+			return super.getAttributeModifiers(slot, stack);
+		}
+		Multimap<String, AttributeModifier> map = super.getAttributeModifiers(slot, stack);
+		if(type.knockbackModifier != 0F)
+			map.put(SharedMonsterAttributes.KNOCKBACK_RESISTANCE.getAttributeUnlocalizedName(), new AttributeModifier("KnockbackResist", type.knockbackModifier, 0));
+		if(type.moveSpeedModifier != 1F)
+			map.put(SharedMonsterAttributes.MOVEMENT_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "MovementSpeed", type.moveSpeedModifier - 1F, 2));
+		if(type.secondaryFunction == EnumSecondaryFunction.MELEE)
+			map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
+		return map;
+	}
+
+
+
 	
 	// For when we have custom paintjob names
 	//@Override
