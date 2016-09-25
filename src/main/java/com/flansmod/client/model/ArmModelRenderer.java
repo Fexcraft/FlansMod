@@ -3,7 +3,6 @@ package com.flansmod.client.model;
 import com.flansmod.common.FlansUtils;
 import com.flansmod.common.ReflectionUtils;
 import com.flansmod.common.vector.Vector3f;
-import com.sun.istack.internal.Nullable;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
@@ -16,6 +15,8 @@ import net.minecraft.util.EnumHandSide;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class ArmModelRenderer extends ModelRenderer
 {

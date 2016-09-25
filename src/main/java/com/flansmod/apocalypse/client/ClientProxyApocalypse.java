@@ -55,7 +55,7 @@ public class ClientProxyApocalypse extends CommonProxyApocalypse
 		RenderingRegistry.registerEntityRenderingHandler(EntitySurvivor.class, new RenderSurvivor(Minecraft.getMinecraft().getRenderManager(), new ModelBiped(), 0));
 		RenderingRegistry.registerEntityRenderingHandler(EntityFakePlayer.class, new RenderFakePlayer(Minecraft.getMinecraft().getRenderManager(), new ModelBiped(), 0));
 		RenderingRegistry.registerEntityRenderingHandler(EntityTeleporter.class, new RenderTeleporter(Minecraft.getMinecraft().getRenderManager()));
-		RenderingRegistry.registerEntityRenderingHandler(EntityAIMecha.class, new RenderMecha(Minecraft.getMinecraft().getRenderManager()));
+		RenderingRegistry.registerEntityRenderingHandler(EntityAIMecha.class, RenderMecha::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityNukeDrop.class, new RenderNukeDrop(Minecraft.getMinecraft().getRenderManager()));
 	}
 	

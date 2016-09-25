@@ -1,8 +1,8 @@
 package com.flansmod.common;
 
-import com.sun.istack.internal.Nullable;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
