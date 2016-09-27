@@ -58,6 +58,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -101,8 +102,7 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 	
 	private static List<ShotData> shotsFiredClient = new ArrayList<ShotData>(), shotsFiredServer = new ArrayList<ShotData>();
 	
-	public ItemGun(GunType type)
-	{
+	public ItemGun(GunType type){
 		maxStackSize = 1;
 		this.type = type;
 		type.item = this;
@@ -111,10 +111,12 @@ public class ItemGun extends Item implements IPaintableItem, IItem
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
-        if (type.model != null)
-        {
-			OverrideVanillaModelLoader.INSTANCE.addAcceptedType(this.getRegistryName(), type);
-        }
+		
+		if(FMLCommonHandler.instance().getSide() == Side.CLIENT){
+			if(type.model != null){
+				OverrideVanillaModelLoader.INSTANCE.addAcceptedType(this.getRegistryName(), type);
+	        }
+		}
 	}
 
 	@Override
