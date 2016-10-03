@@ -158,7 +158,7 @@ public class GuiGunModTable extends GuiContainer
             		
             		Paintjob paintjob = gunType.paintjobs.get(2 * y + x);
             		ItemStack stack = gunStack.copy();
-            		//stack.getTagCompound().setString("Paint", paintjob.iconName);
+            		//stack.getTagCompound().setString("Paint", paintjob.name);
             		stack.setItemDamage(paintjob.ID);
             		itemRender.renderItemIntoGUI(stack, xOrigin + 132 + x * 18, yOrigin + 83 + y * 18);
             	}
@@ -252,7 +252,7 @@ public class GuiGunModTable extends GuiContainer
             		
             		Paintjob paintjob = gunType.paintjobs.get(2 * j + i);
             		ItemStack stack = gunStack.copy();
-            		stack.getTagCompound().setString("Paint", paintjob.iconName);
+            		stack.getTagCompound().setString("Paint", paintjob.name);
             		int slotX = 131 + i * 18;
             		int slotY = 82 + j * 18;
             		if(mouseXInGUI >= slotX && mouseXInGUI < slotX + 18 && mouseYInGUI >= slotY && mouseYInGUI < slotY + 18)

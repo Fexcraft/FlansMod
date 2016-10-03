@@ -171,7 +171,7 @@ public class PlayerClass extends InfoType
 			    		{
 			    			Paintjob paintjob = gunType.getPaintjob(itemNames[i + 1]);
 			    			if(paintjob != null)
-			    				tags.setString("Paint", paintjob.iconName);
+			    				tags.setString("Paint", paintjob.name);
 			    		}
 			    	}
 			    	tags.setTag("attachments", attachmentTags);

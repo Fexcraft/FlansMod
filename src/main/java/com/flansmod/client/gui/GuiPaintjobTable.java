@@ -1,15 +1,5 @@
 package com.flansmod.client.gui;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.model.ModelAttachment;
 import com.flansmod.client.model.ModelDriveable;
@@ -25,7 +15,6 @@ import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.vector.Vector3f;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -35,6 +24,14 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
 
 public class GuiPaintjobTable extends GuiContainer 
 {
@@ -516,7 +513,7 @@ public class GuiPaintjobTable extends GuiContainer
 
         	try
         	{
-        		String imageLocation = "Flan/" + paintableType.contentPack + "/assets/flansmod/skins/" + paintjob.textureName + ".png";
+        		String imageLocation = "Flan/" + paintableType.contentPack + "/assets/flansmod/skins/" + paintjob.texturePath + ".png";
         		BufferedImage bufferedImage = ImageIO.read(new File(imageLocation));
         		dynamicTexture = new DynamicTexture(bufferedImage);
         		dynamicTextureX = bufferedImage.getWidth();
@@ -665,7 +662,7 @@ public class GuiPaintjobTable extends GuiContainer
 	            		
 	            		Paintjob paintjob = paintableType.paintjobs.get(9 * j + i);
 	            		ItemStack stack = gunStack.copy();
-	            		stack.getTagCompound().setString("Paint", paintjob.iconName);
+	            		stack.getTagCompound().setString("Paint", paintjob.name);
 	            		int slotX = 7 + i * 18;
 	            		int slotY = 129 + j * 18;
 	            		if(mouseXInGUI >= slotX && mouseXInGUI < slotX + 18 && mouseYInGUI >= slotY && mouseYInGUI < slotY + 18)

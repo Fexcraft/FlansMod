@@ -1,13 +1,9 @@
 package com.flansmod.common.guns.boxes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
 import com.flansmod.common.types.InfoType;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,6 +19,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockGunBox extends Block
 {
@@ -84,7 +83,7 @@ public class BlockGunBox extends Block
 				{
 					GunType gunType = (GunType)entry.type;
 					NBTTagCompound tags = new NBTTagCompound();
-					tags.setString("Paint", gunType.defaultPaintjob.iconName);
+					tags.setString("Paint", gunType.defaultPaintjob.name);
 					//Add ammo tags
 					NBTTagList ammoTagsList = new NBTTagList();
 					for(int j = 0; j < gunType.numAmmoItemsInGun; j++)

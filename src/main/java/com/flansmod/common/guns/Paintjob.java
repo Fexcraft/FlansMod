@@ -4,16 +4,18 @@ import net.minecraft.item.ItemStack;
 
 public class Paintjob 
 {
-	public String iconName;
-	public String textureName;
+	public final String name;
+	public final String iconPath;
+	public final String texturePath;
 	public ItemStack[] dyesNeeded;
 	public int ID;
 	
-	public Paintjob(int id, String iconName, String textureName, ItemStack[] dyesNeeded)
+	public Paintjob(int id, String name, String iconPath, String texturePath, ItemStack[] dyesNeeded)
 	{
 		this.ID = id;
-		this.iconName = iconName;
-		this.textureName = textureName;
+		this.name = name;
+		this.iconPath = iconPath;
+		this.texturePath = texturePath;
 		this.dyesNeeded = dyesNeeded;
 	}
 }

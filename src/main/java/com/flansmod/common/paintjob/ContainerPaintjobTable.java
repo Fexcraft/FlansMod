@@ -161,7 +161,7 @@ public class ContainerPaintjobTable extends Container
 	    	}
 	    	
 	    	//Paint the gun. This line is only reached if the player is in creative or they have had their dyes taken already
-			//gunStack.getTagCompound().setString("Paint", paintjob.iconName);
+			//gunStack.getTagCompound().setString("Paint", paintjob.name);
 			paintableStack.setItemDamage(paintjob.ID);
 		}
 	}

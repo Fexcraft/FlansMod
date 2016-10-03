@@ -1,28 +1,19 @@
 package com.flansmod.client;
 
-import java.awt.Point;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-
-import javax.imageio.ImageIO;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
-
 import net.minecraft.util.ResourceLocation;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 
 public class FlansModResourceHandler 
 {
@@ -106,7 +97,7 @@ public class FlansModResourceHandler
 		{
 			return paintjobMap.get(paintjob);
 		}
-		ResourceLocation resLoc = new ResourceLocation("flansmod", "skins/" + paintjob.textureName + ".png");
+		ResourceLocation resLoc = new ResourceLocation("flansmod", "skins/" + paintjob.texturePath + ".png");
 		paintjobMap.put(paintjob, resLoc);
 		return resLoc;
 	}
@@ -128,7 +119,7 @@ public class FlansModResourceHandler
 		{
 			return paintjobIconMap.get(paintjob);
 		}
-		ResourceLocation resLoc = new ResourceLocation("flansmod", "textures/items/" + paintjob.iconName + ".png");
+		ResourceLocation resLoc = new ResourceLocation("flansmod", "textures/items/" + paintjob.iconPath + ".png");
 		paintjobIconMap.put(paintjob, resLoc);
 		return resLoc;
 	}
