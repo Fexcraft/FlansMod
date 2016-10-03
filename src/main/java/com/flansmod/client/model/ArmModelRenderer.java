@@ -13,10 +13,9 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.EnumHandSide;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class ArmModelRenderer extends ModelRenderer
 {
@@ -101,7 +100,7 @@ public class ArmModelRenderer extends ModelRenderer
         result.add((ArmModelRenderer) modelBase.bipedRightArm);
 
         //armors
-        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers"); //TODO: obfuscated
+        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers");
         for (LayerRenderer layerRenderer : layerRenderers)
         {
             if (!(layerRenderer instanceof LayerArmorBase))
@@ -190,7 +189,7 @@ public class ArmModelRenderer extends ModelRenderer
         }
 
         //armors
-        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers"); //TODO: obfuscated
+        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers");
         for (LayerRenderer layerRenderer : layerRenderers)
         {
             if (!(layerRenderer instanceof LayerArmorBase))
@@ -230,7 +229,7 @@ public class ArmModelRenderer extends ModelRenderer
         }
 
         //armors
-        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers"); //TODO: obfuscated
+        List<LayerRenderer> layerRenderers = ReflectionUtils.getValue(RenderLivingBase.class, renderer, "layerRenderers");
         for (LayerRenderer layerRenderer : layerRenderers)
         {
             if (!(layerRenderer instanceof LayerArmorBase))
