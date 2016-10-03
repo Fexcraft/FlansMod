@@ -760,19 +760,20 @@ public class ClientRenderHooks
 		*/
 		if(!event.isCancelable() && event.getType() == ElementType.HOTBAR)
 		{
-			//Player ammo overlay
 			if(mc.thePlayer != null)
 			{
-				ItemStack stack = mc.thePlayer.inventory.getCurrentItem();
-				if(stack != null && stack.getItem() instanceof ItemGun)
+
+				EnumHand rightHand = FlansUtils.getHandForSide(EnumHandSide.RIGHT, mc.thePlayer);
+				ItemStack stackRightHand = mc.thePlayer.getHeldItem(rightHand);
+				if(stackRightHand != null && stackRightHand.getItem() instanceof ItemGun)
 				{
-					ItemGun gunItem = (ItemGun)stack.getItem();
+					ItemGun gunItem = (ItemGun)stackRightHand.getItem();
 					GunType gunType = gunItem.getInfoType();
 					int x = 0;
 					for(int n = 0; n < gunType.numAmmoItemsInGun; n++)
 					{
-						ItemStack bulletStack = ((ItemGun)stack.getItem()).getBulletItemStack(stack, n);
-						if(bulletStack != null && bulletStack.getItem() != null && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
+						ItemStack bulletStack = ((ItemGun)stackRightHand.getItem()).getBulletItemStack(stackRightHand, n);
+						if(bulletStack != null && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
 						{
 							RenderHelper.enableGUIStandardItemLighting();
 							GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -788,47 +789,40 @@ public class ClientRenderHooks
 							x += 16 + mc.fontRendererObj.getStringWidth(s);
 						}
 					}
-
-
-					//Render secondary gun
-					/*
-					PlayerData data = PlayerHandler.getPlayerData(mc.thePlayer, Side.CLIENT);
-					if(gunType.oneHanded && data.offHandGunSlot != 0)
-					{
-						ItemStack offHandStack = mc.thePlayer.inventory.getStackInSlot(data.offHandGunSlot - 1);
-						if(offHandStack != null && offHandStack.getItem() instanceof ItemGun)
-						{
-							GunType offHandGunType = ((ItemGun)offHandStack.getItem()).GetType();
-							x = 0;
-							for(int n = 0; n < offHandGunType.numAmmoItemsInGun; n++)
-							{
-								ItemStack bulletStack = ((ItemGun)offHandStack.getItem()).getBulletItemStack(offHandStack, n);
-								if(bulletStack != null && bulletStack.getItem() != null && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
-								{
-									//Find the string we are displaying next to the ammo item
-									String s = (bulletStack.getMaxDamage() - bulletStack.getItemDamage()) + "/" + bulletStack.getMaxDamage();
-									if(bulletStack.getMaxDamage() == 1)
-										s = "";
-									
-									//Draw the slot and then move leftwards
-									RenderHelper.enableGUIStandardItemLighting();
-									GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-									GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-									OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
-									drawSlotInventory(mc.fontRendererObj, bulletStack, i / 2 - 32 - x, j - 65);	
-									x += 16 + mc.fontRendererObj.getStringWidth(s);
-									
-									//Draw the string
-									GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-									RenderHelper.disableStandardItemLighting();
-									mc.fontRendererObj.drawString(s, i / 2 - 16 - x, j - 59, 0x000000);
-									mc.fontRendererObj.drawString(s, i / 2 - 17 - x, j - 60, 0xffffff);
-								}
-							}
-						}
-					}*/
 				}
+				EnumHand leftHand = rightHand == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
+				ItemStack stackLeftHand = mc.thePlayer.getHeldItem(leftHand);
 
+				if(stackLeftHand != null && stackLeftHand.getItem() instanceof ItemGun)
+				{
+					GunType offHandGunType = ((ItemGun)stackLeftHand.getItem()).getInfoType();
+					int x = 0;
+					for(int n = 0; n < offHandGunType.numAmmoItemsInGun; n++)
+					{
+						ItemStack bulletStack = ((ItemGun)stackLeftHand.getItem()).getBulletItemStack(stackLeftHand, n);
+						if(bulletStack != null && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
+						{
+							//Find the string we are displaying next to the ammo item
+							String s = (bulletStack.getMaxDamage() - bulletStack.getItemDamage()) + "/" + bulletStack.getMaxDamage();
+							if(bulletStack.getMaxDamage() == 1)
+								s = "";
+
+							//Draw the slot and then move leftwards
+							RenderHelper.enableGUIStandardItemLighting();
+							GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+							GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
+							drawSlotInventory(mc.fontRendererObj, bulletStack, i / 2 - 32 - x, j - 65);
+							x += 16 + mc.fontRendererObj.getStringWidth(s);
+
+							//Draw the string
+							GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+							RenderHelper.disableStandardItemLighting();
+							mc.fontRendererObj.drawString(s, i / 2 - 16 - x, j - 59, 0x000000);
+							mc.fontRendererObj.drawString(s, i / 2 - 17 - x, j - 60, 0xffffff);
+						}
+					}
+				}
 			}
 			
 			PacketTeamInfo teamInfo = FlansModClient.teamInfo;

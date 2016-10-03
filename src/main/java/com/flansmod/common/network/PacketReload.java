@@ -1,6 +1,7 @@
 package com.flansmod.common.network;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.GunType;
@@ -10,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -47,7 +49,8 @@ public class PacketReload extends PacketBase
 	public void handleServerSide(EntityPlayerMP playerEntity)
 	{
 		PlayerData data = PlayerHandler.getPlayerData(playerEntity);
-		ItemStack stack = playerEntity.getHeldItemMainhand();
+		EnumHand hand = FlansUtils.getHandForSide(handSide, playerEntity);
+		ItemStack stack = playerEntity.getHeldItem(hand);
 		/*
 		if(isOffHand && data.offHandGunSlot != 0)
 		{

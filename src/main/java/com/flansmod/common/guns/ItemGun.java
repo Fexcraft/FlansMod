@@ -20,7 +20,6 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.*;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.PacketReload;
-import com.flansmod.common.network.PacketSelectOffHandGun;
 import com.flansmod.common.network.PacketShotData;
 import com.flansmod.common.teams.EntityFlag;
 import com.flansmod.common.teams.EntityFlagpole;
@@ -56,6 +55,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -107,12 +107,15 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		setCreativeTab(FlansMod.tabFlanGuns);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
+		//The model locations must be the actual location of the model not the item location + meta. Currently the location
+		// is ignored and we just pretend to load the model, but that might change in the future
+		//ItemUtil.registerRender(this);
 
         for(Paintjob paintjob : getInfoType().paintjobs)
         {
             //The location that is used to register the custom location in ItemUtil.registerRender
-            ModelResourceLocation modelLocation = new ModelResourceLocation(type.item.getRegistryName() + "_" +  paintjob.ID, "inventory");
+            ModelResourceLocation modelLocation = new ModelResourceLocation(type.item.getRegistryName() + "_" +  paintjob.name, "inventory");
+			ModelLoader.setCustomModelResourceLocation(this, paintjob.ID, modelLocation);
             OverrideVanillaModelLoader.INSTANCE.setCusomIcon(modelLocation, new ResourceLocation(FlansMod.MODID, "items/" + paintjob.iconPath));
         }
 	}
@@ -277,7 +280,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = (EntityPlayer)entity;
 		PlayerData data = PlayerHandler.getPlayerData(player, Side.CLIENT);
-		
+
 		// Play idle sounds
 		if (soundDelay <= 0 && type.idleSound != null)
 		{
@@ -312,6 +315,18 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		if(type.usableByPlayers)
 		{
 			EnumHand hand = FlansUtils.getHandForSide(handSide, entity);
+
+			if (hand == EnumHand.MAIN_HAND)
+			{
+				lastRightMouseHeld = rightMouseHeld;
+				rightMouseHeld = Mouse.isButtonDown(1);
+			}
+			else
+			{
+				lastLeftMouseHeld = leftMouseHeld;
+				leftMouseHeld = Mouse.isButtonDown(0);
+			}
+
 			boolean needsToReload = needsToReload(gunstack);
 			boolean shouldShootThisTick = false;
 			switch(type.getFireMode(gunstack))
@@ -537,7 +552,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		}
 		
 		
-		boolean isExtraBullet = shotData instanceof InstantShotData ? ((InstantShotData)shotData).isExtraBullet : false;
+		boolean isExtraBullet = shotData instanceof ShotData.InstantShotData && ((ShotData.InstantShotData) shotData).isExtraBullet;
 
 		//Go through the bullet stacks in the gun and see if any of them are not null
 		int bulletID = 0;
@@ -545,13 +560,13 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		for(; bulletID < type.numAmmoItemsInGun; bulletID++)
 		{
 			ItemStack checkingStack = getBulletItemStack(gunstack, bulletID);
-			if(checkingStack != null && checkingStack.getItem() != null && checkingStack.getItemDamage() < checkingStack.getMaxDamage())
+			if(checkingStack != null && checkingStack.getItemDamage() < checkingStack.getMaxDamage())
 			{
 				bulletStack = checkingStack;
 				break;
 			}
 		}
-		
+
 		// We have no bullet stack. So we need to reload. The player will send us a message requesting we do a reload
 		if(bulletStack == null)
 		{
@@ -630,7 +645,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 					//float radius = Vector3f.sub(instantData.origin, instantData.hitPos, null).length();
 					//radius += 50.0f;
 					
-					DoInstantShot(world, player, type, (BulletType)bullet, instantData.origin, instantData.hitPos, instantData.hitData, type.getDamage(gunstack));
+					doInstantShot(world, player, type, (BulletType)bullet, instantData.origin, instantData.hitPos, instantData.hitData, type.getDamage(gunstack));
 					
 					shotsFiredServer.add(shotData);
 				}
@@ -650,8 +665,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		));
 
 	}
-	
-	public void DoInstantShot(World world, Entity shooter, InfoType shotFrom, BulletType shotType, Vector3f origin, Vector3f hit, BulletHit hitData, float damage)
+	public void doInstantShot(World world, Entity shooter, InfoType shotFrom, BulletType shotType, Vector3f origin, Vector3f hit, BulletHit hitData, float damage)
 	{
 		if(EntityBullet.OnHit(world, origin, hit, shooter, shotFrom, shotType, null, damage, hitData))
 		{
@@ -722,7 +736,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		}
 		else
 		{
-			
+
 		}
 	}
 	
@@ -736,7 +750,8 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		PlayerData data = PlayerHandler.getPlayerData(player);
 		if(data == null)
 			return;
-		
+
+		/*
 		if(player.inventory.getCurrentItem() != itemstack)
 		{
 			//If the player is no longer holding a gun, emulate a release of the shoot button
@@ -748,6 +763,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			}
 			return;
 		}
+		*/
 		
 		if(!shotsFiredServer.isEmpty())// && entity.ticksExisted % SERVER_TO_CLIENT_UPDATE_INTERVAL == 0)
 		{
@@ -761,7 +777,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	@Override
 	public void onUpdate(ItemStack itemstack, World world, Entity entity, int i, boolean flag)
 	{
-		if(entity instanceof EntityPlayer && ((EntityPlayer)entity).inventory.getCurrentItem() == itemstack)
+		if(entity instanceof EntityPlayer)
 		{
 			EntityPlayer player = (EntityPlayer) entity;
 			EnumHand hand;
@@ -778,7 +794,6 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 				return;
 			}
 			EnumHandSide side = FlansUtils.getSideForHand(hand, player);
-
 			//don't shoot if gui is open
 			if (Minecraft.getMinecraft().currentScreen != null)
 			{
@@ -787,6 +802,8 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 				return;
 			}
 
+			//onUpdate is called for offHand as well now, do mouse related stuff in onUpdateClient.
+			/*
 			if (world.isRemote)
 			{
 				// Get button presses. Do this before splitting into each hand. Prevents second pass wiping the data
@@ -796,6 +813,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 				rightMouseHeld = Mouse.isButtonDown(1);
 				leftMouseHeld = Mouse.isButtonDown(0);
 			}
+			*/
 			
 			onUpdateEach(itemstack, player.inventory.currentItem, world, player, side);
 		}
@@ -1104,7 +1122,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		for(int i = 0; i < type.numAmmoItemsInGun; i++)
 		{
 			ItemStack bulletStack = getBulletItemStack(stack, i);
-			if(bulletStack != null && bulletStack.getItem() != null && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
+			if(bulletStack != null  && bulletStack.getItemDamage() < bulletStack.getMaxDamage())
 			{
 				return false;
 			}
