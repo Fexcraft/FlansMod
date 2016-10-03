@@ -34,6 +34,7 @@ import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -57,7 +58,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -108,12 +108,13 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
-		
-		if(FMLCommonHandler.instance().getSide() == Side.CLIENT){
-			if(type.model != null){
-				OverrideVanillaModelLoader.INSTANCE.addAcceptedType(this.getRegistryName(), type);
-	        }
-		}
+
+        for(Paintjob paintjob : getInfoType().paintjobs)
+        {
+            //The location that is used to register the custom location in ItemUtil.registerRender
+            ModelResourceLocation modelLocation = new ModelResourceLocation(type.item.getRegistryName() + "_" +  paintjob.ID, "inventory");
+            OverrideVanillaModelLoader.INSTANCE.setCusomIcon(modelLocation, new ResourceLocation(FlansMod.MODID, "items/" + paintjob.iconPath));
+        }
 	}
 
 	@Override

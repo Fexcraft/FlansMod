@@ -1,10 +1,6 @@
 package com.flansmod.common.types;
 
-import java.util.HashMap;
-import java.util.Random;
-
 import com.flansmod.common.FlansMod;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.init.Items;
@@ -17,6 +13,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.HashMap;
+import java.util.Random;
 
 public class InfoType
 {
@@ -85,7 +84,7 @@ public class InfoType
 	protected void postRead(TypeFile file) {}
 	
 	@SideOnly(Side.CLIENT)
-	public ModelBase GetModel() { return null; }
+	public ModelBase getModel() { return null; }
 
 	/** Pack reader */
 	protected void read(String[] split, TypeFile file)

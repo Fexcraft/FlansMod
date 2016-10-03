@@ -1,5 +1,6 @@
 package com.flansmod.client.gui;
 
+import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.model.ModelAttachment;
 import com.flansmod.client.model.ModelDriveable;
@@ -18,6 +19,7 @@ import com.flansmod.common.vector.Vector3f;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
@@ -211,7 +213,7 @@ public class GuiPaintjobTable extends GuiContainer
 				tempStack.setItemDamage(hoveringOver.ID);
 			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).getInfoType();
 			EnumType eType = EnumType.getFromObject(paintableType);
-			if(paintableType.GetModel() != null)
+			if(paintableType.getModel() != null)
 			{
 				GL11.glPushMatrix();
 				GL11.glColor4f(1F, 1F, 1F, 1F);
@@ -249,7 +251,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 				        if(inCustomMode)
 				        	RenderGun.bindTextures = false;
-				        
+						ClientProxy.gunRenderer.renderPerspective(ItemCameraTransforms.TransformType.GROUND, null, tempStack, null);
 						//ClientProxy.gunRenderer.renderItem(ItemRenderType.ENTITY, tempStack);
 						RenderGun.bindTextures = true;
 						break;
@@ -258,7 +260,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 						if(!inCustomMode)
 							mc.renderEngine.bindTexture(FlansModResourceHandler.getPaintjobTexture(paintjob));
-						((ModelAttachment)paintableType.GetModel()).renderAttachment(0.0625f);
+						((ModelAttachment)paintableType.getModel()).renderAttachment(0.0625f);
 						break;
 					}
 					case plane:
@@ -267,7 +269,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 						if(!inCustomMode)
 							mc.renderEngine.bindTexture(FlansModResourceHandler.getPaintjobTexture(paintjob));
-						((ModelDriveable)paintableType.GetModel()).render((DriveableType)paintableType);
+						((ModelDriveable)paintableType.getModel()).render((DriveableType)paintableType);
 						break;
 					}
 				
