@@ -1,11 +1,7 @@
 package com.flansmod.common.guns;
 
-import java.util.ArrayList;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.Entity;
@@ -23,7 +19,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemAAGun extends Item implements IFlanItem, IItem
+import java.util.ArrayList;
+
+public class ItemAAGun extends Item implements IFlanItem<AAGunType>, IItem
 {
     public static final ArrayList<String> names = new ArrayList<String>();
 	public AAGunType type;
@@ -93,7 +91,7 @@ public class ItemAAGun extends Item implements IFlanItem, IItem
 
 	
 	@Override
-	public InfoType getInfoType() 
+	public AAGunType getInfoType()
 	{
 		return type;
 	}
@@ -101,10 +99,5 @@ public class ItemAAGun extends Item implements IFlanItem, IItem
 	@Override
 	public String getName(){
 		return type.shortName;
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
 }

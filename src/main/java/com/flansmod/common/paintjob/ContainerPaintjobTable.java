@@ -110,7 +110,7 @@ public class ContainerPaintjobTable extends Container
 		ItemStack paintableStack = table.getPaintableStack();
 		if(paintableStack != null && paintableStack.getItem() instanceof IPaintableItem)
 		{
-			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).GetPaintableType();
+			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).getInfoType();
 			clickPaintjob(paintableType.getPaintjob(i));
 		}
 	}

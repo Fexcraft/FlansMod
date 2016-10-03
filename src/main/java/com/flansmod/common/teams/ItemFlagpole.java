@@ -86,9 +86,4 @@ public class ItemFlagpole extends Item implements IFlanItem, IItem
 	public String getName() {
 		return "flagpole";
 	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
-	}
 }

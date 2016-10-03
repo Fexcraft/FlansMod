@@ -58,7 +58,7 @@ public class PacketReload extends PacketBase
 		if(data != null && stack != null && stack.getItem() instanceof ItemGun)
 		{
 			ItemGun gun = (ItemGun) stack.getItem();
-			GunType type = gun.GetType();
+			GunType type = gun.getInfoType();
 
 			if (((ItemGun) stack.getItem()).Reload(stack, playerEntity.getEntityWorld(), playerEntity, playerEntity.inventory, handSide, isForced, playerEntity.isCreative()))
 			{

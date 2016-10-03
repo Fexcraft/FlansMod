@@ -27,7 +27,6 @@ import com.flansmod.common.teams.EntityFlagpole;
 import com.flansmod.common.teams.EntityGunItem;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.InfoType;
-import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
 import net.fexcraft.mod.lib.api.item.IItem;
@@ -68,19 +67,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ItemGun extends Item implements IPaintableItem, IItem
+public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 {
 	private static final int CLIENT_TO_SERVER_UPDATE_INTERVAL = 1;
 	private static final int SERVER_TO_CLIENT_UPDATE_INTERVAL = 2;
 	
 	private GunType type;
-	
-	public GunType GetType() { return type; }
+
 	@Override
-	public InfoType getInfoType() { return type; }
-	@Override
-	public PaintableType GetPaintableType() { return type; }
-	
+	public GunType getInfoType() { return type; }
+
+
 	private int soundDelay = 0;
 	
 	private static boolean rightMouseHeld;
@@ -1350,12 +1347,9 @@ public class ItemGun extends Item implements IPaintableItem, IItem
     {
         return false;
     }
-	@Override
+
+    @Override
 	public String getName(){
 		return type.shortName;
-	}
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
 }

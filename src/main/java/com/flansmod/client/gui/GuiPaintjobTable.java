@@ -212,7 +212,7 @@ public class GuiPaintjobTable extends GuiContainer
 			ItemStack tempStack = paintableStack.copy();
 			if(hoveringOver != null)
 				tempStack.setItemDamage(hoveringOver.ID);
-			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).GetPaintableType();
+			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).getInfoType();
 			EnumType eType = EnumType.getFromObject(paintableType);
 			if(paintableType.GetModel() != null)
 			{
@@ -307,7 +307,7 @@ public class GuiPaintjobTable extends GuiContainer
             ItemStack gunStack = inventorySlots.getSlot(0).getStack();
             if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
             {
-            	PaintableType gunType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+            	PaintableType gunType = ((IPaintableItem)gunStack.getItem()).getInfoType();
             	
             	int numPaintjobs = gunType.paintjobs.size();
             	int numRows = numPaintjobs / 9 + 1;
@@ -510,7 +510,7 @@ public class GuiPaintjobTable extends GuiContainer
 		ItemStack gunStack = inventorySlots.getSlot(0).getStack();
         if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
         {
-        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).getInfoType();
         	
         	Paintjob paintjob = paintableType.getPaintjob(gunStack.getItemDamage());
 
@@ -652,7 +652,7 @@ public class GuiPaintjobTable extends GuiContainer
 			ItemStack gunStack = inventorySlots.getSlot(0).getStack();
 	        if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
 	        {
-	        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+	        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).getInfoType();
 	        	int numPaintjobs = paintableType.paintjobs.size();
 	        	int numRows = numPaintjobs / 9 + 1;
 	        	

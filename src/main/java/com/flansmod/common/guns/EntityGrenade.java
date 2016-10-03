@@ -567,7 +567,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 			//Handle ammo
 			if(type.numClips > 0 && player.getHeldItemMainhand() != null && player.getHeldItemMainhand().getItem() instanceof ItemGun)
 			{
-				GunType gun = ((ItemGun)player.getHeldItemMainhand().getItem()).GetType();
+				GunType gun = ((ItemGun)player.getHeldItemMainhand().getItem()).getInfoType();
 				if(gun.ammo.size() > 0)
 				{
 					ShootableType bulletToGive = gun.ammo.get(0);

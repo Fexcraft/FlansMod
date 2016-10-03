@@ -90,7 +90,7 @@ public class ClientRenderHooks
 	{
 		if(event.getItem().getItem() instanceof ItemGun)
 		{
-			GunType type = ((ItemGun)event.getItem().getItem()).GetType();
+			GunType type = ((ItemGun)event.getItem().getItem()).getInfoType();
 			if(type.model != null)
 			{
 				event.setCanceled(true);
@@ -123,8 +123,8 @@ public class ClientRenderHooks
 			ArmModelRenderer.removeLeftArm(renderPlayer, renderPlayer.getMainModel());
 		}
 
-		boolean hasGunMainHand = itemToRenderMainHand != null && itemToRenderMainHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderMainHand.getItem()).GetType().model != null;
-		boolean hasGunOffHand = itemToRenderOffHand != null && itemToRenderOffHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderOffHand.getItem()).GetType().model != null;
+		boolean hasGunMainHand = itemToRenderMainHand != null && itemToRenderMainHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderMainHand.getItem()).getInfoType().model != null;
+		boolean hasGunOffHand = itemToRenderOffHand != null && itemToRenderOffHand.getItem() instanceof ItemGun && ((ItemGun) itemToRenderOffHand.getItem()).getInfoType().model != null;
 		//EntityPlayer player = mc.thePlayer;
 		if(hasGunMainHand || hasGunOffHand)
 		{
@@ -465,12 +465,12 @@ public class ClientRenderHooks
 		GunType gunRight = null;
 		if (rightStack != null && rightStack.getItem() instanceof ItemGun)
 		{
-			gunRight = ((ItemGun) rightStack.getItem()).GetType();
+			gunRight = ((ItemGun) rightStack.getItem()).getInfoType();
 		}
 		GunType gunLeft = null;
 		if (leftStack != null && leftStack.getItem() instanceof ItemGun)
 		{
-			gunLeft = ((ItemGun) leftStack.getItem()).GetType();
+			gunLeft = ((ItemGun) leftStack.getItem()).getInfoType();
 		}
 
 
@@ -767,7 +767,7 @@ public class ClientRenderHooks
 				if(stack != null && stack.getItem() instanceof ItemGun)
 				{
 					ItemGun gunItem = (ItemGun)stack.getItem();
-					GunType gunType = gunItem.GetType();
+					GunType gunType = gunItem.getInfoType();
 					int x = 0;
 					for(int n = 0; n < gunType.numAmmoItemsInGun; n++)
 					{

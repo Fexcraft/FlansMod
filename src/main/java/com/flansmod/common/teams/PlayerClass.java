@@ -144,7 +144,7 @@ public class PlayerClass extends InfoType
 				ItemStack stack = new ItemStack(matchingItem, amount, damage);
 				if(itemNames.length > 1 && matchingItem instanceof ItemGun)
 				{
-					GunType gunType = ((ItemGun)matchingItem).GetType();
+					GunType gunType = ((ItemGun)matchingItem).getInfoType();
 			    	NBTTagCompound tags = new NBTTagCompound();
 			    	NBTTagCompound attachmentTags = new NBTTagCompound();
 			    	int genericID = 0;

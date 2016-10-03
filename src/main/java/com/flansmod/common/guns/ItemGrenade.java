@@ -1,8 +1,5 @@
 package com.flansmod.common.guns;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
@@ -10,7 +7,6 @@ import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.EntityLivingBase;
@@ -28,7 +24,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemGrenade extends ItemShootable implements IFlanItem, IItem
+import java.util.Collections;
+import java.util.List;
+
+public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>, IItem
 {
 	public GrenadeType type;
 	
@@ -107,7 +106,7 @@ public class ItemGrenade extends ItemShootable implements IFlanItem, IItem
     }
     
 	@Override
-	public InfoType getInfoType() 
+	public GrenadeType getInfoType()
 	{
 		return type;
 	}
@@ -177,11 +176,6 @@ public class ItemGrenade extends ItemShootable implements IFlanItem, IItem
 		world.spawnEntityInWorld(grenade);
 	}
 
-	@Override
-	public int getVariantAmount() {
-		return default_variant;
-	}
-	
 	@Override
 	public String getName(){
 		return type.shortName;

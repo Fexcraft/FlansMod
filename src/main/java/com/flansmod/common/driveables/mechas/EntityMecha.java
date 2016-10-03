@@ -334,7 +334,7 @@ public class EntityMecha extends EntityDriveable
 			else if(heldItem instanceof ItemGun)
 			{
 				ItemGun gunItem = (ItemGun)heldItem;
-				GunType gunType = gunItem.GetType();
+				GunType gunType = gunItem.getInfoType();
 				
 				//Get the correct shoot delay
 				float delay = left ? shootDelayLeft : shootDelayRight;

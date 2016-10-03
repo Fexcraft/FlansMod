@@ -121,7 +121,7 @@ public class ContainerGunModTable extends Container
 		ItemStack gunStack = inventory.getStackInSlot(0);
 		if(gunStack != null && gunStack.getItem() instanceof ItemGun)
 		{
-			GunType gunType = ((ItemGun)gunStack.getItem()).GetType();
+			GunType gunType = ((ItemGun)gunStack.getItem()).getInfoType();
 			clickPaintjob(gunType.getPaintjob(i));
 		}
 	}

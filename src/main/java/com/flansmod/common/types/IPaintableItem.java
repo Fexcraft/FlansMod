@@ -1,6 +1,7 @@
 package com.flansmod.common.types;
 
-public interface IPaintableItem extends IFlanItem
+public interface IPaintableItem<T extends PaintableType> extends IFlanItem<T>
 {
-	public PaintableType GetPaintableType();
+	@Override
+	T getInfoType();
 }

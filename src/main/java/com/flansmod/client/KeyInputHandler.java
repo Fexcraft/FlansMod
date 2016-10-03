@@ -112,7 +112,7 @@ public class KeyInputHandler
 				if(stack != null && stack.getItem() instanceof ItemGun)
 				{
 					ItemGun item = (ItemGun)stack.getItem();
-					GunType type = item.GetType();
+					GunType type = item.getInfoType();
 					
 					if(item.CanReload(stack, player.inventory))
 					{

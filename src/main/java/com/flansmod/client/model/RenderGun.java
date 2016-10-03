@@ -75,7 +75,7 @@ public class RenderGun implements RenderCustomItem
 		if(!(item.getItem() instanceof ItemGun))
 			return;	
 		
-		GunType gunType = ((ItemGun)item.getItem()).GetType();
+		GunType gunType = ((ItemGun)item.getItem()).getInfoType();
 		if(gunType == null)
 			return;
 		

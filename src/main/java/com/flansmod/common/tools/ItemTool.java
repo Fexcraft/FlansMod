@@ -1,8 +1,5 @@
 package com.flansmod.common.tools;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerData;
@@ -11,9 +8,7 @@ import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,7 +27,10 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemTool extends ItemFood implements IFlanItem, IItem
+import java.util.Collections;
+import java.util.List;
+
+public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 {
 	public ToolType type;
 
@@ -224,7 +222,7 @@ public class ItemTool extends ItemFood implements IFlanItem, IItem
 	}
 
 	@Override
-	public InfoType getInfoType() 
+	public ToolType getInfoType()
 	{
 		return type;
 	}
@@ -232,10 +230,5 @@ public class ItemTool extends ItemFood implements IFlanItem, IItem
 	@Override
 	public String getName(){
 		return type.shortName;
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
 }
