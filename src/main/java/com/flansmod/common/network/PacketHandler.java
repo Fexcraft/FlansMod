@@ -1,15 +1,6 @@
 package com.flansmod.common.network;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import com.flansmod.common.FlansMod;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -29,6 +20,9 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** 
  * Flan's Mod packet handler class. Directs packet data to packet classes.
@@ -127,7 +121,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 			/*if(!receivedPacketsServer.containsKey(player.getName()))
 				receivedPacketsServer.put(player.getName(), new ConcurrentLinkedQueue<PacketBase>());
 			receivedPacketsServer.get(player.getName()).offer(packet);*/
-			getConcurrentLinkedQueue(player.getName()).offer(packet);
+			getConcurrentLinkedQueue(player.getUniqueID()).offer(packet);
 			
 			//packet.handleServerSide();
 			
@@ -159,43 +153,50 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 		}
 	}*/
 	//NEW CODE START
-	private static HashSet<PlayerQueue> receivedPacketsServer = new HashSet<PlayerQueue>();
+	private static HashMap<UUID, PlayerQueue> receivedPacketsServer = new HashMap<>();
 	
-	private boolean contains(String name){
+	private boolean contains(UUID uuid){
+		/*
 		for(PlayerQueue pq : receivedPacketsServer){
-			if(pq.player.getName().equals(name)){
+			if(pq.player.getUniqueID().equals(uuid)){
 				return true;
 			}
 		}
 		return false;
+		*/
+		return receivedPacketsServer.containsKey(uuid);
 	}
-	
+
+
 	public static void add(EntityPlayerMP player){
-		receivedPacketsServer.add(new PlayerQueue(player));
+		receivedPacketsServer.put(player.getUniqueID(), new PlayerQueue(player));
 	}
 	
-	private ConcurrentLinkedQueue<PacketBase> getConcurrentLinkedQueue(String name){
-		for(PlayerQueue pq : receivedPacketsServer){
-			if(pq.player.getName().equals(name)){
+	private ConcurrentLinkedQueue<PacketBase> getConcurrentLinkedQueue(UUID uuid){
+		for(PlayerQueue pq : receivedPacketsServer.values()){
+			if(pq.player.getUniqueID().equals(uuid)){
 				return pq.packetQueue;
 			}
 		}
 		return null;
 	}
 	
-	public static void tryRemove(String name){
+	public static void tryRemove(UUID uuid){
+		/*
 		PlayerQueue toRemove = null;
-		for(PlayerQueue pq : receivedPacketsServer){
-			if(pq.player.getName().equals(name)){
+		for(PlayerQueue pq : receivedPacketsServer.values()){
+			if(pq.player.getUniqueID().equals(uuid)){
 				toRemove = pq;
 				break;
 			}
 		}
 		receivedPacketsServer.remove(toRemove);
+		*/
+		receivedPacketsServer.remove(uuid);
 	}
 	
 	public void handleServerPackets(){
-		for(PlayerQueue pq : receivedPacketsServer){
+		for(PlayerQueue pq : receivedPacketsServer.values()){
 			for(PacketBase packet = pq.packetQueue.poll(); packet != null; packet = pq.packetQueue.poll()){
 				packet.handleServerSide(pq.player);
 			}

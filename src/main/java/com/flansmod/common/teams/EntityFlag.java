@@ -1,10 +1,7 @@
 package com.flansmod.common.teams;
 
-import javax.annotation.Nullable;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
-
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +11,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
 
 public class EntityFlag extends Entity implements ITeamObject {
 	
@@ -64,7 +63,7 @@ public class EntityFlag extends Entity implements ITeamObject {
 			if(getPassengers() instanceof EntityPlayerMP)
 			{
 				EntityPlayerMP player = ((EntityPlayerMP)getPassengers());
-				Team team = PlayerHandler.getPlayerData(player.getName()).team;
+				Team team = PlayerHandler.getPlayerData(player.getUniqueID()).team;
 				TeamsManager.getInstance();
 				TeamsManager.messageAll("\u00a7f" + player.getName() + " dropped the \u00a7" + team.textColour + team.name + "\u00a7f flag");
 			}
