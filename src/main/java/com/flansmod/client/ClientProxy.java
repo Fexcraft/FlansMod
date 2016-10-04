@@ -3,13 +3,14 @@ package com.flansmod.client;
 import com.flansmod.client.debug.*;
 import com.flansmod.client.gui.*;
 import com.flansmod.client.model.*;
-import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.*;
 import com.flansmod.common.driveables.*;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.EntityAAGun;
+import com.flansmod.common.guns.EntityBullet;
+import com.flansmod.common.guns.EntityGrenade;
+import com.flansmod.common.guns.EntityMG;
 import com.flansmod.common.guns.boxes.BlockGunBox;
-import com.flansmod.common.guns.boxes.BoxType;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.PacketBuyArmour;
 import com.flansmod.common.network.PacketBuyWeapon;
@@ -18,10 +19,8 @@ import com.flansmod.common.network.PacketRepairDriveable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.teams.*;
 import com.flansmod.common.tools.EntityParachute;
-import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
-import com.flansmod.common.types.PaintableType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,9 +40,7 @@ import net.minecraftforge.fml.common.discovery.ModCandidate;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,23 +70,27 @@ public class ClientProxy extends CommonProxy
 	{
 		flansModClient = new FlansModClient();
 		flansModClient.load();
-		
-		//Register a null vanilla renderer to avoid error messages spamming chat - doesn't work.
+
+        /*
+		//Register custom modelLoader for PaintableTypes
 		for(InfoType type : InfoType.infoTypes.values())
 		{
-			if(type != null && type.item != null)
+			if(type != null && type.item != null && type.getModel() != null)
 			{
 				if(type instanceof PaintableType)
 				{
-					for(Paintjob paintjob : ((PaintableType)type).paintjobs)
+					for(Paintjob paintjob : ((PaintableType) type).paintjobs)
 					{
-						//ModelBakery.addVariantName(type.item, new String[] {"flansmod:" + type.shortName + (paintjob.iconName.equals("") ? "" : ("_" + paintjob.iconName))});
-						Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(type.item, paintjob.ID, new ModelResourceLocation("flansmod:" + type.shortName + (paintjob.iconName.equals("") ? "" : ("_" + paintjob.iconName)), "inventory"));
+						//The location that is used to register the custom location in ItemUtil.registerRender
+						ModelResourceLocation modelLocation = new ModelResourceLocation(type.item.getRegistryName() + "_" +  paintjob.ID, "inventory");
+						OverrideVanillaModelLoader.INSTANCE.setCusomIcon(modelLocation, new ResourceLocation(FlansMod.MODID, "items/" + paintjob.iconPath));
 					}
 				}
-				else Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(type.item, 0, new ModelResourceLocation("flansmod:" + type.shortName, "inventory"));
+				//else Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(type.item, 0, new ModelResourceLocation("flansmod:" + type.shortName, "inventory"));
 			}
 		}
+		*/
+
 		
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 0, new ModelResourceLocation("flansmod:flansWorkbench_guns", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 1, new ModelResourceLocation("flansmod:flansWorkbench_vehicles", "inventory"));
@@ -414,7 +415,8 @@ public class ClientProxy extends CommonProxy
 	   	boolean state = (keyCode < 0 ? Mouse.isButtonDown(keyCode + 100) : Keyboard.isKeyDown(keyCode));
 		return state;
 	}
-	
+	//No longer needed, CustomModelLoaders will be used to pretend to load the missing files.
+	/*
 	@Override
 	public void addMissingJSONs(HashMap<Integer, InfoType> types)
 	{
@@ -451,7 +453,7 @@ public class ClientProxy extends CommonProxy
 					{
 						for(Paintjob paintjob : ((PaintableType)type).paintjobs)
 						{
-							createJSONFile(new File(itemModelsDir, type.shortName + (paintjob.iconName.equals("") ? "" : ("_" + paintjob.iconName)) + ".json"), "{ \"parent\": \"builtin/generated\", \"textures\": { \"layer0\": \"flansmod:items/" + type.iconPath + (paintjob.iconName.equals("") ? "" : ("_" + paintjob.iconName)) + "\" }, \"display\": { \"thirdperson\": { \"rotation\": [ 0, 90, -45 ], \"translation\": [ 0, 2, -2 ], \"scale\": [ 0, 0, 0 ] }, \"firstperson\": { \"rotation\": [ 0, -135, 25 ], \"translation\": [ 0, 4, 2 ], \"scale\": [ 1.7, 1.7, 1.7 ] } } }");							
+							createJSONFile(new File(itemModelsDir, type.shortName + (paintjob.name.equals("") ? "" : ("_" + paintjob.name)) + ".json"), "{ \"parent\": \"builtin/generated\", \"textures\": { \"layer0\": \"flansmod:items/" + type.iconPath + (paintjob.name.equals("") ? "" : ("_" + paintjob.name)) + "\" }, \"display\": { \"thirdperson\": { \"rotation\": [ 0, 90, -45 ], \"translation\": [ 0, 2, -2 ], \"scale\": [ 0, 0, 0 ] }, \"firstperson\": { \"rotation\": [ 0, -135, 25 ], \"translation\": [ 0, 4, 2 ], \"scale\": [ 1.7, 1.7, 1.7 ] } } }");
 						}
 					}
 					else if(typeToCheckFor == EnumType.itemHolder)
@@ -488,4 +490,5 @@ public class ClientProxy extends CommonProxy
 			out.close();
 		}
 	}
+	*/
 }

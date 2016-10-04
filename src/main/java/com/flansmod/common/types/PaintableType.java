@@ -1,18 +1,18 @@
 package com.flansmod.common.types;
 
-import java.util.ArrayList;
-
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.Paintjob;
-
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.ArrayList;
+
 public abstract class PaintableType extends InfoType
 {
+	private static final String defaultName = "default";
 	//Paintjobs
 	/** The list of all available paintjobs for this gun */
 	public ArrayList<Paintjob> paintjobs = new ArrayList<Paintjob>();
@@ -30,7 +30,7 @@ public abstract class PaintableType extends InfoType
 	public void postRead(TypeFile file)
 	{
 		//After all lines have been read, set up the default paintjob
-		defaultPaintjob = new Paintjob(0, "", texture, new ItemStack[0]);
+		defaultPaintjob = new Paintjob(0, defaultName, iconPath, texture, new ItemStack[0]);
 		//Move to a new list to ensure that the default paintjob is always first
 		ArrayList<Paintjob> newPaintjobList = new ArrayList<Paintjob>();
 		newPaintjobList.add(defaultPaintjob);
@@ -57,13 +57,14 @@ public abstract class PaintableType extends InfoType
 				ItemStack[] dyeStacks = new ItemStack[(split.length - 3) / 2];
 				for(int i = 0; i < (split.length - 3) / 2; i++)
 					dyeStacks[i] = new ItemStack(Items.DYE, Integer.parseInt(split[i * 2 + 4]), getDyeDamageValue(split[i * 2 + 3]));
-				if(split[1].contains("_"))
+				String name = split[1];
+				if(name.contains("_"))
 				{
-					String[] splat = split[1].split("_");
+					String[] splat =name.split("_");
 					if(splat[0].equals(iconPath))
-						split[1] = splat[1];
+						name = splat[1];
 				}
-				paintjobs.add(new Paintjob(nextPaintjobID++, split[1], split[2], dyeStacks));
+				paintjobs.add(new Paintjob(nextPaintjobID++, name, split[1], split[2], dyeStacks));
 			}
 		} 
 		catch (Exception e)
@@ -77,7 +78,7 @@ public abstract class PaintableType extends InfoType
 	{
 		for(Paintjob paintjob : paintjobs)
 		{
-			if(paintjob.iconName.equals(s))
+			if(paintjob.name.equals(s))
 				return paintjob;
 		}
 		return defaultPaintjob;
@@ -97,7 +98,7 @@ public abstract class PaintableType extends InfoType
 			{
 				ItemStack stack = new ItemStack(this.item);
 				NBTTagCompound tags = new NBTTagCompound();
-				tags.setString("Paint", paintjobs.get(i).iconName);
+				tags.setString("Paint", paintjobs.get(i).name);
 				stack.setTagCompound(tags);
 				
 				addToRandomChest(stack, (float)(FlansMod.dungeonLootChance * dungeonChance) / (float)totalDungeonChance);

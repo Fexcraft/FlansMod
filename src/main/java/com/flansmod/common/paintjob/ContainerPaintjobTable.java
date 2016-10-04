@@ -110,7 +110,7 @@ public class ContainerPaintjobTable extends Container
 		ItemStack paintableStack = table.getPaintableStack();
 		if(paintableStack != null && paintableStack.getItem() instanceof IPaintableItem)
 		{
-			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).GetPaintableType();
+			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).getInfoType();
 			clickPaintjob(paintableType.getPaintjob(i));
 		}
 	}
@@ -161,7 +161,7 @@ public class ContainerPaintjobTable extends Container
 	    	}
 	    	
 	    	//Paint the gun. This line is only reached if the player is in creative or they have had their dyes taken already
-			//gunStack.getTagCompound().setString("Paint", paintjob.iconName);
+			//gunStack.getTagCompound().setString("Paint", paintjob.name);
 			paintableStack.setItemDamage(paintjob.ID);
 		}
 	}

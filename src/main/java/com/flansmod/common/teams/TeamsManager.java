@@ -684,7 +684,7 @@ public class TeamsManager
 						boolean alreadyAdded = false;
 						for(EntityItem check : dropsToThrow)
 						{
-							if(((ItemGun)stack.getItem()).GetType() == ((ItemGun)check.getEntityItem().getItem()).GetType())
+							if(((ItemGun)stack.getItem()).getInfoType() == ((ItemGun)check.getEntityItem().getItem()).getInfoType())
 								alreadyAdded = true;
 						}
 						if(!alreadyAdded)
@@ -700,7 +700,7 @@ public class TeamsManager
 		for(EntityItem entity : dropsToThrow)
 		{
 			EntityGunItem gunEntity = (EntityGunItem)entity;
-			GunType gunType = ((ItemGun)gunEntity.getEntityItem().getItem()).GetType();
+			GunType gunType = ((ItemGun)gunEntity.getEntityItem().getItem()).getInfoType();
 			for(EntityItem ammoEntity : event.getDrops())
 			{
 				ItemStack ammoItemstack = ammoEntity.getEntityItem();

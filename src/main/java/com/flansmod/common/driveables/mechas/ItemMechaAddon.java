@@ -1,12 +1,7 @@
 package com.flansmod.common.driveables.mechas;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMechaAddon extends Item implements IFlanItem, IItem
+import java.util.Collections;
+import java.util.List;
+
+public class ItemMechaAddon extends Item implements IFlanItem<MechaItemType>, IItem
 {
 	public MechaItemType type;
 	
@@ -47,7 +45,7 @@ public class ItemMechaAddon extends Item implements IFlanItem, IItem
     }
     
 	@Override
-	public InfoType getInfoType() 
+	public MechaItemType getInfoType()
 	{
 		return type;
 	}
@@ -55,10 +53,5 @@ public class ItemMechaAddon extends Item implements IFlanItem, IItem
 	@Override
 	public String getName(){
 		return type.shortName;
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
 }

@@ -1,17 +1,9 @@
 package com.flansmod.common.driveables;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
-import com.flansmod.common.types.InfoType;
-import com.flansmod.common.types.PaintableType;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.block.Block;
@@ -34,7 +26,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemPlane extends Item implements IPaintableItem, IItem
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 {
 	public PlaneType type;
 	
@@ -195,13 +192,7 @@ public class ItemPlane extends Item implements IPaintableItem, IItem
     }
 	
 	@Override
-	public InfoType getInfoType() 
-	{
-		return type;
-	}
-
-	@Override
-	public PaintableType GetPaintableType()
+	public PlaneType getInfoType()
 	{
 		return type;
 	}
@@ -211,8 +202,5 @@ public class ItemPlane extends Item implements IPaintableItem, IItem
 		return type.shortName;
 	}
 
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
-	}
+
 }

@@ -147,7 +147,7 @@ public class PacketShotData extends PacketBase
 				{
 					ItemGun gunItem = (ItemGun)entry.shotFrom.getItem();
 					
-					gunItem.DoInstantShot(clientPlayer.worldObj, 
+					gunItem.doInstantShot(clientPlayer.worldObj,
 							FlansModRaytracer.GetEntityByID(instantData.shooterID), 
 							instantData.shotFrom, (BulletType)instantData.shotType, 
 							instantData.origin, instantData.hitPos, 

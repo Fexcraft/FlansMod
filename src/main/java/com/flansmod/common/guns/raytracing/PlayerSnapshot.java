@@ -81,7 +81,7 @@ public class PlayerSnapshot
 			{
 				continue;
 			}
-			GunType gunType = ((ItemGun) stack.getItem()).GetType();
+			GunType gunType = ((ItemGun) stack.getItem()).getInfoType();
 			if (gunType.shield)
 			{
 				EnumHitboxType hitboxType = handSide == EnumHandSide.LEFT ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM;

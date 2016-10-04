@@ -126,7 +126,7 @@ public class ArmourType extends InfoType
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public ModelBase GetModel()
+	public ModelBase getModel()
 	{
 		return model;
 	}

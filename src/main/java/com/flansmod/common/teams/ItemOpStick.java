@@ -204,9 +204,4 @@ public class ItemOpStick extends Item implements IFlanItem, IItem
 	public String getName(){
 		return "opStick";
 	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
-	}
 }

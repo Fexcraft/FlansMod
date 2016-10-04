@@ -1,14 +1,8 @@
 package com.flansmod.common.teams;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
 import com.google.common.collect.Multimap;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -29,7 +23,11 @@ import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanItem, IItem
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanItem<ArmourType>, IItem
 {
 	public ArmourType type;
 	private static final UUID[] uuid = new UUID[] { UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID() };
@@ -115,7 +113,7 @@ public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanIte
     }
     
 	@Override
-	public InfoType getInfoType() 
+	public ArmourType getInfoType()
 	{
 		return type;
 	}
@@ -136,8 +134,4 @@ public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanIte
 		return type.shortName;
 	}
 
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
-	}
 }

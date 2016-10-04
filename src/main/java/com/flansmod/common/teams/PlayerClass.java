@@ -144,7 +144,7 @@ public class PlayerClass extends InfoType
 				ItemStack stack = new ItemStack(matchingItem, amount, damage);
 				if(itemNames.length > 1 && matchingItem instanceof ItemGun)
 				{
-					GunType gunType = ((ItemGun)matchingItem).GetType();
+					GunType gunType = ((ItemGun)matchingItem).getInfoType();
 			    	NBTTagCompound tags = new NBTTagCompound();
 			    	NBTTagCompound attachmentTags = new NBTTagCompound();
 			    	int genericID = 0;
@@ -171,7 +171,7 @@ public class PlayerClass extends InfoType
 			    		{
 			    			Paintjob paintjob = gunType.getPaintjob(itemNames[i + 1]);
 			    			if(paintjob != null)
-			    				tags.setString("Paint", paintjob.iconName);
+			    				tags.setString("Paint", paintjob.name);
 			    		}
 			    	}
 			    	tags.setTag("attachments", attachmentTags);
@@ -203,7 +203,7 @@ public class PlayerClass extends InfoType
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public ModelBase GetModel()
+	public ModelBase getModel()
 	{
 		return null;
 	}

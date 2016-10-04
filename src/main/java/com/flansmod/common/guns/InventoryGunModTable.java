@@ -26,7 +26,7 @@ public class InventoryGunModTable extends InventoryBasic
 		if(gunStack == null || !(gunStack.getItem() instanceof ItemGun))
 			return;
 		
-		gunType = ((ItemGun)gunStack.getItem()).GetType();
+		gunType = ((ItemGun)gunStack.getItem()).getInfoType();
 		
 		//If we changed the gun (i.e. a new gun has been placed in the table)
 		if(gunStack != lastGunStack)

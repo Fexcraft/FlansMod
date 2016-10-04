@@ -82,7 +82,7 @@ public class ClientEventHandler
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		if(player.getHeldItemMainhand() != null && player.getHeldItemMainhand().getItem() instanceof ItemGun)
 		{
-			if(((ItemGun)player.getHeldItemMainhand().getItem()).GetType().oneHanded && 
+			if(((ItemGun)player.getHeldItemMainhand().getItem()).getInfoType().oneHanded &&
 					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode()) && Math.abs(event.getDwheel()) > 0)
 				event.setCanceled(true);
 		}

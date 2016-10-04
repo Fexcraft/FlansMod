@@ -1,26 +1,26 @@
 package com.flansmod.client.gui;
 
-import java.io.IOException;
-import java.util.Random;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
+import com.flansmod.client.ClientProxy;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.ContainerGunModTable;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.network.PacketGunPaint;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
+import java.util.Random;
 
 public class GuiGunModTable extends GuiContainer 
 {
@@ -49,7 +49,7 @@ public class GuiGunModTable extends GuiContainer
 			ItemStack tempStack = gunStack.copy();
 			if(hoveringOver != null)
 				tempStack.setItemDamage(hoveringOver.ID);
-			GunType gunType = ((ItemGun)gunStack.getItem()).GetType();
+			GunType gunType = ((ItemGun)gunStack.getItem()).getInfoType();
 			if(gunType.model != null)
 			{
 				GL11.glPushMatrix();
@@ -70,6 +70,8 @@ public class GuiGunModTable extends GuiContainer
 				GL11.glScalef(-50F, 50F, 50F);
 				//ClientProxy.gunRenderer.renderGun(gunStack, gunType, 1F / 16F, gunType.model, GunAnimations.defaults, 0F);
 				//ClientProxy.gunRenderer.renderItem(ItemRenderType.ENTITY, tempStack);
+				ClientProxy.gunRenderer.renderPerspective(ItemCameraTransforms.TransformType.GROUND, null, tempStack, null);
+
 				GL11.glPopMatrix();
 			}
 		}
@@ -92,7 +94,7 @@ public class GuiGunModTable extends GuiContainer
         ItemStack gunStack = inventorySlots.getSlot(0).getStack();
         if(gunStack != null && gunStack.getItem() instanceof ItemGun)
         {
-        	GunType gunType = ((ItemGun)gunStack.getItem()).GetType();
+        	GunType gunType = ((ItemGun)gunStack.getItem()).getInfoType();
         	if(gunType.allowBarrelAttachments)
         	{
         		drawTexturedModalRect(xOrigin + 51, yOrigin + 107, 176, 122, 22, 22);
@@ -158,7 +160,7 @@ public class GuiGunModTable extends GuiContainer
             		
             		Paintjob paintjob = gunType.paintjobs.get(2 * y + x);
             		ItemStack stack = gunStack.copy();
-            		//stack.getTagCompound().setString("Paint", paintjob.iconName);
+            		//stack.getTagCompound().setString("Paint", paintjob.name);
             		stack.setItemDamage(paintjob.ID);
             		itemRender.renderItemIntoGUI(stack, xOrigin + 132 + x * 18, yOrigin + 83 + y * 18);
             	}
@@ -239,7 +241,7 @@ public class GuiGunModTable extends GuiContainer
 		ItemStack gunStack = inventorySlots.getSlot(0).getStack();
         if(gunStack != null && gunStack.getItem() instanceof ItemGun)
         {
-        	GunType gunType = ((ItemGun)gunStack.getItem()).GetType();
+        	GunType gunType = ((ItemGun)gunStack.getItem()).getInfoType();
         	int numPaintjobs = gunType.paintjobs.size();
         	int numRows = numPaintjobs / 2 + 1;
         	
@@ -252,7 +254,7 @@ public class GuiGunModTable extends GuiContainer
             		
             		Paintjob paintjob = gunType.paintjobs.get(2 * j + i);
             		ItemStack stack = gunStack.copy();
-            		stack.getTagCompound().setString("Paint", paintjob.iconName);
+            		stack.getTagCompound().setString("Paint", paintjob.name);
             		int slotX = 131 + i * 18;
             		int slotY = 82 + j * 18;
             		if(mouseXInGUI >= slotX && mouseXInGUI < slotX + 18 && mouseYInGUI >= slotY && mouseYInGUI < slotY + 18)

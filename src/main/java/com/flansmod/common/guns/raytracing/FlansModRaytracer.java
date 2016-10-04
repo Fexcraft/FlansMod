@@ -168,7 +168,7 @@ public class FlansModRaytracer
 
 		if (itemstack != null && itemstack.getItem() instanceof ItemGun)
 		{
-			GunType gunType = ((ItemGun) itemstack.getItem()).GetType();
+			GunType gunType = ((ItemGun) itemstack.getItem()).getInfoType();
 			AttachmentType barrelType = gunType.getBarrel(itemstack);
 
 			return Vector3f.add(

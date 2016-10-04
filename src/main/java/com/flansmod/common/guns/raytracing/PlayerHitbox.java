@@ -191,7 +191,7 @@ public class PlayerHitbox
 			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.RIGHT, player);
 			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
 			{
-				GunType gunType = ((ItemGun)currentStack.getItem()).GetType();
+				GunType gunType = ((ItemGun)currentStack.getItem()).getInfoType();
 				//TODO : Shield damage
 				return penetratingPower - gunType.shieldDamageAbsorption;
 			}
@@ -202,7 +202,7 @@ public class PlayerHitbox
 			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.LEFT, player);
 			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
 			{
-				GunType gunType = ((ItemGun)currentStack.getItem()).GetType();
+				GunType gunType = ((ItemGun)currentStack.getItem()).getInfoType();
 				//TODO : Shield damage
 				return penetratingPower - gunType.shieldDamageAbsorption;
 			}

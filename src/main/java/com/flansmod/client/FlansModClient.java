@@ -162,7 +162,7 @@ public class FlansModClient extends FlansMod
 			if(FMLClientHandler.instance().getClient().currentScreen != null 
 			|| itemInHand == null 
 			|| !(itemInHand instanceof ItemGun)
-			|| ((ItemGun)itemInHand).GetType().getCurrentScope(itemstackInHand) != currentScope)
+			|| ((ItemGun)itemInHand).getInfoType().getCurrentScope(itemstackInHand) != currentScope)
 			{
 				currentScope = null;
 				minecraft.gameSettings.fovSetting = originalFOV;
@@ -484,7 +484,7 @@ public class FlansModClient extends FlansMod
 				ItemStack currentHeldItem = player.getHeldItemMainhand();
 				if(currentHeldItem != null && currentHeldItem.getItem() instanceof ItemGun)
 				{
-					GunType type = ((ItemGun)currentHeldItem.getItem()).GetType();
+					GunType type = ((ItemGun)currentHeldItem.getItem()).getInfoType();
 					AttachmentType grip = type.getGrip(currentHeldItem);
 					if(grip != null && grip.flashlight)
 					{

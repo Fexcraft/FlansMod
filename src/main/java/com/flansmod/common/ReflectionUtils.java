@@ -1,13 +1,11 @@
 package com.flansmod.common;
 
+import net.minecraft.client.renderer.entity.RenderLivingBase;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ReflectionUtils
 {
@@ -48,6 +46,21 @@ public class ReflectionUtils
     private static HashMap<Class, HashMap<String, Field>> fieldMap = new HashMap<Class, HashMap<String, Field>>();
 
 
+    private static void setObfuscatedName(Class cls, String nonObfuscatedName, String... names)
+    {
+        HashMap<String, List<String>> classFields =  obfuscatedFieldNames.get(cls);
+        if (classFields == null)
+        {
+            classFields = new HashMap<>();
+            obfuscatedFieldNames.put(cls, classFields);
+        }
+        classFields.put(nonObfuscatedName, Arrays.asList(names));
+    }
+    static
+    {
+        setObfuscatedName(RenderLivingBase.class, "layerRenderers", "field_177097_h");
+    }
+
     @SuppressWarnings("EmptyCatchBlock")
     private static Field getObfuscatedField(Class<?> clazz, String nonObfuscated) throws NoSuchFieldException
     {
@@ -61,13 +74,14 @@ public class ReflectionUtils
         if (result == null)
         {
 
-            //try to find it by normal name.
-            result = clazz.getDeclaredField(nonObfuscated);
-
-            //try to find it with obfuscated name
-            if (result == null)
+            try
             {
-
+                //try to find it by normal name.
+                result = clazz.getDeclaredField(nonObfuscated);
+            }
+            catch (NoSuchFieldException e1)
+            {
+                //try to find it with obfuscated name
                 Map<String, List<String>> obfuscatedAdapter = obfuscatedFieldNames.get(clazz);
                 if (obfuscatedAdapter == null)
                 {
@@ -79,8 +93,9 @@ public class ReflectionUtils
                     try
                     {
                         result = clazz.getDeclaredField(obfuscated);
+                        break;
                     }
-                    catch (Exception e)
+                    catch (NoSuchFieldException e)
                     {
                     }
                 }

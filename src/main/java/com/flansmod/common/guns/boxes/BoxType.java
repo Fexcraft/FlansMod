@@ -50,7 +50,7 @@ public abstract class BoxType extends InfoType
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public ModelBase GetModel()
+	public ModelBase getModel()
 	{
 		return null;
 	}

@@ -2,17 +2,12 @@ package com.flansmod.client.model;
 
 import com.flansmod.client.ClientProxy;
 import com.flansmod.client.RenderUtils;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Radian;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.IResourceManager;
@@ -21,7 +16,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.*;
+import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.IPerspectiveAwareModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.IModelPart;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -44,7 +42,7 @@ public class OverrideVanillaModelLoader implements ICustomModelLoader
 {
     public static final OverrideVanillaModelLoader INSTANCE = new OverrideVanillaModelLoader();
 
-    private final HashMap<ResourceLocation, InfoType> acceptedTypes = new HashMap<>();
+    private final HashMap<ResourceLocation, ResourceLocation> acceptedIcons = new HashMap<>();
 
     private IResourceManager resourceManager;
 
@@ -53,9 +51,8 @@ public class OverrideVanillaModelLoader implements ICustomModelLoader
     @Override
     public boolean accepts(ResourceLocation modelLocation)
     {
-        ResourceLocation location = new ResourceLocation(modelLocation.getResourceDomain(), modelLocation.getResourcePath().replace("models/item/", ""));
         //TODO : possibly check if resource exists.
-        return acceptedTypes.containsKey(location);
+        return acceptedIcons.containsKey(modelLocation);
     }
 
     @Override
@@ -64,21 +61,15 @@ public class OverrideVanillaModelLoader implements ICustomModelLoader
         this.resourceManager = resourceManager;
     }
 
-    public void addAcceptedType(ResourceLocation location, InfoType type)
+    public void setCusomIcon(ModelResourceLocation model, ResourceLocation icon)
     {
-        acceptedTypes.put(location, type);
+        acceptedIcons.put(new ResourceLocation(model.getResourceDomain(), "models/item/" + model.getResourcePath()), icon);
     }
 
     @Override
     public IModel loadModel(ResourceLocation modelLocation) throws Exception
     {
-        InfoType type = acceptedTypes.get(new ResourceLocation(modelLocation.getResourceDomain(), modelLocation.getResourcePath().replace("models/item", "")));
-        if (type != null)
-        {
-            ResourceLocation iconLocation = new ResourceLocation(FlansMod.MODID, "items/" + type.iconPath);
-            return new IconBasedModel(iconLocation);
-        }
-        return ModelLoaderRegistry.getMissingModel();
+        return new IconBasedModel(acceptedIcons.get(modelLocation));
     }
 
     private static class IconBasedModel implements IModel

@@ -1,11 +1,7 @@
 package com.flansmod.common.parts;
 
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemPart extends Item implements IFlanItem, IItem
+import java.util.List;
+
+public class ItemPart extends Item implements IFlanItem<PartType>, IItem
 {
 	public PartType type;
 	
@@ -53,7 +51,7 @@ public class ItemPart extends Item implements IFlanItem, IItem
     }
     
 	@Override
-	public InfoType getInfoType() 
+	public PartType getInfoType()
 	{
 		return type;
 	}
@@ -61,10 +59,5 @@ public class ItemPart extends Item implements IFlanItem, IItem
 	@Override
 	public String getName(){
 		return type.shortName;
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
 }

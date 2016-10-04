@@ -1,13 +1,8 @@
 package com.flansmod.common.guns;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IPaintableItem;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
-
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,7 +13,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemAttachment extends Item implements IPaintableItem, IItem
+import java.util.Collections;
+import java.util.List;
+
+public class ItemAttachment extends Item implements IPaintableItem<AttachmentType>, IItem
 {
 	public AttachmentType type;
 	
@@ -50,17 +48,15 @@ public class ItemAttachment extends Item implements IPaintableItem, IItem
 	}
 	
 	@Override
-	public InfoType getInfoType() { return type; }
-	
-	@Override 
-	public PaintableType GetPaintableType() { return type; }
+	public AttachmentType getInfoType() { return type; }
+
 	
 	// ----------------- Paintjobs -----------------
 	
     @Override
     public void getSubItems(Item item, CreativeTabs tabs, List list)
     {
-    	PaintableType type = ((IPaintableItem)item).GetPaintableType();
+    	PaintableType type = ((IPaintableItem)item).getInfoType();
     	if(FlansMod.addAllPaintjobsToCreative)
     	{
     		for(Paintjob paintjob : type.paintjobs)
@@ -80,11 +76,6 @@ public class ItemAttachment extends Item implements IPaintableItem, IItem
 	@Override
 	public String getName(){
 		return type.shortName;
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
 	}
     
     // ---------------------------------------------

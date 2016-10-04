@@ -1,15 +1,6 @@
 package com.flansmod.client.gui;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
+import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.model.ModelAttachment;
 import com.flansmod.client.model.ModelDriveable;
@@ -25,16 +16,24 @@ import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.vector.Vector3f;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
 
 public class GuiPaintjobTable extends GuiContainer 
 {
@@ -212,9 +211,9 @@ public class GuiPaintjobTable extends GuiContainer
 			ItemStack tempStack = paintableStack.copy();
 			if(hoveringOver != null)
 				tempStack.setItemDamage(hoveringOver.ID);
-			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).GetPaintableType();
+			PaintableType paintableType = ((IPaintableItem)paintableStack.getItem()).getInfoType();
 			EnumType eType = EnumType.getFromObject(paintableType);
-			if(paintableType.GetModel() != null)
+			if(paintableType.getModel() != null)
 			{
 				GL11.glPushMatrix();
 				GL11.glColor4f(1F, 1F, 1F, 1F);
@@ -252,7 +251,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 				        if(inCustomMode)
 				        	RenderGun.bindTextures = false;
-				        
+						ClientProxy.gunRenderer.renderPerspective(ItemCameraTransforms.TransformType.GROUND, null, tempStack, null);
 						//ClientProxy.gunRenderer.renderItem(ItemRenderType.ENTITY, tempStack);
 						RenderGun.bindTextures = true;
 						break;
@@ -261,7 +260,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 						if(!inCustomMode)
 							mc.renderEngine.bindTexture(FlansModResourceHandler.getPaintjobTexture(paintjob));
-						((ModelAttachment)paintableType.GetModel()).renderAttachment(0.0625f);
+						((ModelAttachment)paintableType.getModel()).renderAttachment(0.0625f);
 						break;
 					}
 					case plane:
@@ -270,7 +269,7 @@ public class GuiPaintjobTable extends GuiContainer
 					{
 						if(!inCustomMode)
 							mc.renderEngine.bindTexture(FlansModResourceHandler.getPaintjobTexture(paintjob));
-						((ModelDriveable)paintableType.GetModel()).render((DriveableType)paintableType);
+						((ModelDriveable)paintableType.getModel()).render((DriveableType)paintableType);
 						break;
 					}
 				
@@ -307,7 +306,7 @@ public class GuiPaintjobTable extends GuiContainer
             ItemStack gunStack = inventorySlots.getSlot(0).getStack();
             if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
             {
-            	PaintableType gunType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+            	PaintableType gunType = ((IPaintableItem)gunStack.getItem()).getInfoType();
             	
             	int numPaintjobs = gunType.paintjobs.size();
             	int numRows = numPaintjobs / 9 + 1;
@@ -510,13 +509,13 @@ public class GuiPaintjobTable extends GuiContainer
 		ItemStack gunStack = inventorySlots.getSlot(0).getStack();
         if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
         {
-        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).getInfoType();
         	
         	Paintjob paintjob = paintableType.getPaintjob(gunStack.getItemDamage());
 
         	try
         	{
-        		String imageLocation = "Flan/" + paintableType.contentPack + "/assets/flansmod/skins/" + paintjob.textureName + ".png";
+        		String imageLocation = "Flan/" + paintableType.contentPack + "/assets/flansmod/skins/" + paintjob.texturePath + ".png";
         		BufferedImage bufferedImage = ImageIO.read(new File(imageLocation));
         		dynamicTexture = new DynamicTexture(bufferedImage);
         		dynamicTextureX = bufferedImage.getWidth();
@@ -652,7 +651,7 @@ public class GuiPaintjobTable extends GuiContainer
 			ItemStack gunStack = inventorySlots.getSlot(0).getStack();
 	        if(gunStack != null && gunStack.getItem() instanceof IPaintableItem)
 	        {
-	        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).GetPaintableType();
+	        	PaintableType paintableType = ((IPaintableItem)gunStack.getItem()).getInfoType();
 	        	int numPaintjobs = paintableType.paintjobs.size();
 	        	int numRows = numPaintjobs / 9 + 1;
 	        	
@@ -665,7 +664,7 @@ public class GuiPaintjobTable extends GuiContainer
 	            		
 	            		Paintjob paintjob = paintableType.paintjobs.get(9 * j + i);
 	            		ItemStack stack = gunStack.copy();
-	            		stack.getTagCompound().setString("Paint", paintjob.iconName);
+	            		stack.getTagCompound().setString("Paint", paintjob.name);
 	            		int slotX = 7 + i * 18;
 	            		int slotY = 129 + j * 18;
 	            		if(mouseXInGUI >= slotX && mouseXInGUI < slotX + 18 && mouseYInGUI >= slotY && mouseYInGUI < slotY + 18)
