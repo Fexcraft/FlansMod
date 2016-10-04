@@ -16,6 +16,11 @@ version = "5.2"
 group= "com.flansmod"
 archivesBaseName = "Flan's Mod"
 
+sourceCompatibility = targetCompatibility = "1.8"
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
+
 minecraft {
     version = "1.10.2-12.18.1.2011"
     runDir = "run"
