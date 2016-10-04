@@ -4,6 +4,9 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
 import com.flansmod.common.types.InfoType;
+
+import net.fexcraft.mod.lib.api.block.IBlock;
+import net.fexcraft.mod.lib.util.block.BlockUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -18,12 +21,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockGunBox extends Block
+public class BlockGunBox extends Block implements IBlock
 {
 	public GunBoxType type;
 	
@@ -33,12 +34,13 @@ public class BlockGunBox extends Block
 		setHardness(2F);
 		setResistance(4F);
 		type = t;
-
-	    setUnlocalizedName(type.shortName);
-	    GameRegistry.registerBlock(this, type.shortName);
 		setCreativeTab(FlansMod.tabFlanGuns);
 		type.block = this;
 		type.item = Item.getItemFromBlock(this);
+		
+		BlockUtil.register(FlansMod.MODID, this);
+		BlockUtil.registerFIB(this);
+		BlockUtil.registerFIBRender(this);
 	}
 		
 	public void buyGun(InfoType gun, InventoryPlayer inventory, GunBoxType type)
@@ -124,5 +126,15 @@ public class BlockGunBox extends Block
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 		ret.add(new ItemStack(this, 1, 0));
 		return ret;
+	}
+
+	@Override
+	public String getName(){
+		return type.shortName;
+	}
+
+	@Override
+	public int getVariantAmount(){
+		return default_variant;
 	}
 }

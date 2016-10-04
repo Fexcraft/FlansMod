@@ -4,6 +4,8 @@ import com.flansmod.common.CraftingInstance;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.teams.ArmourBoxType.ArmourBoxEntry;
 
+import net.fexcraft.mod.lib.api.block.IBlock;
+import net.fexcraft.mod.lib.util.block.BlockUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -16,9 +18,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class BlockArmourBox extends Block
+public class BlockArmourBox extends Block implements IBlock
 {
 	public ArmourBoxType type;
 	
@@ -27,13 +28,15 @@ public class BlockArmourBox extends Block
 		super(Material.WOOD);
 		type = t;
 
-		setUnlocalizedName(type.shortName);
 		setHardness(2F);
 		setResistance(4F);
-		GameRegistry.registerBlock(this, type.shortName);
 		setCreativeTab(FlansMod.tabFlanTeams);
 		type.block = this;
 		type.item = Item.getItemFromBlock(this);
+		
+		BlockUtil.register(FlansMod.MODID, this);
+		BlockUtil.registerFIB(this);
+		BlockUtil.registerFIBRender(this);
 	}
 	
 	public void buyArmour(String shortName, int piece, InventoryPlayer inventory)
@@ -65,5 +68,15 @@ public class BlockArmourBox extends Block
 			return false;
 		entityplayer.openGui(FlansMod.INSTANCE, 11, world, pos.getX(), pos.getY(), pos.getZ());
 		return true;
+	}
+
+	@Override
+	public String getName(){
+		return type.shortName;
+	}
+
+	@Override
+	public int getVariantAmount(){
+		return default_variant;
 	}
 }
