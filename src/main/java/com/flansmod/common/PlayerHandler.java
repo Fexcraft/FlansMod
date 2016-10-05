@@ -1,14 +1,9 @@
 package com.flansmod.common;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.teams.TeamsManager;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,11 +20,16 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class PlayerHandler
 {
-	public static Map<String, PlayerData> serverSideData = new HashMap<String, PlayerData>();
-	public static Map<String, PlayerData> clientSideData = new HashMap<String, PlayerData>();
-	public static ArrayList<String> clientsToRemoveAfterThisRound = new ArrayList<String>();
+	public static Map<UUID, PlayerData> serverSideData = new HashMap<UUID, PlayerData>();
+	public static Map<UUID, PlayerData> clientSideData = new HashMap<UUID, PlayerData>();
+	public static ArrayList<UUID> clientsToRemoveAfterThisRound = new ArrayList<UUID>();
 	
 	public PlayerHandler()
 	{
@@ -40,7 +40,7 @@ public class PlayerHandler
 	public void onEntityHurt(LivingAttackEvent event)
 	{
 		EntityLivingBase entity = event.getEntityLiving();
-		if(event instanceof LivingAttackEvent && (entity.getRidingEntity() instanceof EntityDriveable || entity.getRidingEntity() instanceof EntitySeat))
+		if((entity.getRidingEntity() instanceof EntityDriveable || entity.getRidingEntity() instanceof EntitySeat))
 		{
 			event.setCanceled(true);
 		}
@@ -82,10 +82,10 @@ public class PlayerHandler
 	{
 		if(player == null)
 			return null;
-		return getPlayerData(player.getName(), player.worldObj.isRemote ? Side.CLIENT : Side.SERVER);
+		return getPlayerData(player.getUniqueID(), player.worldObj.isRemote ? Side.CLIENT : Side.SERVER);
 	}
 	
-	public static PlayerData getPlayerData(String username)
+	public static PlayerData getPlayerData(UUID username)
 	{
 		return getPlayerData(username, Side.SERVER);
 	}
@@ -94,22 +94,22 @@ public class PlayerHandler
 	{
 		if(player == null)
 			return null;
-		return getPlayerData(player.getName(), side);
+		return getPlayerData(player.getUniqueID(), side);
 	}
 	
-	public static PlayerData getPlayerData(String username, Side side)
+	public static PlayerData getPlayerData(UUID uuid, Side side)
 	{
 		if(side.isClient())
 		{
-			if(!clientSideData.containsKey(username))
-				clientSideData.put(username, new PlayerData(username));
+			if(!clientSideData.containsKey(uuid))
+				clientSideData.put(uuid, new PlayerData(uuid));
 		}
 		else
 		{
-			if(!serverSideData.containsKey(username))
-				serverSideData.put(username, new PlayerData(username));
+			if(!serverSideData.containsKey(uuid))
+				serverSideData.put(uuid, new PlayerData(uuid));
 		}
-		return side.isClient() ? clientSideData.get(username) : serverSideData.get(username);
+		return side.isClient() ? clientSideData.get(uuid) : serverSideData.get(uuid);
 	}
 
 	@SubscribeEvent
@@ -118,39 +118,43 @@ public class PlayerHandler
 		if(event instanceof PlayerLoggedInEvent)
 		{
 			EntityPlayer player = event.player;
-			String username = player.getName();
-			if(!serverSideData.containsKey(username))
-				serverSideData.put(username, new PlayerData(username));
-			if(clientsToRemoveAfterThisRound.contains(username))
-				clientsToRemoveAfterThisRound.remove(username);
+			UUID uuid = player.getUniqueID();
+			if(!serverSideData.containsKey(uuid))
+				serverSideData.put(uuid, new PlayerData(uuid));
+			if(clientsToRemoveAfterThisRound.contains(uuid))
+				clientsToRemoveAfterThisRound.remove(uuid);
 			
 			PacketHandler.add((EntityPlayerMP)player);
 		}
 		else if(event instanceof PlayerLoggedOutEvent)
 		{
 			EntityPlayer player = event.player;
-			String username = player.getName();
+			UUID uuid = player.getUniqueID();
 			if(TeamsManager.getInstance().currentRound == null)
-				serverSideData.remove(username);
-			else clientsToRemoveAfterThisRound.add(username);
+				serverSideData.remove(uuid);
+			else clientsToRemoveAfterThisRound.add(uuid);
 			
-			PacketHandler.tryRemove(username);
+			PacketHandler.tryRemove(uuid);
 		}
 		else if(event instanceof PlayerRespawnEvent)
 		{
 			EntityPlayer player = event.player;
-			String username = player.getName();
-			if(!serverSideData.containsKey(username))
-				serverSideData.put(username, new PlayerData(username));
+			UUID uuid = player.getUniqueID();
+			if(!serverSideData.containsKey(uuid))
+				serverSideData.put(uuid, new PlayerData(uuid));
+
+			//If a player dies, a new EntityPlayerMP is created on the server,
+			//remove the old Player and add the current one.
+			PacketHandler.add((EntityPlayerMP)player);
 		}
 	}
 	
 	/** Called by teams manager to remove lingering player data */
 	public static void roundEnded()
 	{
-		for(String username : clientsToRemoveAfterThisRound)
+		for(UUID uuid : clientsToRemoveAfterThisRound)
 		{
-			serverSideData.remove(username);
+			serverSideData.remove(uuid);
 		}
 	}
 }

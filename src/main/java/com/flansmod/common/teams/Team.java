@@ -1,17 +1,11 @@
 package com.flansmod.common.teams;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -19,10 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.*;
+
 public class Team extends InfoType
 {
 	public static List<Team> teams = new ArrayList<Team>();
-	public List<String> members = new ArrayList<String>();
+	public List<UUID> members = new ArrayList<UUID>();
 	//public List<ITeamBase> bases = new ArrayList<ITeamBase>();
 	public List<PlayerClass> classes = new ArrayList<PlayerClass>();
 	
@@ -180,42 +176,47 @@ public class Team extends InfoType
 	
 	public void removePlayer(EntityPlayer player)
 	{
-		removePlayer(player.getName());
+		removePlayer(player.getUniqueID());
 	}
 	
-	public String removePlayer(String username)
+	public UUID removePlayer(UUID uuid)
 	{
-		members.remove(username);
-		if(PlayerHandler.getPlayerData(username) != null)
-			PlayerHandler.getPlayerData(username).team = null;
-		return username;
+		members.remove(uuid);
+		if(PlayerHandler.getPlayerData(uuid) != null)
+			PlayerHandler.getPlayerData(uuid).team = null;
+		return uuid;
 	}
 	
 	public EntityPlayer addPlayer(EntityPlayer player)
 	{
-		addPlayer(player.getName());
+		addPlayer(player.getUniqueID());
 		return player;
 	}
 	
-	public String addPlayer(String username)
+	public UUID addPlayer(UUID uuid)
 	{
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(username);
+		ArrayList<UUID> list = new ArrayList<UUID>();
+		list.add(uuid);
 		for(Team team : teams)
 		{
 			team.members.removeAll(list);
 		}
-		members.add(username);
-		PlayerHandler.getPlayerData(username).newTeam = PlayerHandler.getPlayerData(username).team = this;
-		return username;
+		members.add(uuid);
+		PlayerHandler.getPlayerData(uuid).newTeam = PlayerHandler.getPlayerData(uuid).team = this;
+		return uuid;
 	}
 	
-	public String removeWorstPlayer()
+	public UUID removeWorstPlayer()
 	{
 		sortPlayers();
 		if(members.size() == 0)
+		{
 			return null;
-		else return removePlayer(members.get(members.size() - 1));
+		}
+		else
+		{
+			return removePlayer(members.get(members.size() - 1));
+		}
 	}
 	
 	public void sortPlayers()
@@ -223,10 +224,10 @@ public class Team extends InfoType
 		Collections.sort(members, new ComparatorScore());
 	}
 	
-	public static class ComparatorScore implements Comparator<String>
+	public static class ComparatorScore implements Comparator<UUID>
 	{
 		@Override
-		public int compare(String a, String b) 
+		public int compare(UUID a, UUID b)
 		{
 			PlayerData dataA = PlayerHandler.getPlayerData(a);
 			PlayerData dataB = PlayerHandler.getPlayerData(b);

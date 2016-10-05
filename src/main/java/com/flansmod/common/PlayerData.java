@@ -14,11 +14,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class PlayerData 
 {
-	/** Their username */
-	public String username;
+	/** Their uuid */
+	private final UUID uniqueId;
 
 	//Movement related fields
 	/** Roll variables */
@@ -118,9 +119,9 @@ public class PlayerData
 	@SideOnly(Side.CLIENT)
 	public ResourceLocation skin;
 	
-	public PlayerData(String name) 
+	public PlayerData(UUID uuid)
 	{
-		username = name;	
+		uniqueId = uuid;
 		snapshots = new PlayerSnapshot[FlansMod.numPlayerSnapshots];
 	}
 	

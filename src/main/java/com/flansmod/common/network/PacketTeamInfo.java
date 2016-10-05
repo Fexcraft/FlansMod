@@ -1,21 +1,22 @@
 package com.flansmod.common.network;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.teams.PlayerClass;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.teams.TeamsManager;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.UUID;
 
 public class PacketTeamInfo extends PacketBase 
 {			
@@ -118,9 +119,11 @@ public class PacketTeamInfo extends PacketBase
 						data.writeInt(team.members.size());
 						for(int j = 0; j < team.members.size(); j++)
 						{
-							String username = team.members.get(j);
-							PlayerData playerData = PlayerHandler.getPlayerData(username, Side.SERVER);
-							writeUTF(data, username);
+							UUID uuid = team.members.get(j);
+							String userName = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid).getName();
+							PlayerData playerData = PlayerHandler.getPlayerData(uuid, Side.SERVER);
+							writeUTF(data, userName);
+
 							if(playerData == null)
 							{
 								data.writeInt(0);
@@ -143,7 +146,7 @@ public class PacketTeamInfo extends PacketBase
 			else
 			{
 				data.writeBoolean(false);
-				ArrayList<String> playerNames = new ArrayList<String>();
+				ArrayList<UUID> playerNames = new ArrayList<UUID>();
 				for(int i = 0; i < TeamsManager.getInstance().currentRound.teams.length; i++)
 				{
 					Team team = TeamsManager.getInstance().currentRound.teams[i];
@@ -156,8 +159,9 @@ public class PacketTeamInfo extends PacketBase
 
 				Collections.sort(playerNames, new Team.ComparatorScore());
 				data.writeInt(playerNames.size());
-				for (String username : playerNames) {
-					PlayerData playerData = PlayerHandler.getPlayerData(username, Side.SERVER);
+				for (UUID uuid : playerNames) {
+					PlayerData playerData = PlayerHandler.getPlayerData(uuid, Side.SERVER);
+					String username = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid).getName();
 					writeUTF(data, username);
 					if (playerData == null) {
 						data.writeInt(0);
