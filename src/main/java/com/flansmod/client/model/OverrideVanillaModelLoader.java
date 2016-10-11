@@ -2,7 +2,11 @@ package com.flansmod.client.model;
 
 import com.flansmod.client.ClientProxy;
 import com.flansmod.client.RenderUtils;
+import com.flansmod.common.FlansMod;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.vector.Radian;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -12,6 +16,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -60,8 +65,16 @@ public class OverrideVanillaModelLoader implements ICustomModelLoader
     {
         this.resourceManager = resourceManager;
     }
+    
+    public void setPaintJobIcons(Item item){
+        for(Paintjob paintjob : ((IPaintableItem<GunType>)item).getInfoType().paintjobs){
+            ModelResourceLocation modelLocation = new ModelResourceLocation(((IPaintableItem<GunType>)item).getInfoType().item.getRegistryName() + "_" +  paintjob.name, "inventory");
+			ModelLoader.setCustomModelResourceLocation(item, paintjob.ID, modelLocation);
+            OverrideVanillaModelLoader.INSTANCE.setCustomIcon(modelLocation, new ResourceLocation(FlansMod.MODID, "items/" + paintjob.iconPath));
+        }
+    }
 
-    public void setCusomIcon(ModelResourceLocation model, ResourceLocation icon)
+    public void setCustomIcon(ModelResourceLocation model, ResourceLocation icon)
     {
         acceptedIcons.put(new ResourceLocation(model.getResourceDomain(), "models/item/" + model.getResourcePath()), icon);
     }

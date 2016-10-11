@@ -33,7 +33,6 @@ import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -55,9 +54,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -107,17 +106,11 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		setCreativeTab(FlansMod.tabFlanGuns);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
-		//The model locations must be the actual location of the model not the item location + meta. Currently the location
-		// is ignored and we just pretend to load the model, but that might change in the future
-		//ItemUtil.registerRender(this);
-
-        for(Paintjob paintjob : getInfoType().paintjobs)
-        {
-            //The location that is used to register the custom location in ItemUtil.registerRender
-            ModelResourceLocation modelLocation = new ModelResourceLocation(type.item.getRegistryName() + "_" +  paintjob.name, "inventory");
-			ModelLoader.setCustomModelResourceLocation(this, paintjob.ID, modelLocation);
-            OverrideVanillaModelLoader.INSTANCE.setCusomIcon(modelLocation, new ResourceLocation(FlansMod.MODID, "items/" + paintjob.iconPath));
-        }
+		
+		//moved code to another class cause client imports in the constructor crash the server
+		if(FMLCommonHandler.instance().getSide() == Side.CLIENT){
+			OverrideVanillaModelLoader.INSTANCE.setPaintJobIcons(this);
+		}
 	}
 
 	@Override
