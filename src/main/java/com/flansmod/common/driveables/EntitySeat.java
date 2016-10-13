@@ -12,10 +12,10 @@ import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemShootable;
 import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.network.PacketDriveableKey;
 import com.flansmod.common.network.PacketDriveableKeyHeld;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.PacketSeatUpdates;
+import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.vector.Vector3f;
@@ -113,9 +113,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public void setPositionAndRotationDirect(double d, double d1, double d2, float f, float f1, int i, boolean b)
-	{
+	public void setPositionAndRotationDirect(double d, double d1, double d2, float f, float f1, int i, boolean b){
 		//setPosition(x, y, z);
+		super.setPositionAndRotationDirect(d1, d1, d2, f1, f1, i, b);//TODO check
 	}
 	
 	@Override
@@ -126,10 +126,13 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//prevPosY = posY;
 		//prevPosZ = posZ;
 		
+	    if(driver && EntUtil.getPassengerOf(this) == null){//tt
+	        prevLooking = looking.clone();
+	        prevPlayerLooking = playerLooking.clone();
+	    }
 		
 		//If on the client and the driveable parent has yet to be found, search for it
-		if(worldObj.isRemote && !foundDriveable)
-		{
+		if(worldObj.isRemote && !foundDriveable){
 			driveable = (EntityDriveable)worldObj.getEntityByID(driveableID);
 			if(driveable == null)
 				return;
@@ -138,11 +141,20 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			seatInfo = driveable.getDriveableType().seats[seatID];
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			prevLooking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
+			prevLooking = looking.clone();//tt
+			
 			playerPosX = prevPlayerPosX = posX = driveable.posX;
 			playerPosY = prevPlayerPosY = posY = driveable.posY;
 			playerPosZ = prevPlayerPosZ = posZ = driveable.posZ;
+			
+			lastTickPosX = driveable.lastTickPosX; // synchronization with driveable
+			lastTickPosY = driveable.lastTickPosY; // synchronization with driveable
+			lastTickPosZ = driveable.lastTickPosZ; // synchronization with driveable
+			
 			setPosition(posX, posY, posZ);
-		}		
+		}
+		
+		
 		//Update gun delay ticker
 		if(gunDelay > 0)
 			gunDelay--;
@@ -552,7 +564,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		{
 			if(foundDriveable)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableKey(key));
+				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 				if(key == 9)
 					minigunSpeed += 0.1F;
 			}
@@ -560,8 +572,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		
 		//Exit key pressed
-		if(key == 6 && EntUtil.getPassengerOf(this) != null)
+		if(key == 6 && EntUtil.getPassengerOf(this) != null){
 			EntUtil.getPassengerOf(this).dismountRidingEntity();
+		}
 				
 		if(key == 9) //Shoot
 		{
@@ -642,7 +655,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			if(EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) instanceof EntityLiving && !(EntUtil.getPassengerOf(this) instanceof EntityPlayer))
 			{
 				EntityLiving mob = (EntityLiving)EntUtil.getPassengerOf(this);
-				EntUtil.getPassengerOf(this).dismountRidingEntity();;
+				EntUtil.getPassengerOf(this).dismountRidingEntity();
 				mob.setLeashedToEntity(entityplayer, true);
 				return true;
 			}

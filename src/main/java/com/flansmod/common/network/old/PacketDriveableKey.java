@@ -1,7 +1,8 @@
-package com.flansmod.common.network;
+package com.flansmod.common.network.old;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.network.PacketBase;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

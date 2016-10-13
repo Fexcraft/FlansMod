@@ -1,8 +1,9 @@
-package com.flansmod.common.network;
+package com.flansmod.common.network.old;
 
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntityVehicle;
+import com.flansmod.common.network.PacketBase;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

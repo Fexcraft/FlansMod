@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.network.PacketDriveableKey;
 import com.flansmod.common.network.PacketPlaySound;
-import com.flansmod.common.network.PacketVehicleControl;
+import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.vector.Vector3f;
@@ -23,6 +23,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -149,7 +150,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Send keys which require server side updates to the server
 		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9))
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketDriveableKey(key));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
 		switch(key)
@@ -236,7 +237,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 					if(type.hasDoor)
 						player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
 					toggleTimer = 10;
-					FlansMod.getPacketHandler().sendToServer(new PacketVehicleControl(this));
+					FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
 				}
 				return true;
 			}
@@ -505,7 +506,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Calculate movement on the client and then send position, rotation etc to the server
 		if(thePlayerIsDrivingThis)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketVehicleControl(this));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
 			serverPosX = posX;
 			serverPosY = posY;
 			serverPosZ = posZ;
@@ -515,7 +516,8 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//If this is the server, send position updates to everyone, having received them from the driver
 		if(!worldObj.isRemote && ticksExisted % 5 == 0)
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketVehicleControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketVehicleControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, FlansMod.driveableUpdateRange));
 		}
 				
 				int animSpeed = 4;

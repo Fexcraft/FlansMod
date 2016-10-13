@@ -8,6 +8,7 @@ import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.*;
 import com.flansmod.common.guns.*;
 import com.flansmod.common.network.*;
+import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.vector.Vector3f;
@@ -193,7 +194,7 @@ public class EntityMecha extends EntityDriveable
 		//send keys which require server side updates to the server
 		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9))
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketDriveableKey(key));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
 		switch(key)

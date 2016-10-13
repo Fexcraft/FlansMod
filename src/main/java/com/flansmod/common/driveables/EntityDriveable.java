@@ -43,6 +43,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
@@ -115,7 +116,9 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		setSize(1F, 1F);
 		yOffset = 6F / 16F;
 		ignoreFrustumCheck = true;
-		setRenderDistanceWeight(200D);
+		if(FMLCommonHandler.instance().getSide().isClient()){
+			setRenderDistanceWeight(200D);
+		}
 	}
 	
 	public EntityDriveable(World world, DriveableType t, DriveableData d)

@@ -225,10 +225,10 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 		registerPacket(PacketBuyArmour.class);
 		registerPacket(PacketBuyWeapon.class);
 		registerPacket(PacketCraftDriveable.class);	
-		registerPacket(PacketDriveableControl.class);	
+		//registerPacket(PacketDriveableControl.class);	
 		registerPacket(PacketDriveableDamage.class);	
 		registerPacket(PacketDriveableGUI.class);	
-		registerPacket(PacketDriveableKey.class);	
+		//registerPacket(PacketDriveableKey.class);	
 		registerPacket(PacketDriveableKeyHeld.class);	
 		registerPacket(PacketFlak.class);	
 		//registerPacket(PacketGunFire.class);	
@@ -248,7 +248,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 		registerPacket(PacketShotData.class);
 		registerPacket(PacketTeamInfo.class);	
 		registerPacket(PacketTeamSelect.class);	
-		registerPacket(PacketVehicleControl.class);
+		//registerPacket(PacketVehicleControl.class);
 		registerPacket(PacketVoteCast.class);
 		registerPacket(PacketVoting.class);
 		registerPacket(PacketRequestDebug.class);

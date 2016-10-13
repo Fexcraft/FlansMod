@@ -3,10 +3,10 @@ package com.flansmod.common.driveables;
 import javax.annotation.Nullable;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.network.PacketDriveableControl;
-import com.flansmod.common.network.PacketDriveableKey;
 import com.flansmod.common.network.PacketPlaneControl;
 import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.network.packets.PacketDriveableControl;
+import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.vector.Matrix4f;
@@ -156,7 +156,7 @@ public class EntityPlane extends EntityDriveable
 		//Send keys which require server side updates to the server
 		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9))
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketDriveableKey(key));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
 		boolean canThrust = ((seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && ((EntityPlayer)EntUtil.getPassengerOf(seats[0])).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
@@ -249,7 +249,7 @@ public class EntityPlane extends EntityDriveable
 					varGear = !varGear;
 					player.addChatMessage(new TextComponentString("Landing gear " + (varGear ? "down" : "up")));
 					toggleTimer = 10;
-					FlansMod.getPacketHandler().sendToServer(new PacketDriveableControl(this));
+					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
 				}
 				return true;
 			}
@@ -261,7 +261,7 @@ public class EntityPlane extends EntityDriveable
 					if(type.hasDoor)
 						player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
 					toggleTimer = 10;
-					FlansMod.getPacketHandler().sendToServer(new PacketDriveableControl(this));
+					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
 				}
 				return true;
 			}
@@ -282,7 +282,7 @@ public class EntityPlane extends EntityDriveable
 						player.addChatMessage(new TextComponentString(mode == EnumPlaneMode.HELI ? "Entering hover mode" : "Entering plane mode"));
 					}
 					toggleTimer = 10;
-					FlansMod.getPacketHandler().sendToServer(new PacketDriveableControl(this));
+					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
 				}
 				return true;
 			}

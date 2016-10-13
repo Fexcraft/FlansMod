@@ -166,9 +166,9 @@ public class RotatedAxes
 		mat.m10 = in.y;
 		mat.m20 = in.z;
 		//Do the rotations used to obtain this basis in reverse
-		mat.rotate(-rotationYaw * 3.14159265F / 180F, new Vector3f(0F, 1F, 0F));
-		mat.rotate(-rotationPitch * 3.14159265F / 180F, new Vector3f(0F, 0F, 1F));
-		mat.rotate(-rotationRoll * 3.14159265F / 180F, new Vector3f(1F, 0F, 0F));
+		mat.rotate(-rotationYaw * 3.14159265F / 180F, new Vector3f(0F, 1F, 0F), mat, mat);
+		mat.rotate(-rotationPitch * 3.14159265F / 180F, new Vector3f(0F, 0F, 1F), mat, mat);
+		mat.rotate(-rotationRoll * 3.14159265F / 180F, new Vector3f(1F, 0F, 0F), mat, mat);
 		return new Vector3f(mat.m00, mat.m10, mat.m20);
 	}
 	
@@ -181,9 +181,9 @@ public class RotatedAxes
 		mat.m10 = in.y;
 		mat.m20 = in.z;
 		//Do the rotations used to obtain this basis
-		mat.rotate(rotationRoll * 3.14159265F / 180F, new Vector3f(1F, 0F, 0F));
-		mat.rotate(rotationPitch * 3.14159265F / 180F, new Vector3f(0F, 0F, 1F));
-		mat.rotate(rotationYaw * 3.14159265F / 180F, new Vector3f(0F, 1F, 0F));
+		mat.rotate(rotationRoll * 3.14159265F / 180F, new Vector3f(1F, 0F, 0F), mat, mat);
+		mat.rotate(rotationPitch * 3.14159265F / 180F, new Vector3f(0F, 0F, 1F), mat, mat);
+		mat.rotate(rotationYaw * 3.14159265F / 180F, new Vector3f(0F, 1F, 0F), mat, mat);
 		return new Vector3f(mat.m00, mat.m10, mat.m20);
 	}
 

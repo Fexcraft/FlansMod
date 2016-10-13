@@ -2,6 +2,7 @@ package com.flansmod.common.network;
 
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
+import com.flansmod.common.network.old.PacketDriveableControl;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

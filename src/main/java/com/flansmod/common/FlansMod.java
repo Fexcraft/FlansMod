@@ -6,6 +6,7 @@ import com.flansmod.common.eventhandlers.PlayerDeathEventListener;
 import com.flansmod.common.guns.*;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
+import com.flansmod.common.network.FPacketHandler;
 import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
@@ -48,6 +49,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
@@ -100,6 +102,7 @@ public class FlansMod
 
 	//Handlers
 	public static final PacketHandler packetHandler = new PacketHandler();
+	public static final FPacketHandler packet_handler = new FPacketHandler();
 	public static final PlayerHandler playerHandler = new PlayerHandler();
 	public static final TeamsManager teamsManager = new TeamsManager();
 	public static final CommonTickHandler tickHandler = new CommonTickHandler();
@@ -122,7 +125,6 @@ public class FlansMod
 	public static BlockPaintjobTable paintjobTable;
 
 	/** The mod pre-initialiser method */
-	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
@@ -279,6 +281,7 @@ public class FlansMod
 	public void postInit(FMLPostInitializationEvent event)
 	{
 		packetHandler.postInitialise();
+		packet_handler.initialise();
 		
 		hooks.hook();
 	}
@@ -546,6 +549,10 @@ public class FlansMod
 	public static PacketHandler getPacketHandler()
 	{
 		return INSTANCE.packetHandler;
+	}
+	
+	public static SimpleNetworkWrapper getNewPacketHandler(){
+		return packet_handler.getInstance();
 	}
 
 	public static void syncConfig() {
