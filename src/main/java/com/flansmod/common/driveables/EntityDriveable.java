@@ -1,5 +1,9 @@
 package com.flansmod.common.driveables;
 
+import java.util.ArrayList;
+import java.util.List;
+//import cofh.api.energy.IEnergyContainerItem;
+
 import com.flansmod.api.IControllable;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
@@ -9,7 +13,16 @@ import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveableType.ParticleEmitter;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.BulletType;
+import com.flansmod.common.guns.EntityShootable;
+import com.flansmod.common.guns.EnumFireMode;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.InventoryHelper;
+import com.flansmod.common.guns.ItemBullet;
+import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.ItemShootable;
+import com.flansmod.common.guns.ShootableType;
+import com.flansmod.common.guns.ShotData;
 import com.flansmod.common.guns.ShotData.InstantShotData;
 import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
@@ -23,6 +36,7 @@ import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.vector.Vector3f;
+
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.Block;
@@ -39,7 +53,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -48,10 +66,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.List;
-//import cofh.api.energy.IEnergyContainerItem;
 
 public abstract class EntityDriveable extends Entity implements IControllable, IExplodeable, IEntityAdditionalSpawnData
 {
@@ -275,13 +289,13 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity entity)
 	{
-		return null;//entity.boundingBox;
+		return entity.getEntityBoundingBox();
 	}
 
 	@Override
     public boolean canBePushed()
     {
-        return false;
+        return true;//TODO just testing, false is original fm
     }
 
 	@Override
@@ -339,24 +353,25 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	}
 	
 	@Override
-    public void setPositionAndRotationDirect(double d, double d1, double d2, float f, float f1, int i, boolean b)
+    public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport)
     {
 		if(ticksExisted > 1)
 			return;
 		if(EntUtil.getPassengerOf(this) instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)EntUtil.getPassengerOf(this)))
 		{
+			//
 		}
 		else
 		{				
 			if(syncFromServer)
 			{
-				serverPositionTransitionTicker = i + 5;
+				serverPositionTransitionTicker = posRotationIncrements + 5;
 			}
 			else
 			{
-				double var10 = d - posX;
-				double var12 = d1 - posY;
-				double var14 = d2 - posZ;
+				double var10 = x - posX;
+				double var12 = y - posY;
+				double var14 = z - posZ;
 				double var16 = var10 * var10 + var12 * var12 + var14 * var14;
 	
 				if (var16 <= 1.0D)
@@ -366,11 +381,11 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	
 				serverPositionTransitionTicker = 3;
 			}
-			serverPosX = d;
-			serverPosY = d1;
-			serverPosZ = d2;
-			serverYaw = f;
-			serverPitch = f1;
+			serverPosX = x;
+			serverPosY = y;
+			serverPosZ = z;
+			serverYaw = yaw;
+			serverPitch = pitch;
 		}
 	}
 	
@@ -474,7 +489,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		return seats != null && seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && ((EntityPlayer)EntUtil.getPassengerOf(seats[0])).capabilities.isCreativeMode;
 	}
 	
-	private EntityPlayer GetDriver()
+	private EntityPlayer getDriver()
 	{
 		if(seats != null && seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer)
 			return ((EntityPlayer)EntUtil.getPassengerOf(seats[0]));
@@ -494,7 +509,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 			//Get the gun from the plane type and the ammo from the data
 			GunType gunType = pilotGun.type;
 			ItemStack shootableStack = driveableData.ammo[getDriveableType().numPassengerGunners + currentGun];
-			EntityPlayer driver = GetDriver();
+			EntityPlayer driver = getDriver();
 			
 			// For each 
 			if(shootableStack == null){
@@ -868,16 +883,15 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		prevRotationRoll = axes.getRoll();		
 		prevAxes = axes.clone();
 		
-		if(EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this).isDead)
-		{
+		if(EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this).isDead){
 			getPassengers().removeAll(this.getPassengers());
 		}
-		if(EntUtil.getPassengerOf(this) != null && isDead)
-		{
-			EntUtil.getPassengerOf(this).dismountRidingEntity();;
+		if(EntUtil.getPassengerOf(this) != null && isDead){
+			EntUtil.getPassengerOf(this).dismountRidingEntity();
 		}
-		if(EntUtil.getPassengerOf(this) != null)
+		if(EntUtil.getPassengerOf(this) != null){
 			EntUtil.getPassengerOf(this).fallDistance = 0F;
+		}
 		
 		boolean canThrust = driverIsCreative() || driveableData.fuelInTank > 0;
 

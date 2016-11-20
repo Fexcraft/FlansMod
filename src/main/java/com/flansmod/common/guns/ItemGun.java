@@ -1,5 +1,13 @@
 package com.flansmod.common.guns;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
+import org.lwjgl.input.Mouse;
+
 import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.client.FlansModResourceHandler;
@@ -17,7 +25,11 @@ import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.ShotData.InstantShotData;
 import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.*;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.BlockHit;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.EntityHit;
+import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.PacketReload;
 import com.flansmod.common.network.PacketShotData;
@@ -28,6 +40,7 @@ import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
+
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.block.state.IBlockState;
@@ -48,7 +61,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -59,12 +79,6 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 {
@@ -768,31 +782,29 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	/** Generic update method. If we have an off hand weapon, it will also make calls for that 
 	 *  Passes on to onUpdateEach */
 	@Override
-	public void onUpdate(ItemStack itemstack, World world, Entity entity, int i, boolean flag)
-	{
-		if(entity instanceof EntityPlayer)
-		{
+	public void onUpdate(ItemStack itemstack, World world, Entity entity, int i, boolean flag){
+		if(entity instanceof EntityPlayer){
+			
 			EntityPlayer player = (EntityPlayer) entity;
 			EnumHand hand;
-			if (itemstack == player.getHeldItemMainhand())
-			{
+			if(itemstack == player.getHeldItemMainhand()){
 				hand = EnumHand.MAIN_HAND;
 			}
-			else if (itemstack == player.getHeldItemOffhand())
-			{
+			else if(itemstack == player.getHeldItemOffhand()){
 				hand = EnumHand.OFF_HAND;
 			}
-			else
-			{
+			else{
 				return;
 			}
+			
 			EnumHandSide side = FlansUtils.getSideForHand(hand, player);
 			//don't shoot if gui is open
-			if (Minecraft.getMinecraft().currentScreen != null)
-			{
-				rightMouseHeld = false;
-				leftMouseHeld = false;
-				return;
+			if(world.isRemote){
+				if(Minecraft.getMinecraft().currentScreen != null){
+					rightMouseHeld = false;
+					leftMouseHeld = false;
+					return;
+				}
 			}
 
 			//onUpdate is called for offHand as well now, do mouse related stuff in onUpdateClient.

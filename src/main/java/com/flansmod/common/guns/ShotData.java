@@ -3,6 +3,7 @@ package com.flansmod.common.guns;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 

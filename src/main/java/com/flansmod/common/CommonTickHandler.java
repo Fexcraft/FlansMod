@@ -2,6 +2,7 @@ package com.flansmod.common;
 
 import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.teams.TeamsManager;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;

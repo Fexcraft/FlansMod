@@ -1,6 +1,7 @@
 package com.flansmod.common.network;
 
 import com.flansmod.common.FlansMod;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;

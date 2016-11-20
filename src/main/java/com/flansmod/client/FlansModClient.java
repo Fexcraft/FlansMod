@@ -1,16 +1,25 @@
 package com.flansmod.client;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.gui.GuiTeamScores;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.AttachmentType;
+import com.flansmod.common.guns.EntityBullet;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.IScope;
+import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.network.PacketTeamInfo;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3i;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
@@ -27,10 +36,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class FlansModClient extends FlansMod
 {

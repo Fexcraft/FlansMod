@@ -17,12 +17,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BlockFlansWorkbench extends Block
-{
+public class BlockFlansWorkbench extends Block{
+	
 	public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 2);
 	
-    public BlockFlansWorkbench(int j, int k)
-    {
+    public BlockFlansWorkbench(){
         super(Material.IRON);
         setHardness(3F);
         setResistance(6F);

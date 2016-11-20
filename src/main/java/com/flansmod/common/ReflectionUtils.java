@@ -1,11 +1,16 @@
 package com.flansmod.common;
 
-import net.minecraft.client.renderer.entity.RenderLivingBase;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.*;
+
+import net.minecraft.client.renderer.entity.RenderLivingBase;
 
 public class ReflectionUtils
 {
@@ -61,7 +66,6 @@ public class ReflectionUtils
         setObfuscatedName(RenderLivingBase.class, "layerRenderers", "field_177097_h");
     }
 
-    @SuppressWarnings("EmptyCatchBlock")
     private static Field getObfuscatedField(Class<?> clazz, String nonObfuscated) throws NoSuchFieldException
     {
         HashMap<String, Field> classFields = fieldMap.get(clazz);

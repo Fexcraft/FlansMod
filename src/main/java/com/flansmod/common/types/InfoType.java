@@ -1,6 +1,10 @@
 package com.flansmod.common.types;
 
+import java.util.HashMap;
+import java.util.Random;
+
 import com.flansmod.common.FlansMod;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.init.Items;
@@ -13,9 +17,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.HashMap;
-import java.util.Random;
 
 public class InfoType
 {

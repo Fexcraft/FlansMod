@@ -1,11 +1,24 @@
 package com.flansmod.client.model;
 
+import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND;
+import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND;
+import static net.minecraft.util.EnumHandSide.LEFT;
+
+import org.lwjgl.opengl.GL11;
+
 import com.flansmod.client.FlansModClient;
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.RenderUtils;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.AttachmentType;
+import com.flansmod.common.guns.EnumFireMode;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.IScope;
+import com.flansmod.common.guns.ItemBullet;
+import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.vector.Vector3f;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -15,10 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
-
-import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.*;
-import static net.minecraft.util.EnumHandSide.LEFT;
 
 public class RenderGun implements RenderCustomItem
 {

@@ -1,9 +1,13 @@
 package com.flansmod.common.guns;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
+
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,9 +17,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.Collections;
-import java.util.List;
 
 /** Implemented from old source. */
 public class ItemBullet extends ItemShootable implements IFlanItem<BulletType>, IItem

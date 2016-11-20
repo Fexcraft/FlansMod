@@ -1,5 +1,8 @@
 package com.flansmod.common.guns.boxes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
@@ -21,8 +24,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockGunBox extends Block implements IBlock
 {

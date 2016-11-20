@@ -1,8 +1,12 @@
 package com.flansmod.common.guns;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.PaintableType;
+
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,9 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.Collections;
-import java.util.List;
 
 public class ItemAttachment extends Item implements IPaintableItem<AttachmentType>, IItem
 {

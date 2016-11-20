@@ -1,14 +1,15 @@
 package com.flansmod.common.types;
 
+import java.util.ArrayList;
+
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.Paintjob;
+
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.ArrayList;
 
 public abstract class PaintableType extends InfoType
 {

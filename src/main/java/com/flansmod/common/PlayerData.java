@@ -1,5 +1,8 @@
 package com.flansmod.common;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 import com.flansmod.common.guns.EntityGrenade;
 import com.flansmod.common.guns.EntityMG;
 import com.flansmod.common.guns.GunType;
@@ -7,14 +10,12 @@ import com.flansmod.common.guns.raytracing.PlayerSnapshot;
 import com.flansmod.common.teams.PlayerClass;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.vector.Vector3f;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class PlayerData 
 {

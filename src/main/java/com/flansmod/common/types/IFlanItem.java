@@ -1,6 +1,7 @@
 package com.flansmod.common.types;
 
 import com.flansmod.client.model.RenderCustomItem;
+
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

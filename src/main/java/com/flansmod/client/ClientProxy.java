@@ -1,10 +1,60 @@
 package com.flansmod.client;
 
-import com.flansmod.client.debug.*;
-import com.flansmod.client.gui.*;
-import com.flansmod.client.model.*;
-import com.flansmod.common.*;
-import com.flansmod.common.driveables.*;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+
+import com.flansmod.client.debug.EntityDebugAABB;
+import com.flansmod.client.debug.EntityDebugDot;
+import com.flansmod.client.debug.EntityDebugVector;
+import com.flansmod.client.debug.RenderDebugAABB;
+import com.flansmod.client.debug.RenderDebugDot;
+import com.flansmod.client.debug.RenderDebugVector;
+import com.flansmod.client.gui.GuiArmourBox;
+import com.flansmod.client.gui.GuiDriveableCrafting;
+import com.flansmod.client.gui.GuiDriveableFuel;
+import com.flansmod.client.gui.GuiDriveableInventory;
+import com.flansmod.client.gui.GuiDriveableMenu;
+import com.flansmod.client.gui.GuiDriveableRepair;
+import com.flansmod.client.gui.GuiGunBox;
+import com.flansmod.client.gui.GuiGunModTable;
+import com.flansmod.client.gui.GuiMechaInventory;
+import com.flansmod.client.gui.GuiPaintjobTable;
+import com.flansmod.client.model.OverrideVanillaModelLoader;
+import com.flansmod.client.model.RenderAAGun;
+import com.flansmod.client.model.RenderBullet;
+import com.flansmod.client.model.RenderCustomEntityItem;
+import com.flansmod.client.model.RenderCustomItem;
+import com.flansmod.client.model.RenderFlag;
+import com.flansmod.client.model.RenderFlagpole;
+import com.flansmod.client.model.RenderGrenade;
+import com.flansmod.client.model.RenderGun;
+import com.flansmod.client.model.RenderItemHolder;
+import com.flansmod.client.model.RenderMG;
+import com.flansmod.client.model.RenderMecha;
+import com.flansmod.client.model.RenderNull;
+import com.flansmod.client.model.RenderParachute;
+import com.flansmod.client.model.RenderPlane;
+import com.flansmod.client.model.RenderVehicle;
+import com.flansmod.common.CommonProxy;
+import com.flansmod.common.EntityCustomItem;
+import com.flansmod.common.FlansMod;
+import com.flansmod.common.PlayerData;
+import com.flansmod.common.PlayerHandler;
+import com.flansmod.common.TileEntityItemHolder;
+import com.flansmod.common.driveables.DriveablePart;
+import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.driveables.EntityDriveable;
+import com.flansmod.common.driveables.EntityPlane;
+import com.flansmod.common.driveables.EntitySeat;
+import com.flansmod.common.driveables.EntityVehicle;
+import com.flansmod.common.driveables.EntityWheel;
+import com.flansmod.common.driveables.PlaneType;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityBullet;
@@ -17,10 +67,15 @@ import com.flansmod.common.network.PacketBuyWeapon;
 import com.flansmod.common.network.PacketCraftDriveable;
 import com.flansmod.common.network.PacketRepairDriveable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
-import com.flansmod.common.teams.*;
+import com.flansmod.common.teams.ArmourBoxType;
+import com.flansmod.common.teams.BlockArmourBox;
+import com.flansmod.common.teams.EntityFlag;
+import com.flansmod.common.teams.EntityFlagpole;
+import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,14 +92,6 @@ import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.common.discovery.ContainerType;
 import net.minecraftforge.fml.common.discovery.ModCandidate;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class ClientProxy extends CommonProxy
 {

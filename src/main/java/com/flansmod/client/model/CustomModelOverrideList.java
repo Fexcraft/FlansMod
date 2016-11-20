@@ -1,15 +1,15 @@
 package com.flansmod.client.model;
 
+import java.util.Collections;
+
+import com.flansmod.client.model.OverrideVanillaModelLoader.BakedIconBasedModel;
 import com.flansmod.common.types.IFlanItem;
+
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
-import java.util.Collections;
-
-import static com.flansmod.client.model.OverrideVanillaModelLoader.BakedIconBasedModel;
 
 public class CustomModelOverrideList extends ItemOverrideList
 {

@@ -1,7 +1,8 @@
 package com.flansmod.common.guns.raytracing;
 
 import com.flansmod.client.debug.EntityDebugDot;
-import com.flansmod.common.*;
+import com.flansmod.common.FlansUtils;
+import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.GunType;

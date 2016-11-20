@@ -1,15 +1,17 @@
 package com.flansmod.common.guns;
 
 
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.flansmod.common.vector.Radian;
 import com.flansmod.common.vector.Vector3f;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.apache.commons.lang3.tuple.Pair;
-
-import javax.annotation.Nullable;
 
 /**
  * Describes what the player model should look in third person, when a gun is being held.

@@ -1,7 +1,10 @@
 package com.flansmod.common.teams;
 
+import javax.annotation.Nullable;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
+
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,8 +14,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
 
 public class EntityFlag extends Entity implements ITeamObject {
 	

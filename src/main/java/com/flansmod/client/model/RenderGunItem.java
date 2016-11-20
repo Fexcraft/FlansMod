@@ -2,6 +2,7 @@ package com.flansmod.client.model;
 
 import com.flansmod.client.ClientProxy;
 import com.flansmod.common.FlansMod;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.Render;

@@ -1,8 +1,13 @@
 package com.flansmod.client.model;
 
+import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.GROUND;
+
+import java.util.Random;
+
 import com.flansmod.client.ClientProxy;
 import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.types.IFlanItem;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -14,10 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-
-import java.util.Random;
-
-import static net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.GROUND;
 
 /**
  * Used to render ItemEntities with models.

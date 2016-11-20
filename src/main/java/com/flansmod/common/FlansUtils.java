@@ -1,11 +1,11 @@
 package com.flansmod.common;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
-
-import java.lang.reflect.Field;
 
 public class FlansUtils
 {

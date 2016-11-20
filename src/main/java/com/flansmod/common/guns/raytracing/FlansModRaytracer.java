@@ -1,14 +1,23 @@
 package com.flansmod.common.guns.raytracing;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.AttachmentType;
+import com.flansmod.common.guns.EntityAAGun;
+import com.flansmod.common.guns.EntityGrenade;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.vector.Vector3f;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -23,10 +32,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class FlansModRaytracer 
 {

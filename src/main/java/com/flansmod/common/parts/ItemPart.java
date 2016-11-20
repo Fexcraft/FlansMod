@@ -1,7 +1,10 @@
 package com.flansmod.common.parts;
 
+import java.util.List;
+
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
+
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,8 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
 
 public class ItemPart extends Item implements IFlanItem<PartType>, IItem
 {

@@ -1,9 +1,50 @@
 package com.flansmod.common;
 
-import com.flansmod.common.driveables.*;
-import com.flansmod.common.driveables.mechas.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.flansmod.common.driveables.EntityPlane;
+import com.flansmod.common.driveables.EntitySeat;
+import com.flansmod.common.driveables.EntityVehicle;
+import com.flansmod.common.driveables.EntityWheel;
+import com.flansmod.common.driveables.ItemPlane;
+import com.flansmod.common.driveables.ItemVehicle;
+import com.flansmod.common.driveables.PlaneType;
+import com.flansmod.common.driveables.VehicleType;
+import com.flansmod.common.driveables.mechas.EntityMecha;
+import com.flansmod.common.driveables.mechas.ItemMecha;
+import com.flansmod.common.driveables.mechas.ItemMechaAddon;
+import com.flansmod.common.driveables.mechas.MechaItemType;
+import com.flansmod.common.driveables.mechas.MechaType;
 import com.flansmod.common.eventhandlers.PlayerDeathEventListener;
-import com.flansmod.common.guns.*;
+import com.flansmod.common.guns.AAGunType;
+import com.flansmod.common.guns.AttachmentType;
+import com.flansmod.common.guns.BulletType;
+import com.flansmod.common.guns.EntityAAGun;
+import com.flansmod.common.guns.EntityBullet;
+import com.flansmod.common.guns.EntityGrenade;
+import com.flansmod.common.guns.EntityMG;
+import com.flansmod.common.guns.GrenadeType;
+import com.flansmod.common.guns.GunType;
+import com.flansmod.common.guns.ItemAAGun;
+import com.flansmod.common.guns.ItemAttachment;
+import com.flansmod.common.guns.ItemBullet;
+import com.flansmod.common.guns.ItemGrenade;
+import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.FPacketHandler;
@@ -12,13 +53,30 @@ import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
-import com.flansmod.common.teams.*;
+import com.flansmod.common.teams.ArmourBoxType;
+import com.flansmod.common.teams.ArmourType;
+import com.flansmod.common.teams.BlockArmourBox;
+import com.flansmod.common.teams.BlockSpawner;
+import com.flansmod.common.teams.ChunkLoadingHandler;
+import com.flansmod.common.teams.CommandTeams;
+import com.flansmod.common.teams.EntityFlag;
+import com.flansmod.common.teams.EntityFlagpole;
+import com.flansmod.common.teams.EntityGunItem;
+import com.flansmod.common.teams.EntityTeamItem;
+import com.flansmod.common.teams.ItemFlagpole;
+import com.flansmod.common.teams.ItemOpStick;
+import com.flansmod.common.teams.ItemTeamArmour;
+import com.flansmod.common.teams.PlayerClass;
+import com.flansmod.common.teams.Team;
+import com.flansmod.common.teams.TeamsManager;
+import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.tools.ToolType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+
 import net.fexcraft.mod.lib.util.block.BlockUtil;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -40,8 +98,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -52,18 +108,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-
-@Mod(modid = FlansMod.MODID, name = FlansMod.NAME, version = FlansMod.VERSION, acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+//@Mod(modid = FlansMod.MODID, name = FlansMod.NAME, version = FlansMod.VERSION, acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod
 {
 	//Core mod stuff
@@ -73,7 +119,7 @@ public class FlansMod
 	public static final String MODID = "flansmod";
 	public static final String VERSION = "@VERSION@";
 	public static final String NAME = "Flan's Mod";
-	@Instance(MODID)
+	//@Mod.Instance(MODID)
 	public static FlansMod INSTANCE;
 	public static int generalConfigInteger = 32;
 	public static String generalConfigString = "Hello!";
@@ -104,8 +150,8 @@ public class FlansMod
 	public static final PacketHandler packetHandler = new PacketHandler();
 	public static final FPacketHandler packet_handler = new FPacketHandler();
 	public static final PlayerHandler playerHandler = new PlayerHandler();
-	public static final TeamsManager teamsManager = new TeamsManager();
-	public static final CommonTickHandler tickHandler = new CommonTickHandler();
+	//public static final TeamsManager teamsManager = new TeamsManager();
+	//public static final CommonTickHandler tickHandler = new CommonTickHandler();//TODO
 	public static FlansHooks hooks = new FlansHooks();
 	
 	//Items and creative tabs
@@ -125,7 +171,7 @@ public class FlansMod
 	public static BlockPaintjobTable paintjobTable;
 
 	/** The mod pre-initialiser method */
-	@EventHandler
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		//Register a logger
@@ -159,7 +205,7 @@ public class FlansMod
 		}
 		
 		//Set up mod blocks and items
-		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench(1, 0));
+		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench());
 		workbench.setRegistryName(MODID, "flansWorkbench");
 		workbench.setUnlocalizedName(workbench.getRegistryName().toString());
 		GameRegistry.register(workbench);
@@ -201,7 +247,7 @@ public class FlansMod
 	}
 	
 	/** The mod initialiser method */
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{
 		log("Initialising Flan's Mod.");
@@ -277,7 +323,7 @@ public class FlansMod
 	}
 	
 	/** The mod post-initialisation method */
-	@EventHandler
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
 		packetHandler.postInitialise();
@@ -307,7 +353,7 @@ public class FlansMod
 	}
 	
 	/** Teams command register method */
-	@EventHandler
+	@Mod.EventHandler
 	public void registerCommand(FMLServerStartedEvent e)
 	{
 		CommandHandler handler = ((CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().getCommandManager());
