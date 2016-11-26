@@ -509,7 +509,7 @@ public class ModelRendererTurbo extends ModelRenderer
 			break;
 		}
 		
-		float[] qValues = new float[] {
+		/*float[] qValues = new float[] {
 				Math.abs((v[0] - v1[0])/(v3[0]-v2[0])),
 				Math.abs((v[0] - v1[0])/(v4[0]-v5[0])),
 				Math.abs((v4[0] - v5[0])/(v7[0]-v6[0])),
@@ -524,7 +524,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				Math.abs((v[2] - v4[2])/(v3[2]-v7[2])),
 				Math.abs((v1[2] - v5[2])/(v2[2]-v6[2])),
 				Math.abs((v3[2] - v7[2])/(v2[2]-v6[2]))	
-		};
+		};*/
 		
 		addRectShape(v, v1, v2, v3, v4, v5, v6, v7, w, h, d);
 	}
@@ -640,7 +640,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				break;
 		}
 		
-		float[] qValues = new float[] {
+		/*float[] qValues = new float[] {
 				Math.abs((v[0] - v1[0])/(v3[0]-v2[0])),
 				Math.abs((v[0] - v1[0])/(v4[0]-v5[0])),
 				Math.abs((v4[0] - v5[0])/(v7[0]-v6[0])),
@@ -655,7 +655,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				Math.abs((v[2] - v4[2])/(v3[2]-v7[2])),
 				Math.abs((v1[2] - v5[2])/(v2[2]-v6[2])),
 				Math.abs((v3[2] - v7[2])/(v2[2]-v6[2]))	
-		};
+		};*/
 		
 		addRectShape(v, v1, v2, v3, v4, v5, v6, v7, w, h, d);
 	}
@@ -804,7 +804,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				break;
 		}
 		
-		float[] qValues = new float[] {
+		/*float[] qValues = new float[] {
 				Math.abs((v[0] - v1[0])/(v3[0]-v2[0])),
 				Math.abs((v[0] - v1[0])/(v4[0]-v5[0])),
 				Math.abs((v4[0] - v5[0])/(v7[0]-v6[0])),
@@ -819,7 +819,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				Math.abs((v[2] - v4[2])/(v3[2]-v7[2])),
 				Math.abs((v1[2] - v5[2])/(v2[2]-v6[2])),
 				Math.abs((v3[2] - v7[2])/(v2[2]-v6[2]))	
-		};
+		};*/
 		
 		addRectShape(v, v1, v2, v3, v4, v5, v6, v7, w, h, d);
 	}
@@ -878,7 +878,7 @@ public class ModelRendererTurbo extends ModelRenderer
 		f5 += scale;
 		f6 += scale;
 
-		int m = (mirror ? -1 : 1);
+		//int m = (mirror ? -1 : 1);
 		if(mirror)
 		{
 			float f7 = f4;
@@ -895,7 +895,7 @@ public class ModelRendererTurbo extends ModelRenderer
 		float[] v6 = {f4 + x6, f5 + y6, f6 + z6};
 		float[] v7 = {x  - x7, f5 + y7, f6 + z7};
 		
-		float[] qValues = new float[] {
+		/*float[] qValues = new float[] {
 				Math.abs((v[0] - v1[0])/(v3[0]-v2[0])),
 				Math.abs((v[0] - v1[0])/(v4[0]-v5[0])),
 				Math.abs((v4[0] - v5[0])/(v7[0]-v6[0])),
@@ -910,7 +910,7 @@ public class ModelRendererTurbo extends ModelRenderer
 				Math.abs((v[2] - v4[2])/(v3[2]-v7[2])),
 				Math.abs((v1[2] - v5[2])/(v2[2]-v6[2])),
 				Math.abs((v3[2] - v7[2])/(v2[2]-v6[2]))	
-		};
+		};*/
 		
 		addRectShape(v, v1, v2, v3, v4, v5, v6, v7, w, h, d);
 	}
@@ -2294,4 +2294,8 @@ public class ModelRendererTurbo extends ModelRenderer
 	public static final int MR_BOTTOM = 5;
 	
 	private static final float pi = (float) Math.PI;
+
+	public void render(){
+		render(0.625f);
+	}
 }

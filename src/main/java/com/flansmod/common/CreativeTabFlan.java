@@ -2,6 +2,7 @@ package com.flansmod.common;
 
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.guns.GunType;
+import com.flansmod.common.util.Ticker;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -29,7 +30,7 @@ public class CreativeTabFlan extends CreativeTabs
 	@Override
 	public ItemStack getIconItemStack()
 	{
-		icon = FlansMod.ticker / 20;
+		icon = Ticker.tick / 20;
 		switch(type)
 		{
 			case 0 : return GunType.gunList.size() == 0 ? new ItemStack(Blocks.WOOL, 1, 4) : new ItemStack(GunType.gunList.get(icon % GunType.gunList.size()).item);

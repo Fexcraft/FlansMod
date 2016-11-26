@@ -2,7 +2,7 @@ package com.flansmod.common.network;
 
 import java.util.Random;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -54,7 +54,7 @@ public class PacketFlak extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received flak packet on server. Disregarding.");
+		Util.log("Received flak packet on server. Disregarding.");
 	}
 
 	@Override

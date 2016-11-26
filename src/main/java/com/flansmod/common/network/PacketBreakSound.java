@@ -1,6 +1,6 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,7 +46,7 @@ public class PacketBreakSound extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received block break sound packet on server. Skipping.");
+		Util.log("Received block break sound packet on server. Skipping.");
 	}
 
 	@Override

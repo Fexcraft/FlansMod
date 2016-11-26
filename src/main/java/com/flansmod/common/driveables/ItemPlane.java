@@ -9,6 +9,8 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
+import com.flansmod.common.util.CTabs;
+import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -41,7 +43,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanDriveables);
+		setCreativeTab(CTabs.vehicles);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
@@ -91,7 +93,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 		}
 		catch(IOException e)
 		{
-			FlansMod.log("Failed to read old vehicle file");
+			Util.log("Failed to read old vehicle file");
 			e.printStackTrace();
 		}
 		return null;

@@ -12,6 +12,7 @@ import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.block.material.Material;
@@ -400,7 +401,7 @@ public abstract class DriveableType extends PaintableType
 				}
 				if(damage == -1)
 				{
-					FlansMod.log("Failed to find dye colour : " + split[2] + " while adding " + file.name);
+					Util.log("Failed to find dye colour : " + split[2] + " while adding " + file.name);
 					return;
 				}
 				driveableRecipe.add(new ItemStack(Items.DYE, amount, damage));
@@ -567,7 +568,7 @@ public abstract class DriveableType extends PaintableType
 		}
 		catch (Exception e)
 		{
-			FlansMod.log("Errored reading " + file.name);
+			Util.log("Errored reading " + file.name);
 			e.printStackTrace();
 		}
 	}
@@ -670,12 +671,6 @@ public abstract class DriveableType extends PaintableType
 				return type;
 		}
 		return null;
-	}
-	
-	@Override
-	public void addDungeonLoot() 
-	{
-		//Do not add vehicles to dungeon chests. That would be so op.
 	}
 	
 	public class ParticleEmitter

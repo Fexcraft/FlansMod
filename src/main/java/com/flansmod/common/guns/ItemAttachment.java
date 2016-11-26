@@ -6,6 +6,8 @@ import java.util.List;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.PaintableType;
+import com.flansmod.common.util.CTabs;
+import com.flansmod.common.util.Config;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -26,7 +28,7 @@ public class ItemAttachment extends Item implements IPaintableItem<AttachmentTyp
 		type = t;
 		type.item = this;
 		maxStackSize = t.maxStackSize;
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
@@ -58,8 +60,7 @@ public class ItemAttachment extends Item implements IPaintableItem<AttachmentTyp
     public void getSubItems(Item item, CreativeTabs tabs, List list)
     {
     	PaintableType type = ((IPaintableItem)item).getInfoType();
-    	if(FlansMod.addAllPaintjobsToCreative)
-    	{
+    	if(Config.addAllPaintjobsToCreative){
     		for(Paintjob paintjob : type.paintjobs)
     			addPaintjobToList(item, type, paintjob, list);
     	}

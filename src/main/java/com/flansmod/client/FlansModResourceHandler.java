@@ -15,12 +15,12 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -178,7 +178,7 @@ public class FlansModResourceHandler
 		}
 		catch(IOException e)
 		{
-			FlansMod.log("Failed to create custom skin!");
+			Util.log("Failed to create custom skin!");
 			return;
 		}
 	}
@@ -201,7 +201,7 @@ public class FlansModResourceHandler
 		}
 		catch(IOException e)
 		{
-			FlansMod.log("Failed to create custom icon!");
+			Util.log("Failed to create custom icon!");
 			return;
 		}	
 	}

@@ -1,8 +1,8 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -49,6 +49,6 @@ public class PacketBuyWeapon extends PacketBase
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer)
 	{
-		FlansMod.log("Received gun box purchase packet on client. Skipping.");
+		Util.log("Received gun box purchase packet on client. Skipping.");
 	}
 }

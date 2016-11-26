@@ -1,9 +1,9 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityMG;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -53,6 +53,6 @@ public class PacketMGFire extends PacketBase
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
-		FlansMod.log("MG firing packet received on client. Skipping.");
+		Util.log("MG firing packet received on client. Skipping.");
 	}
 }

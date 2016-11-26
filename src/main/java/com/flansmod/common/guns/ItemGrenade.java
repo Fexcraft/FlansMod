@@ -8,6 +8,7 @@ import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.CTabs;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
 
@@ -37,7 +38,7 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 		super(t);
 		type = t;
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
 	}

@@ -1,8 +1,8 @@
 package com.flansmod.common.guns.boxes;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,7 +33,7 @@ public abstract class BoxType extends InfoType
 				sideTexturePath = split[1];
 		} catch (Exception e)
 		{
-			FlansMod.log("Reading box file failed : " + shortName);
+			Util.log("Reading box file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}

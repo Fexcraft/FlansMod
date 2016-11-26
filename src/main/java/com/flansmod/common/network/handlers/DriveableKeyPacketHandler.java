@@ -20,7 +20,9 @@ public class DriveableKeyPacketHandler implements IMessageHandler<PacketDriveabl
 			public void run(){
 				EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
 				if(player.getRidingEntity() != null && player.getRidingEntity() instanceof IControllable){
+					//Print.spam(1, "PRESS " + packet.key);
 					((IControllable)player.getRidingEntity()).pressKey(packet.key, player);
+					//Print.spam(1, "PRESS COMPLETE " + packet.key);
 				}
 			}
 			

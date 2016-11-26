@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -32,7 +33,7 @@ public class ItemAAGun extends Item implements IFlanItem<AAGunType>, IItem
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);

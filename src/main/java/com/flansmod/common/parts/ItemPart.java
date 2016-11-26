@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -29,7 +30,7 @@ public class ItemPart extends Item implements IFlanItem<PartType>, IItem
 		}
 		type.item = this;
 		setUnlocalizedName("FlansMod:" + type.iconPath);
-		setCreativeTab(FlansMod.tabFlanParts);
+		setCreativeTab(CTabs.parts);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.util.CTabs;
+import com.flansmod.common.util.Ticker;
 import com.google.common.collect.Multimap;
 
 import net.fexcraft.mod.lib.api.item.IItem;
@@ -38,7 +40,7 @@ public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanIte
 		super(ItemArmor.ArmorMaterial.LEATHER, 0, EntUtil.getEquipmentSlotAl(t.type));
 		type = t;
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanTeams);
+		setCreativeTab(CTabs.other);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
@@ -122,9 +124,9 @@ public class ItemTeamArmour extends ItemArmor implements ISpecialArmor, IFlanIte
 	@Override
 	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack)
 	{
-		if(type.nightVision && FlansMod.ticker % 25 == 0)
+		if(type.nightVision && Ticker.tick % 25 == 0)
 			player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 250));
-		if(type.jumpModifier > 1.01F && FlansMod.ticker % 25 == 0)
+		if(type.jumpModifier > 1.01F && Ticker.tick % 25 == 0)
 			player.addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("jump_boost"), 250, (int)((type.jumpModifier - 1F) * 2F), true, false));
 		if(type.negateFallDamage)
 			player.fallDistance = 0F;

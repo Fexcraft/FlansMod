@@ -1,8 +1,6 @@
 package com.flansmod.client;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.teams.Team;
-import com.flansmod.common.teams.TileEntitySpawner;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -18,14 +16,14 @@ public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer worldRenderer = tessellator.getBuffer();
 		
-		TileEntitySpawner spawner = (TileEntitySpawner)te;
-        int spawnerTeamID = spawner.getTeamID();
-        Team spawnerTeam = FlansModClient.getTeam(spawnerTeamID);
+		//TileEntitySpawner spawner = (TileEntitySpawner)te;
+        //int spawnerTeamID = spawner.getTeamID();
+        //Team spawnerTeam = FlansModClient.getTeam(spawnerTeamID);
         
-        boolean currentMap = FlansModClient.isCurrentMap(spawner.map);
+        //boolean currentMap = FlansModClient.isCurrentMap(spawner.map);
         
         //Use default colours
-        if(spawnerTeam == null || !currentMap)
+        /*if(spawnerTeam == null || !currentMap)
         {
         	switch(spawnerTeamID)
         	{
@@ -41,7 +39,7 @@ public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer
         	float green = (float)((spawnerTeam.teamColour >> 8) & 0xff) / 255f;
         	float blue = (float)((spawnerTeam.teamColour >> 0) & 0xff) / 255f;
         	GlStateManager.color(red, green, blue);
-        }
+        }*/
         
         GlStateManager.disableTexture2D();        
        
@@ -51,7 +49,7 @@ public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer
 	        case 0: inset = 0.375d; break;
 	        case 1: inset = 0.25d; break;
 	        case 2: inset = 0.0625d; break;
-	        default: FlansMod.log("" + te.getBlockMetadata());
+	        default: Util.log("" + te.getBlockMetadata());
         }
         
         RenderBox(tessellator, worldRenderer, x + inset, x + 1.0d - inset, y + 0.0625d, y + 0.125d, z + inset, z + 1.0d - inset);

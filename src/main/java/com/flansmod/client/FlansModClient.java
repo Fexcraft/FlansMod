@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
-import com.flansmod.client.gui.GuiTeamScores;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.EntityMecha;
@@ -15,9 +14,9 @@ import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.IScope;
 import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.network.PacketTeamInfo;
-import com.flansmod.common.teams.Team;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Ticker;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3i;
 
 import net.minecraft.client.Minecraft;
@@ -78,8 +77,6 @@ public class FlansModClient extends FlansMod
 	/** Whether the player is in a plane or not */
 	public static boolean inPlane = false;
 	
-	/** Packet containing teams mod information from the server */
-	public static PacketTeamInfo teamInfo;
 	/** When a round ends, the teams score GUI is locked for this length of time */
 	public static int teamsScoreGUILock = 0;	
 	
@@ -90,30 +87,26 @@ public class FlansModClient extends FlansMod
 	
 	public void load()
 	{		
-		log("Loading Flan's mod client side.");
+		Util.log("Loading Flan's mod client side.");
 
 	}
 	
 	//private static final ResourceLocation zombieSkin = new ResourceLocation("flansmod", "skins/zombie.png");
 
-	public static void tick()
-	{
+	public static void tick(){
 		if (minecraft.thePlayer == null || minecraft.theWorld == null)
 			return;
 		
 		if(minecraft.thePlayer.getRidingEntity() instanceof IControllable && minecraft.currentScreen == null)
 			minecraft.displayGuiScreen(new GuiDriveableController((IControllable)minecraft.thePlayer.getRidingEntity()));
 		
-		if(teamInfo != null && teamInfo.timeLeft > 0)
-			teamInfo.timeLeft--;
-		
 		//Teams GUI lock at end of rounds
-		if(teamsScoreGUILock > 0)
-		{
+		/*if(teamsScoreGUILock > 0){
 			teamsScoreGUILock--;
-			if(minecraft.currentScreen == null)
+			if(minecraft.currentScreen == null){
 				minecraft.displayGuiScreen(new GuiTeamScores());
-		}
+			}
+		}*/
 		
 		// Guns
 		if(scopeTime > 0)
@@ -187,26 +180,22 @@ public class FlansModClient extends FlansMod
 			zoomProgress = 1F - (1F - zoomProgress) * 0.66F; 
 		}
 		
-		if (minecraft.thePlayer.getRidingEntity() instanceof IControllable)
-		{
+		if(minecraft.thePlayer.getRidingEntity() instanceof IControllable){
 			inPlane = true;	
-			try
-			{
+			try{
 				ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, minecraft.entityRenderer, ((IControllable)minecraft.thePlayer.getRidingEntity()).getCameraDistance(), "thirdPersonDistance", "q", "field_78490_B");
-			} catch (Exception e)
-			{
-				log("I forgot to update obfuscated reflection D:");
+			}
+			catch (Exception e){
+				Util.log("I forgot to update obfuscated reflection D:");
 				throw new RuntimeException(e);
 			}		
 		}
-		else if(inPlane)
-		{
-			try
-			{
+		else if(inPlane){
+			try{
 				ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, minecraft.entityRenderer, 4.0F, "thirdPersonDistance", "q", "field_78490_B");
-			} catch (Exception e)
-			{
-				log("I forgot to update obfuscated reflection D:");
+			}
+			catch (Exception e){
+				Util.log("I forgot to update obfuscated reflection D:");
 				throw new RuntimeException(e);
 			}	
 			inPlane = false;
@@ -270,18 +259,18 @@ public class FlansModClient extends FlansMod
 			}
 			catch(Exception e)
 			{
-				FlansMod.log("Failed to create file");
-				FlansMod.log(file.getAbsolutePath());
+				Util.log("Failed to create file");
+				Util.log(file.getAbsolutePath());
 			}
 			return false;
 		}	
 		return true;
 	}
 
-	public static boolean flipControlMode()
-	{
-		if (controlModeSwitchTimer > 0)
+	public static boolean flipControlMode(){
+		if(controlModeSwitchTimer > 0){
 			return false;
+		}
 		controlModeMouse = !controlModeMouse;
 		FMLClientHandler.instance().getClient().displayGuiScreen(controlModeMouse ? new GuiDriveableController((IControllable)FMLClientHandler.instance().getClient().thePlayer.getRidingEntity()) : null);
 		controlModeSwitchTimer = 40;
@@ -299,18 +288,6 @@ public class FlansModClient extends FlansMod
 	}
 	
 	public static Minecraft minecraft = FMLClientHandler.instance().getClient();
-
-	/** Gets the team class from an ID */
-	public static Team getTeam(int spawnerTeamID) 
-	{
-		if(teamInfo == null)
-			return null;
-		else return teamInfo.getTeam(spawnerTeamID);
-	}
-
-	public static boolean isCurrentMap(String map) {
-		return !(teamInfo == null || teamInfo.mapShortName == null) && teamInfo.mapShortName.equals(map);
-	}
 	
 	public static EnumParticleTypes getParticleType(String s)
 	{
@@ -469,7 +446,7 @@ public class FlansModClient extends FlansMod
 	public static void UpdateFlashlights(Minecraft mc)
 	{
 		//Handle lighting from flashlights and glowing bullets
-		if(FlansMod.ticker % lightOverrideRefreshRate == 0 && mc.theWorld != null)
+		if(Ticker.tick % lightOverrideRefreshRate == 0 && mc.theWorld != null)
 		{
 			//Check graphics setting and adjust refresh rate
 			lightOverrideRefreshRate = mc.gameSettings.fancyGraphics ? 10 : 20;

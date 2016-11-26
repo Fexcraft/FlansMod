@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -96,7 +96,7 @@ public class GunBoxType extends BoxType
 		} 
 		catch (Exception e)
 		{
-			FlansMod.log("Reading gun box file failed : " + shortName);
+			Util.log("Reading gun box file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}

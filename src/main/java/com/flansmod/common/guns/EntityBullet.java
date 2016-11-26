@@ -21,8 +21,9 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer.EntityHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.network.PacketPlaySound;
-import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
@@ -239,12 +240,12 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 	{
 		if(!(shootableType instanceof BulletType))
 		{
-			FlansMod.log("Tried to fire grenade instantly");
+			Util.log("Tried to fire grenade instantly");
 			return true;
 		}
 		if(world == null || origin == null || hit == null || shooter == null || shotFrom == null || shootableType == null)
 		{
-			FlansMod.log("Something was null");
+			Util .log("Something was null");
 			return true;
 		}
 		
@@ -307,7 +308,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 			//If the bullet breaks glass, and can do so according to FlansMod, do so.
 			if(bulletType.breaksGlass && mat == Material.GLASS)
 			{
-				if(TeamsManager.canBreakGlass)
+				if(Config.canBreakGlass)
                 {
                     world.setBlockToAir(pos);
                     //TODO FlansMod.proxy.playBlockBreakSound(pos.getX(), pos.getY(), pos.getZ(), block);
@@ -467,19 +468,19 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 
 	@SideOnly(Side.CLIENT)
 	private void spawnParticles() {
-		double dX = (posX - prevPosX) / 10;
+		/*double dX = (posX - prevPosX) / 10;
 		double dY = (posY - prevPosY) / 10;
 		double dZ = (posZ - prevPosZ) / 10;
 
 		float spread = 0.1F;
 		for (int i = 0; i < 10; i++) {
-			/*EntityFX particle = FlansModClient.getParticle(type.trailParticleType, worldObj,
+			EntityFX particle = FlansModClient.getParticle(type.trailParticleType, worldObj,
 					prevPosX + dX * i + rand.nextGaussian() * spread, prevPosY + dY * i + rand.nextGaussian() * spread,
 					prevPosZ + dZ * i + rand.nextGaussian() * spread);
 			if (particle != null && Minecraft.getMinecraft().gameSettings.fancyGraphics)
-				particle.renderDistanceWeight = 100D;*///TODO
+				particle.renderDistanceWeight = 100D;//TODO
 			// worldObj.spawnEntityInWorld(particle);
-		}
+		}*/
 	}
 
 	public DamageSource getBulletDamage(boolean headshot) {
@@ -540,7 +541,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 			}
 			else
 			{
-				world.createExplosion(bullet, detonatePos.x, detonatePos.y, detonatePos.z, bulletType.explosionRadius, TeamsManager.explosions && bulletType.explosionBreaksBlocks);
+				world.createExplosion(bullet, detonatePos.x, detonatePos.y, detonatePos.z, bulletType.explosionRadius, Config.explosions && bulletType.explosionBreaksBlocks);
 			}
 		}
 		if (bulletType.fireRadius > 0) 
@@ -655,7 +656,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 				}
 			}
 		} catch (Exception e) {
-			FlansMod.log("Failed to read bullet owner from server.");
+			Util.log("Failed to read bullet owner from server.");
 			super.setDead();
 			e.printStackTrace();
 		}

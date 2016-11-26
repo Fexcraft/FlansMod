@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -78,7 +79,7 @@ public class PacketPlaySound extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received play sound packet on server. Skipping.");
+		Util.log("Received play sound packet on server. Skipping.");
 	}
 
 	@Override

@@ -34,7 +34,7 @@ package com.flansmod.common.vector;
 import java.io.Serializable;
 import java.nio.FloatBuffer;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.Vec3d;
@@ -57,24 +57,21 @@ public class Vector3f extends Vector implements Serializable, ReadableVector3f, 
 	/**
 	 * Constructor for Vector3f.
 	 */
-	public Vector3f() {
+	public Vector3f(){
 		super();
 	}
 	
-	public Vector3f(String input, String typeName)
-	{
+	public Vector3f(String input, String typeName){
 		//Input should be of the form [float,float,float]
 		String noBrackets = input.substring(1, input.length() - 1);
 		String[] split = noBrackets.split(",");
-		if(split.length == 3)
-		{
+		if(split.length == 3){
 			x = Float.parseFloat(split[0]);
 			y = Float.parseFloat(split[1]);
 			z = Float.parseFloat(split[2]);
 		}
-		else
-		{
-			FlansMod.log("Invalid vector input in " + typeName + "!");
+		else{
+			Util.log("Invalid vector input in " + typeName + "!");
 		}
 	}
 

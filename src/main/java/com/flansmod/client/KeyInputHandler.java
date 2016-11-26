@@ -3,8 +3,6 @@ package com.flansmod.client;
 import org.lwjgl.input.Keyboard;
 
 import com.flansmod.api.IControllable;
-import com.flansmod.client.gui.GuiTeamScores;
-import com.flansmod.client.gui.GuiTeamSelect;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerData;
@@ -42,8 +40,8 @@ public class KeyInputHandler
 	public static KeyBinding gunKey = new KeyBinding("Gun Key", Keyboard.KEY_B, "Flan's Mod");
 	public static KeyBinding controlSwitchKey = new KeyBinding("Control Switch key", Keyboard.KEY_C, "Flan's Mod");
 	public static KeyBinding reloadKey = new KeyBinding("Reload key", Keyboard.KEY_R, "Flan's Mod");
-	public static KeyBinding teamsMenuKey = new KeyBinding("Teams Menu Key", Keyboard.KEY_G, "Flan's Mod");
-	public static KeyBinding teamsScoresKey = new KeyBinding("Teams Scores Key", Keyboard.KEY_H, "Flan's Mod");
+	//public static KeyBinding teamsMenuKey = new KeyBinding("Teams Menu Key", Keyboard.KEY_G, "Flan's Mod");
+	//public static KeyBinding teamsScoresKey = new KeyBinding("Teams Scores Key", Keyboard.KEY_H, "Flan's Mod");
 	public static KeyBinding leftRollKey = new KeyBinding("Roll Left Key", Keyboard.KEY_Z, "Flan's Mod");
 	public static KeyBinding rightRollKey = new KeyBinding("Roll Right Key", Keyboard.KEY_X, "Flan's Mod");
 	public static KeyBinding gearKey = new KeyBinding("Gear Up / Down Key", Keyboard.KEY_L, "Flan's Mod");
@@ -70,8 +68,6 @@ public class KeyInputHandler
 		ClientRegistry.registerKeyBinding(gunKey);
 		ClientRegistry.registerKeyBinding(controlSwitchKey);
 		ClientRegistry.registerKeyBinding(reloadKey);
-		ClientRegistry.registerKeyBinding(teamsMenuKey);
-		ClientRegistry.registerKeyBinding(teamsScoresKey);
 		ClientRegistry.registerKeyBinding(leftRollKey);
 		ClientRegistry.registerKeyBinding(rightRollKey);
 		ClientRegistry.registerKeyBinding(gearKey);
@@ -94,16 +90,6 @@ public class KeyInputHandler
 		Entity ridingEntity = player.getRidingEntity();
 		
 		//Handle universal keys
-		if(teamsMenuKey.isPressed())
-		{
-			mc.displayGuiScreen(new GuiTeamSelect());
-			return;
-		}
-		if(teamsScoresKey.isPressed())
-		{
-			mc.displayGuiScreen(new GuiTeamScores());
-			return;
-		}
 		if(reloadKey.isPressed())
 		{
 			PlayerData data = PlayerHandler.getPlayerData(player, Side.CLIENT);
@@ -151,41 +137,56 @@ public class KeyInputHandler
 		}
 		
 		//Handle driving keys
-		if(ridingEntity instanceof IControllable)
-		{
+		if(ridingEntity instanceof IControllable){
 			IControllable riding = (IControllable)ridingEntity;
-			if(mc.gameSettings.keyBindForward.isPressed())//if(accelerateKey.isPressed())
+			if(mc.gameSettings.keyBindForward.isPressed()){
 				riding.pressKey(0, player);
-			if(mc.gameSettings.keyBindBack.isPressed())//if(decelerateKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindBack.isPressed()){
 				riding.pressKey(1, player);
-			if(mc.gameSettings.keyBindLeft.isPressed())//if(leftKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindLeft.isPressed()){
 				riding.pressKey(2, player);
-			if(mc.gameSettings.keyBindRight.isPressed())//if(rightKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindRight.isPressed()){
 				riding.pressKey(3, player);
-			if(mc.gameSettings.keyBindJump.isPressed())//if(upKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindJump.isPressed()){
 				riding.pressKey(4, player);
-			if(downKey.isPressed())
+			}
+			if(downKey.isPressed()){
 				riding.pressKey(5, player);
-			if(mc.gameSettings.keyBindSneak.isPressed())//if(exitKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindSneak.isPressed()){
 				riding.pressKey(6, player);
-			if(mc.gameSettings.keyBindInventory.isPressed() || inventoryKey.isPressed())
+			}
+			if(mc.gameSettings.keyBindInventory.isPressed() || inventoryKey.isPressed()){
 				riding.pressKey(7, player);
-			if(bombKey.isPressed())
+			}
+			if(bombKey.isPressed()){
 				riding.pressKey(8, player);
-			if(gunKey.isPressed())
+			}
+			if(gunKey.isPressed()){
 				riding.pressKey(9, player);
-			if(controlSwitchKey.isPressed())
+			}
+			if(controlSwitchKey.isPressed()){
 				riding.pressKey(10, player);
-			if(leftRollKey.isPressed())
+			}
+			if(leftRollKey.isPressed()){
 				riding.pressKey(11, player);
-			if(rightRollKey.isPressed())
+			}
+			if(rightRollKey.isPressed()){
 				riding.pressKey(12, player);
-			if(gearKey.isPressed())
+			}
+			if(gearKey.isPressed()){
 				riding.pressKey(13, player);
-			if(doorKey.isPressed())
+			}
+			if(doorKey.isPressed()){
 				riding.pressKey(14, player);
-			if(modeKey.isPressed())
+			}
+			if(modeKey.isPressed()){
 				riding.pressKey(15, player);
+			}
 			//if(trimKey.isPressed())
 			//	riding.pressKey(16, player);
 			

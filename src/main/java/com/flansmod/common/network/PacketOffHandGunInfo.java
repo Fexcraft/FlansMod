@@ -1,6 +1,6 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,7 +45,7 @@ public class PacketOffHandGunInfo extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received off hand gun info packet on server. Skipping. Did you mean to send a PacketSelectOffHandGun?");
+		Util.log("Received off hand gun info packet on server. Skipping. Did you mean to send a PacketSelectOffHandGun?");
 	}
 
 	@Override

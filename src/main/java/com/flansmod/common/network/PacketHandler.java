@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -55,17 +55,17 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 	{
 		if(packets.size() > 256)
 		{
-			FlansMod.log("Packet limit exceeded in Flan's Mod packet handler by packet " + cl.getCanonicalName() + ".");
+			Util.log("Packet limit exceeded in Flan's Mod packet handler by packet " + cl.getCanonicalName() + ".");
 			return false;
 		}
 		if(packets.contains(cl))
 		{
-			FlansMod.log("Tried to register " + cl.getCanonicalName() + " packet class twice.");
+			Util.log("Tried to register " + cl.getCanonicalName() + " packet class twice.");
 			return false;
 		}
 		if(modInitialised)
 		{
-			FlansMod.log("Tried to register packet " + cl.getCanonicalName() + " after mod initialisation.");
+			Util.log("Tried to register packet " + cl.getCanonicalName() + " after mod initialisation.");
 			return false;
 		}
 		
@@ -250,14 +250,10 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 		registerPacket(PacketReload.class);	
 		registerPacket(PacketRepairDriveable.class);
 		registerPacket(PacketRoundFinished.class);
-		registerPacket(PacketSeatUpdates.class);	
+		//registerPacket(PacketSeatUpdates.class);	
 		registerPacket(PacketSelectOffHandGun.class);	
-		registerPacket(PacketShotData.class);
-		registerPacket(PacketTeamInfo.class);	
-		registerPacket(PacketTeamSelect.class);	
+		registerPacket(PacketShotData.class);	
 		//registerPacket(PacketVehicleControl.class);
-		registerPacket(PacketVoteCast.class);
-		registerPacket(PacketVoting.class);
 		registerPacket(PacketRequestDebug.class);
 	}
 

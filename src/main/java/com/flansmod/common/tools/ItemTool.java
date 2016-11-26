@@ -11,6 +11,7 @@ import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.util.CTabs;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.api.item.IItem;
@@ -44,11 +45,11 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 		setMaxDamage(type.toolLife);
 		if(type.foodness == 0)
 		{
-			setCreativeTab(FlansMod.tabFlanParts);
+			setCreativeTab(CTabs.parts);
 			if(type.remote)
-				setCreativeTab(FlansMod.tabFlanGuns);
+				setCreativeTab(CTabs.weapons);
 			if(type.healDriveables)
-				setCreativeTab(FlansMod.tabFlanDriveables);
+				setCreativeTab(CTabs.vehicles);
 		}
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);

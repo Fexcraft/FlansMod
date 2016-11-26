@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -23,7 +24,7 @@ public class ItemMechaAddon extends Item implements IFlanItem<MechaItemType>, II
 		type = type1;
 		setMaxStackSize(1);
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanMechas);
+		setCreativeTab(CTabs.vehicles);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);

@@ -13,6 +13,7 @@ import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -333,7 +334,7 @@ public class GuiDriveableCrafting extends GuiScreen
 		if (k == 0 || k == 1)
 		{
 			
-			FlansMod.log(x + " " + y);
+			Util.log(x + " " + y);
 			//Driveable buttons
 			for(int m = 0; m < 2; m++)
 			{

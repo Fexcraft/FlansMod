@@ -13,10 +13,10 @@ public class ChunkLoadingHandler implements LoadingCallback
 	{
 		for(Ticket ticket : tickets) 
 		{
-			String s = ticket.getModData().getString("ShortName");
+			/*String s = ticket.getModData().getString("ShortName");
 			TeamsMap map = TeamsManager.getInstance().maps.get(s);
 			if(ticket != null && map != null)
-				map.forceChunkLoading(ticket);
+				map.forceChunkLoading(ticket);*/
 		}
 	}
 

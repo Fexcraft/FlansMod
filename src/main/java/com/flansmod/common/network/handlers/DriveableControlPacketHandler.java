@@ -3,7 +3,6 @@ package com.flansmod.common.network.handlers;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -59,7 +58,7 @@ public class DriveableControlPacketHandler {
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							driveable.driveableData.fuelInTank = packet.fuelInTank;
-							if(driveable.seats[0] != null && EntUtil.getPassengerOf(driveable.seats[0]) == player){
+							if(driveable.seats[0] != null && driveable.seats[0].getPassenger() == player){
 								return;
 							}
 							break;

@@ -6,7 +6,6 @@ import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -90,7 +89,9 @@ public class DriveableData implements IInventory
 	public void writeToNBT(NBTTagCompound tag)
 	{
 		tag.setString("Type", type);
-		tag.setString("Engine", engine.shortName);
+		if(engine != null){
+			tag.setString("Engine", engine.shortName);
+		}
 		tag.setInteger("Paint", paintjobID);
 		for(int i = 0; i < ammo.length; i++)
 		{

@@ -33,11 +33,11 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.PacketReload;
 import com.flansmod.common.network.PacketShotData;
-import com.flansmod.common.teams.EntityFlag;
-import com.flansmod.common.teams.EntityFlagpole;
 import com.flansmod.common.teams.EntityGunItem;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.CTabs;
+import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
 
@@ -117,7 +117,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		this.type = type;
 		type.item = this;
 		setMaxDamage(0);
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		
@@ -291,7 +291,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		// Play idle sounds
 		if (soundDelay <= 0 && type.idleSound != null)
 		{
-			PacketPlaySound.sendSoundPacket(entity.posX, entity.posY, entity.posZ, FlansMod.soundRange, entity.dimension, type.idleSound, false);
+			PacketPlaySound.sendSoundPacket(entity.posX, entity.posY, entity.posZ, Config.soundRange, entity.dimension, type.idleSound, false);
 			soundDelay = type.idleSoundLength;
 		}
 		
@@ -300,7 +300,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			return;
 		
 		// Do not shoot ammo bags, flags or dropped gun items
-		if(mc.objectMouseOver != null && (mc.objectMouseOver.entityHit instanceof EntityFlagpole || mc.objectMouseOver.entityHit instanceof EntityFlag || mc.objectMouseOver.entityHit instanceof EntityGunItem || (mc.objectMouseOver.entityHit instanceof EntityGrenade && ((EntityGrenade)mc.objectMouseOver.entityHit).type.isDeployableBag)))
+		if(mc.objectMouseOver != null && (mc.objectMouseOver.entityHit instanceof EntityGunItem || (mc.objectMouseOver.entityHit instanceof EntityGrenade && ((EntityGrenade)mc.objectMouseOver.entityHit).type.isDeployableBag)))
 			return;
 		
 		// If we have an off hand item, then disable our secondary functions
@@ -617,7 +617,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 					AttachmentType barrel = type.getBarrel(gunstack);
 					boolean silenced = barrel != null && barrel.silencer;
 					//world.playSoundAtEntity(entityplayer, type.shootSound, 10F, type.distortSound ? 1.0F / (world.rand.nextFloat() * 0.4F + 0.8F) : 1.0F);
-					PacketPlaySound.sendSoundPacket(player.posX, player.posY, player.posZ, FlansMod.soundRange, player.dimension, type.shootSound, type.distortSound, silenced);
+					PacketPlaySound.sendSoundPacket(player.posX, player.posY, player.posZ, Config.soundRange, player.dimension, type.shootSound, type.distortSound, silenced);
 					soundDelay = type.shootSoundLength;
 				}
 				
@@ -1240,7 +1240,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack)
 	{
 		if (type.meleeSound != null)
-			PacketPlaySound.sendSoundPacket(entityLiving.posX, entityLiving.posY, entityLiving.posZ, FlansMod.soundRange, entityLiving.dimension, type.meleeSound, true);
+			PacketPlaySound.sendSoundPacket(entityLiving.posX, entityLiving.posY, entityLiving.posZ, Config.soundRange, entityLiving.dimension, type.meleeSound, true);
 		//Do custom melee code here
 		if(type.secondaryFunction == EnumSecondaryFunction.CUSTOM_MELEE)
 		{
@@ -1287,13 +1287,12 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	// ----------------- Paintjobs -----------------
 	
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, List list)
-    {
+    public void getSubItems(Item item, CreativeTabs tabs, List list){
     	GunType type = ((ItemGun)item).type;
-    	if(FlansMod.addAllPaintjobsToCreative)
-    	{
-    		for(Paintjob paintjob : type.paintjobs)
+    	if(Config.addAllPaintjobsToCreative){
+    		for(Paintjob paintjob : type.paintjobs){
     			addPaintjobToList(item, type, paintjob, list);
+    		}
     	}
         else addPaintjobToList(item, type, type.defaultPaintjob, list);
     }

@@ -1,6 +1,6 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,13 +39,13 @@ public class PacketGunFire extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Depreceated message!");
+		Util.log("Depreceated message!");
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
-		FlansMod.log("Received gun button packet on client. Skipping.");
+		Util.log("Received gun button packet on client. Skipping.");
 	}
 }

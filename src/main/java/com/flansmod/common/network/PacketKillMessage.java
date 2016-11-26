@@ -1,8 +1,8 @@
 package com.flansmod.common.network;
 
 import com.flansmod.client.ClientRenderHooks;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,7 +50,7 @@ public class PacketKillMessage extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received kill message packet on the server. Skipping.");
+		Util.log("Received kill message packet on the server. Skipping.");
 	}
 
 	@Override

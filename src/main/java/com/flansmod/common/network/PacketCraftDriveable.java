@@ -2,6 +2,7 @@ package com.flansmod.common.network;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,6 +46,6 @@ public class PacketCraftDriveable extends PacketBase
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
-		FlansMod.log("Received driveable repair packet on client side. Skipping.");
+		Util.log("Received driveable repair packet on client side. Skipping.");
 	}
 }

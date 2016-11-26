@@ -1,13 +1,5 @@
 package com.flansmod.common.eventhandlers;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.network.PacketKillMessage;
-import com.flansmod.common.teams.Team;
-
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -22,7 +14,7 @@ public class PlayerDeathEventListener {
 	@EventHandler
 	@SubscribeEvent
 	public void PlayerDied(LivingDeathEvent DamageEvent) {
-		if ((DamageEvent.getSource().getDamageType().equalsIgnoreCase("explosion") && ((DamageEvent.getSource().getSourceOfDamage() instanceof EntityGrenade) || (DamageEvent.getSource().getSourceOfDamage() instanceof EntityBullet))) && DamageEvent.getEntityLiving() instanceof EntityPlayer) {
+		/*if ((DamageEvent.getSource().getDamageType().equalsIgnoreCase("explosion") && ((DamageEvent.getSource().getSourceOfDamage() instanceof EntityGrenade) || (DamageEvent.getSource().getSourceOfDamage() instanceof EntityBullet))) && DamageEvent.getEntityLiving() instanceof EntityPlayer) {
 			boolean isGrenade;
 			if (DamageEvent.getSource().getSourceOfDamage() instanceof EntityGrenade) {
 				isGrenade = true;
@@ -48,6 +40,6 @@ public class PlayerDeathEventListener {
 			if (DamageEvent.getEntityLiving() instanceof EntityPlayer && isGrenade) {
 				FlansMod.getPacketHandler().sendToDimension(new PacketKillMessage(false, ((EntityGrenade) DamageEvent.getSource().getSourceOfDamage()).type, (killedTeam == null ? "f" : killedTeam.textColour) + ((EntityPlayer) DamageEvent.getEntity()).getDisplayName().getFormattedText(), (killerTeam == null ? "f" : killedTeam.textColour) + ((EntityPlayer) DamageEvent.getSource().getSourceOfDamage()).getDisplayName().getFormattedText()), DamageEvent.getEntityLiving().dimension);
 			}
-		}
+		}*/
 	}
 }

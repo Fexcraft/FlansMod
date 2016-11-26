@@ -7,13 +7,14 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketVehicleControl;
-import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.cls.MathHelper;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -144,118 +145,123 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	}
 	
 	@Override
-	public boolean pressKey(int key, EntityPlayer player)
-	{
-		VehicleType type = getVehicleType();
-		//Send keys which require server side updates to the server
-		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9))
-		{
-			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
-			return true;
+	public boolean pressKey(int key, EntityPlayer player){
+		try{
+			VehicleType type = getVehicleType();
+			//Send keys which require server side updates to the server
+			if(worldObj.isRemote && (key == 6 || key == 8 || key == 9)){
+				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
+				return true;
+			}
+			switch(key){
+				case 0 : //Accelerate : Increase the throttle, up to 1.
+				{
+					throttle += 0.01F;
+					if(throttle > 1F)
+						throttle = 1F;
+					return true;
+				}
+				case 1 : //Decelerate : Decrease the throttle, down to -1, or 0 if the vehicle cannot reverse
+				{
+					throttle -= 0.01F;
+					if(throttle < -1F)
+						throttle = -1F;
+					if(throttle < 0F && type.maxNegativeThrottle == 0F)
+						throttle = 0F;
+					return true;
+				}
+				case 2 : //Left : Yaw the wheels left
+				{
+					wheelsYaw -= 1F;
+					return true;
+				}
+				case 3 : //Right : Yaw the wheels right
+				{
+					wheelsYaw += 1F;
+					return true;
+				}
+				case 4 : //Up : Brake
+				{
+					throttle *= 0.8F;
+					if(onGround)
+					{
+						motionX *= 0.8F;
+						motionZ *= 0.8F;
+					}
+					return true;
+				}
+				case 5 : //Down : Do nothing
+				{
+					return true;
+				}
+				case 6 : //Exit : Get out
+				{
+					seats[0].getPassenger().dismountRidingEntity();
+					//TODO seats[0].passenger = null;
+			  		return true;
+				}
+				case 7 : //Inventory
+				{
+					if(worldObj.isRemote)
+					{
+						FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getPassenger(), worldObj, this);
+					}
+					return true;
+				}
+				case 8 : //Shoot shell
+				case 9 : //Shoot bullet
+				{
+					return super.pressKey(key, player);
+				}
+				case 10 : //Change control mode : Do nothing
+				{
+					return true;
+				}
+				case 11 : //Roll left : Do nothing
+				{
+					return true;
+				}
+				case 12 : //Roll right : Do nothing
+				{
+					return true;
+				}
+				case 13 : // Gear : Do nothing
+				{
+					return true;
+				}
+				case 14 : // Door
+					Print.log("pass14");
+				{
+					if(toggleTimer <= 0)
+					{
+						varDoor = !varDoor;
+						if(type.hasDoor)
+							player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
+						toggleTimer = 10;
+						FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
+					}
+					return true;
+				}
+				case 15 : // Wing : Do nothing
+				{
+					return true;
+				}
+				case 16 : // Trim Button
+				{
+					//applyTorque(new Vector3f(axes.getRoll() / 10, 0F, 0F));
+					return true;
+				}
+				case 17 : //Park
+				{
+					break;
+				}
+			}
+			return false;
 		}
-		switch(key)
-		{
-			case 0 : //Accelerate : Increase the throttle, up to 1.
-			{
-				throttle += 0.01F;
-				if(throttle > 1F)
-					throttle = 1F;
-				return true;
-			}
-			case 1 : //Decelerate : Decrease the throttle, down to -1, or 0 if the vehicle cannot reverse
-			{
-				throttle -= 0.01F;
-				if(throttle < -1F)
-					throttle = -1F;
-				if(throttle < 0F && type.maxNegativeThrottle == 0F)
-					throttle = 0F;
-				return true;
-			}
-			case 2 : //Left : Yaw the wheels left
-			{
-				wheelsYaw -= 1F;
-				return true;
-			}
-			case 3 : //Right : Yaw the wheels right
-			{
-				wheelsYaw += 1F;
-				return true;
-			}
-			case 4 : //Up : Brake
-			{
-				throttle *= 0.8F;
-				if(onGround)
-				{
-					motionX *= 0.8F;
-					motionZ *= 0.8F;
-				}
-				return true;
-			}
-			case 5 : //Down : Do nothing
-			{
-				return true;
-			}
-			case 6 : //Exit : Get out
-			{
-				EntUtil.getPassengerOf(seats[0]).dismountRidingEntity();;
-		  		return true;
-			}
-			case 7 : //Inventory
-			{
-				if(worldObj.isRemote)
-				{
-					FlansMod.proxy.openDriveableMenu((EntityPlayer)EntUtil.getPassengerOf(seats[0]), worldObj, this);
-				}
-				return true;
-			}
-			case 8 : //Shoot shell
-			case 9 : //Shoot bullet
-			{
-				return super.pressKey(key, player);
-			}
-			case 10 : //Change control mode : Do nothing
-			{
-				return true;
-			}
-			case 11 : //Roll left : Do nothing
-			{
-				return true;
-			}
-			case 12 : //Roll right : Do nothing
-			{
-				return true;
-			}
-			case 13 : // Gear : Do nothing
-			{
-				return true;
-			}
-			case 14 : // Door
-			{
-				if(toggleTimer <= 0)
-				{
-					varDoor = !varDoor;
-					if(type.hasDoor)
-						player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
-					toggleTimer = 10;
-					FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
-				}
-				return true;
-			}
-			case 15 : // Wing : Do nothing
-			{
-				return true;
-			}
-			case 16 : // Trim Button
-			{
-				//applyTorque(new Vector3f(axes.getRoll() / 10, 0F, 0F));
-				return true;
-			}
-			case 17 : //Park
-			{
-				break;
-			}
+		catch(Exception e){
+			e.printStackTrace();
+			return false;
 		}
-		return false;
 	}
 
 	@Override
@@ -274,19 +280,19 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		DriveableData data = getDriveableData();
 		if(type == null)
 		{
-			FlansMod.log("Vehicle type null. Not ticking vehicle");
+			Util.log("Vehicle type null. Not ticking vehicle");
 			return;
 		}
 
 		//Work out if this is the client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)EntUtil.getPassengerOf(seats[0]));
+		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && EntUtil.getPassengerOf(seats[0]) != null)
+		if(!worldObj.isRemote && seats[0].getPassenger() != null){
 			ticksSinceUsed = 0;
-		if(!worldObj.isRemote && TeamsManager.vehicleLife > 0 && ticksSinceUsed > TeamsManager.vehicleLife * 20)
-		{
+		}
+		if(!worldObj.isRemote && Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20){
 			setDead();
 		}
 		
@@ -380,7 +386,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			
 			//Apply velocity
 			//If the player driving this is in creative, then we can thrust, no matter what
-			boolean canThrustCreatively = !TeamsManager.vehiclesNeedFuel || (seats != null && seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && ((EntityPlayer)EntUtil.getPassengerOf(seats[0])).capabilities.isCreativeMode);
+			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
 			if(canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption * throttle)
 			{
@@ -517,7 +523,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		if(!worldObj.isRemote && ticksExisted % 5 == 0)
 		{
 			//FlansMod.getPacketHandler().sendToAllAround(new PacketVehicleControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
-			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, FlansMod.driveableUpdateRange));
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 		}
 				
 				int animSpeed = 4;
@@ -561,7 +567,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 
 	private float averageAngles(float a, float b)
 	{
-		FlansMod.log("Pre  " + a + " " + b);
+		Util.log("Pre  " + a + " " + b);
 
 		float pi = (float)Math.PI;
 		for(; a > b + pi; a -= 2 * pi) ;
@@ -572,7 +578,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		for(; avg > pi; avg -= 2 * pi) ;
 		for(; avg < -pi; avg += 2 * pi) ;
 
-		FlansMod.log("Post " + a + " " + b + " " + avg);
+		Util.log("Post " + a + " " + b + " " + avg);
 
 		return avg;
 	}
@@ -601,7 +607,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 
 		VehicleType type = getVehicleType();
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || EntUtil.getPassengerOf(seats[0]) == null))
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
 		{
 			ItemStack vehicleStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();

@@ -2,6 +2,8 @@ package com.flansmod.common;
 
 import java.util.List;
 
+import com.flansmod.common.util.CTabs;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -25,18 +27,18 @@ public class BlockFlansWorkbench extends Block{
         super(Material.IRON);
         setHardness(3F);
         setResistance(6F);
-        setCreativeTab(FlansMod.tabFlanDriveables);
+        setCreativeTab(CTabs.vehicles);
         setDefaultState(blockState.getBaseState().withProperty(TYPE, Integer.valueOf(0)));
     }
     
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List par3List)
     {
-    	if(tab == FlansMod.tabFlanDriveables)
+    	if(tab == CTabs.vehicles)
     		par3List.add(new ItemStack(item, 1, 0));
-    	else if(tab == FlansMod.tabFlanGuns)
+    	else if(tab == CTabs.weapons)
     		par3List.add(new ItemStack(item, 1, 1));
-    	else if(tab == FlansMod.tabFlanParts)
+    	else if(tab == CTabs.parts)
     		par3List.add(new ItemStack(item, 1, 2));
     }
 

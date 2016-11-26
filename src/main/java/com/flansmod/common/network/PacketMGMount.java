@@ -1,7 +1,7 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.EntityMG;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,7 +44,7 @@ public class PacketMGMount extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		FlansMod.log("Received MG mount packet on server. Skipping.");
+		Util.log("Received MG mount packet on server. Skipping.");
 	}
 
 	@Override

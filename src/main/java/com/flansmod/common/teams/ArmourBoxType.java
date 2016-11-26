@@ -3,9 +3,9 @@ package com.flansmod.common.teams;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.boxes.BoxType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.item.ItemStack;
 
@@ -74,7 +74,7 @@ public class ArmourBoxType extends BoxType
 			
 		} catch (Exception e)
 		{
-			FlansMod.log("Reading gun box file failed : " + shortName);
+			Util.log("Reading gun box file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}

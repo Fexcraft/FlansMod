@@ -1,6 +1,7 @@
 package com.flansmod.common.paintjob;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.block.IBlock;
 import net.minecraft.block.BlockContainer;
@@ -26,7 +27,7 @@ public class BlockPaintjobTable extends BlockContainer implements IBlock
 		setHardness(2F);
 		setResistance(4F);
 	    setUnlocalizedName("paintjobTable");
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 	}
 
 	@Override

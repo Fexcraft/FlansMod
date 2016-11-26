@@ -9,6 +9,7 @@ import com.flansmod.client.model.ModelMG;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.client.model.ModelBase;
@@ -346,7 +347,7 @@ public class GunType extends PaintableType implements IScope
 					if(type.explosionRadius <= 0F)
 						nonExplosiveAmmo.add(type);
 				}
-				else FlansMod.log("Could not find " + split[1] + " when reading ammo types for " + shortName);
+				else Util.log("Could not find " + split[1] + " when reading ammo types for " + shortName);
 			}
 			else if(split[0].equals("NumAmmoSlots") || split[0].equals("NumAmmoItemsInGun") || split[0].equals("LoadIntoGun"))
 				numAmmoItemsInGun = Integer.parseInt(split[1]);

@@ -11,6 +11,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.network.PacketDriveableGUI;
+import com.flansmod.common.util.Ticker;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -149,7 +150,7 @@ public class GuiDriveableRepair extends GuiScreen
 				for(int n = 0; n < 7; n++)
 				{
 					//If there are more than 7 stacks, loop over them
-					int stackNum = n + (FlansMod.ticker / 60) % Math.max(1, stacksNeeded.size() - 6);
+					int stackNum = n + (Ticker.tick / 60) % Math.max(1, stacksNeeded.size() - 6);
 					//If this is a valid stack
 					if(stackNum < stacksNeeded.size())
 					{

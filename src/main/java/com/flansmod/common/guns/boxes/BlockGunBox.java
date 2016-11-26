@@ -7,6 +7,7 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.block.IBlock;
 import net.fexcraft.mod.lib.util.block.BlockUtil;
@@ -35,7 +36,7 @@ public class BlockGunBox extends Block implements IBlock
 		setHardness(2F);
 		setResistance(4F);
 		type = t;
-		setCreativeTab(FlansMod.tabFlanGuns);
+		setCreativeTab(CTabs.weapons);
 		type.block = this;
 		type.item = Item.getItemFromBlock(this);
 		

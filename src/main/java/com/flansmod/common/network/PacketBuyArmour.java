@@ -1,7 +1,7 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.teams.ArmourBoxType;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -54,7 +54,7 @@ public class PacketBuyArmour extends PacketBase
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
-		FlansMod.log("Received armour box purchase packet on client. Skipping.");
+		Util.log("Received armour box purchase packet on client. Skipping.");
 	}
 
 }

@@ -14,8 +14,8 @@ import com.flansmod.common.network.PacketMGFire;
 import com.flansmod.common.network.PacketMGMount;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.teams.EntityGunItem;
-import com.flansmod.common.teams.Team;
-import com.flansmod.common.teams.TeamsManager;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
@@ -97,7 +97,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		prevPosZ = posZ = blockZ + 0.5f;
 		
 		ticksSinceUsed++;
-		if(TeamsManager.mgLife > 0 && ticksSinceUsed > TeamsManager.mgLife * 20)
+		if(Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20)
 		{
 			setDead();
 		}
@@ -166,7 +166,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 				if (!gunner.capabilities.isCreativeMode)
 					gunner.inventory.setInventorySlotContents(slot, null);
 				reloadTimer = type.reloadTime;
-				PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.reloadSound, false);
+				PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.reloadSound, false);
 			}
 		}
 		if (worldObj.isRemote && gunner != null && gunner == FMLClientHandler.instance().getClient().thePlayer && type.mode == EnumFireMode.FULLAUTO)
@@ -200,7 +200,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			if (soundDelay <= 0)
 			{
 				soundDelay = type.shootSoundLength;
-				PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.shootSound, type.distortSound);
+				PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.shootSound, type.distortSound);
 			}
 		}
 		if (soundDelay > 0)
@@ -263,14 +263,14 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 				{
 					//float distortion = type.distortSound ? 1.0F / (rand.nextFloat() * 0.4F + 0.8F) : 1F;
 					//worldObj.playSoundAtEntity(this, type.shootSound, 1.0F, distortion);
-					PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.shootSound, type.distortSound);
+					PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.shootSound, type.distortSound);
 
 					soundDelay = type.shootSoundLength;
 				}
 			} else if(gunner != null)
 			{
 				return gunner.attackEntityFrom(damagesource, i);
-			} else if(TeamsManager.canBreakGuns)
+			} else if(Config.canBreakGuns)
 			{
 				setDead();
 			}
@@ -293,7 +293,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			if(gunner == player)
 			{
 				mountGun(player, false);
-				FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, false), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
+				FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, false), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 				return true;
 			}
 			
@@ -305,12 +305,12 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			}
 			
 			//Spectators can't mount guns
-			if(TeamsManager.instance.currentRound != null && PlayerHandler.getPlayerData(player).team == Team.spectators)
-				return true;
+			//if(TeamsManager.instance.currentRound != null && PlayerHandler.getPlayerData(player).team == Team.spectators)
+			//	return true;
 
 			//None of the above applied, so mount the gun
 			mountGun(player, true);
-			FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, true), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
+			FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, true), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 			if (ammo == null)
 			{
 				int slot = findAmmo(player);
@@ -365,12 +365,12 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		// Drop gun
 		if(!worldObj.isRemote)
 		{
-			if(TeamsManager.weaponDrops == 2)
+			if(Config.weaponDrops == 2)
 			{
 				EntityGunItem gunEntity = new EntityGunItem(worldObj, posX, posY, posZ, new ItemStack(type.getItem()), Arrays.asList(ammo));
 				worldObj.spawnEntityInWorld(gunEntity);
 			}
-			else if(TeamsManager.weaponDrops == 1)
+			else if(Config.weaponDrops == 1)
 			{
 				dropItem(type.getItem(), 1);
 				// Drop ammo box
@@ -439,7 +439,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		}
 		catch(Exception e)
 		{
-			FlansMod.log("Failed to retreive gun type from server.");
+			Util.log("Failed to retreive gun type from server.");
 			super.setDead();
 			e.printStackTrace();
 		}

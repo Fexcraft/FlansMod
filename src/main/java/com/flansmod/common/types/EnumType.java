@@ -36,7 +36,6 @@ import com.flansmod.common.teams.ArmourType;
 import com.flansmod.common.teams.BlockArmourBox;
 import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.teams.PlayerClass;
-import com.flansmod.common.teams.Team;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.tools.ToolType;
 
@@ -78,7 +77,6 @@ public enum EnumType
 		case armour : 		return ArmourType.class;
 		case armourBox : 	return ArmourBoxType.class;
 		case playerClass :	return PlayerClass.class;
-		case team :			return Team.class;
 		case box :			return GunBoxType.class;
 		case part :			return PartType.class;
 		case itemHolder:	return ItemHolderType.class;
@@ -101,7 +99,6 @@ public enum EnumType
 		if(o instanceof ArmourType  		|| o instanceof ItemTeamArmour) 								return armour;
 		if(o instanceof ArmourBoxType  		|| o instanceof BlockArmourBox) 								return armourBox;
 		if(o instanceof PlayerClass) 																		return playerClass;
-		if(o instanceof Team) 																				return team;
 		if(o instanceof GunBoxType  		|| o instanceof BlockGunBox) 									return box;
 		if(o instanceof PartType  			|| o instanceof ItemPart) 										return part;
 		if(o instanceof ItemHolderType  	|| o instanceof TileEntityItemHolder) 							return itemHolder;

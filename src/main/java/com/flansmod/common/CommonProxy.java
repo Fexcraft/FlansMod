@@ -28,6 +28,7 @@ import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.ArmourBoxType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,25 +39,21 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class CommonProxy
-{
+public class CommonProxy {
 	protected static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
 
 	/** Returns the list of content pack files, and on the client, adds the content pack resources and models to the classpath */
-	public List<File> getContentList(Method method, ClassLoader classloader)
-	{
+	public List<File> getContentList(Method method, ClassLoader classloader){
 		List<File> contentPacks = new ArrayList<File>();
-		for (File file : FlansMod.flanDir.listFiles())
-		{
+		for (File file : FlansMod.flanDir.listFiles()){
 			//Load folders and valid zip files
-			if (file.isDirectory() || zipJar.matcher(file.getName()).matches())
-			{
+			if (file.isDirectory() || zipJar.matcher(file.getName()).matches()){
 				//Add the directory to the content pack list
-				FlansMod.log("Loaded content pack : " + file.getName());
+				Util.log("Loaded content pack : " + file.getName());
 				contentPacks.add(file);
 			}
 		}
-		FlansMod.log("Loaded content pack list server side.");
+		Util.log("Loaded content pack list server side.");
 		return contentPacks;
 	}
 	

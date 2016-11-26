@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
@@ -15,7 +14,7 @@ import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityGrenade;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.teams.Team;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
@@ -73,7 +72,7 @@ public class FlansModRaytracer
 				shouldDoNormalHitDetect = false;
 				if(data != null)
 				{
-					if(player.isDead || data.team == Team.spectators)
+					if(player.isDead/* || data.team == Team.spectators*/)
 					{
 						continue;
 					}
@@ -354,7 +353,7 @@ public class FlansModRaytracer
 				}
 				else
 				{
-					FlansMod.log("Entity was not a driveable");
+					Util.log("Entity was not a driveable");
 					return null;
 				}
 			}
@@ -370,7 +369,7 @@ public class FlansModRaytracer
 				}
 				else
 				{
-					FlansMod.log("Entity was not a player");
+					Util.log("Entity was not a player");
 					return null;
 				}
 			}

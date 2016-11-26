@@ -5,14 +5,14 @@ import java.util.HashMap;
 import com.flansmod.client.model.ModelItemHolder;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemHolderType extends InfoType 
-{
+public class ItemHolderType extends InfoType  {
 	@SideOnly(Side.CLIENT)
 	public ModelItemHolder model;
 	
@@ -20,57 +20,47 @@ public class ItemHolderType extends InfoType
 	
 	private static HashMap<String, ItemHolderType> itemHolders = new HashMap<String, ItemHolderType>();
 	
-	public ItemHolderType(TypeFile file) 
-	{
+	public ItemHolderType(TypeFile file) {
 		super(file);
 	}
 	
 	@Override
-	protected void preRead(TypeFile file)
-	{
-	}
+	protected void preRead(TypeFile file){}
 
 	@Override
-	public void postRead(TypeFile file)
-	{
+	public void postRead(TypeFile file){
 		itemHolders.put(this.shortName, this);
 	}
 	
 	@Override
-	protected void read(String[] split, TypeFile file)
-	{
+	protected void read(String[] split, TypeFile file){
 		super.read(split, file);
-		try
-		{		
+		try{		
 			if(FMLCommonHandler.instance().getSide().isClient() && split[0].equals("Model"))
 				model = FlansMod.proxy.loadModel(split[1], shortName, ModelItemHolder.class);
 			
 			else if(split[0].equals("Texture"))
 				texture = split[1];
 		}
-		catch (Exception e)
-		{
-			FlansMod.log("Reading item holder file failed : " + shortName);
+		catch (Exception e){
+			Util.log("Reading item holder file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}
 	
-	public static ItemHolderType getItemHolder(String string) 
-	{
+	public static ItemHolderType getItemHolder(String string) {
 		return itemHolders.get(string);
 	}
 	
 	/** To be overriden by subtypes for model reloading */
 	@Override
-	public void reloadModel()
-	{
+	public void reloadModel(){
 		model = FlansMod.proxy.loadModel(modelString, shortName, ModelItemHolder.class);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public ModelBase getModel()
-	{
+	public ModelBase getModel(){
 		return model;
 	}
 }

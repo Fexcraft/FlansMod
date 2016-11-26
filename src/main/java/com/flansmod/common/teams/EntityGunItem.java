@@ -128,41 +128,35 @@ public class EntityGunItem extends EntityCustomItem
         ++age;
 
         //TODO
-        ItemStack item = null;//getDataWatcher().getWatchableObjectItemStack(10);
+        ItemStack item = getEntityItem();//getDataWatcher().getWatchableObjectItemStack(10);
 
-        if (!worldObj.isRemote && age >= lifespan)
-        {
-            if (item != null)
-            {   
+        if(!worldObj.isRemote && age >= lifespan){
+            if(item != null){   
                 ItemExpireEvent event = new ItemExpireEvent(this, (item.getItem() == null ? 6000 : item.getItem().getEntityLifespan(item, worldObj)));
-                if (MinecraftForge.EVENT_BUS.post(event))
-                {
+                if (MinecraftForge.EVENT_BUS.post(event)){
                     lifespan += event.getExtraLife();
                 }
-                else
-                {
+                else{
                     setDead();
                 }
             }
-            else
-            {
+            else{
                 setDead();
             }
         }
 
-        if (item != null && item.stackSize <= 0)
-        {
+        if(item != null && item.stackSize <= 0){
             setDead();
         }
         
 		//Temporary fire glitch fix
-		if(worldObj.isRemote)
+		if(worldObj.isRemote){
 			extinguish();
+		}
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
-	{
+	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2){
 	 	return true;
 	}
 
@@ -208,7 +202,8 @@ public class EntityGunItem extends EntityCustomItem
 		if(worldObj.isRemote)
 			return true;
 		EntityItemPickupEvent event = new EntityItemPickupEvent(player, this);
-		TeamsManager.getInstance().playerLoot(event);
+		//TODO fsu implementation? 
+		//TeamsManager.getInstance().playerLoot(event);
 		if(!event.isCanceled())
 		{
 			ItemStack currentItem = player.getHeldItemMainhand();

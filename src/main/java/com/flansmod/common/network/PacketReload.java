@@ -1,11 +1,12 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -86,7 +87,7 @@ public class PacketReload extends PacketBase
 							playerEntity.posX,
 							playerEntity.posY,
 							playerEntity.posZ,
-							FlansMod.soundRange,
+							Config.soundRange,
 							playerEntity.dimension,
 							type.reloadSound,
 							false
@@ -101,6 +102,6 @@ public class PacketReload extends PacketBase
 	@SideOnly(Side.CLIENT)
 	public void handleClientSide(EntityPlayer clientPlayer)
 	{
-		FlansMod.log("Recieved reload packet on client!");
+		Util.log("Recieved reload packet on client!");
 	}
 }

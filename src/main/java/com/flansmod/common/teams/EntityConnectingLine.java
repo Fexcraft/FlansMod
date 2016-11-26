@@ -1,6 +1,5 @@
 package com.flansmod.common.teams;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -14,7 +13,7 @@ public class EntityConnectingLine extends EntityFishHook {
 		super(world);
 	}
 
-	public EntityConnectingLine(World world, EntityPlayer player, ITeamBase base)
+	/*public EntityConnectingLine(World world, EntityPlayer player, ITeamBase base)
     {
         super(world);
         caughtEntity = this;
@@ -27,9 +26,9 @@ public class EntityConnectingLine extends EntityFishHook {
         motionZ = 0;
         motionY = 0;
         connectedTo = base;
-    }
+    }*/
 	   
-	public EntityConnectingLine(World world, EntityPlayer player, ITeamObject object)
+	/*public EntityConnectingLine(World world, EntityPlayer player, ITeamObject object)
     {
         super(world);
         caughtEntity = this; 
@@ -42,13 +41,13 @@ public class EntityConnectingLine extends EntityFishHook {
         motionZ = 0;
         motionY = 0;
         connectedTo = object;
-    }
+    }*/
 	    
     @Override
 	public void onUpdate()
     {          
     	ItemStack currentItemstack = angler.inventory.getCurrentItem();
-    	if(currentItemstack == null || !(currentItemstack.getItem() instanceof ItemOpStick) || currentItemstack.getItemDamage() != 1)
+    	if(currentItemstack == null || currentItemstack.getItemDamage() != 1)
     	{
     		setDead();
     		angler.fishEntity = null;

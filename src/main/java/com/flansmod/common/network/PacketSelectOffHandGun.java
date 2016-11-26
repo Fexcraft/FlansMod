@@ -1,14 +1,12 @@
 package com.flansmod.common.network;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.relauncher.Side;
 
 @Deprecated
 public class PacketSelectOffHandGun extends PacketBase 
@@ -50,7 +48,7 @@ public class PacketSelectOffHandGun extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		PlayerData data = PlayerHandler.getPlayerData(playerEntity, Side.SERVER);
+		//PlayerData data = PlayerHandler.getPlayerData(playerEntity, Side.SERVER);
 		//data.offHandGunSlot = slot;
 		
 		FlansMod.getPacketHandler().sendToAllAround(new PacketOffHandGunInfo(playerEntity, slot), playerEntity.posX, playerEntity.posY, playerEntity.posZ, 50F, playerEntity.dimension);
@@ -60,6 +58,6 @@ public class PacketSelectOffHandGun extends PacketBase
 	@Override
 	public void handleClientSide(EntityPlayer clientPlayer) 
 	{
-		FlansMod.log("Received off hand gun select packet on client. Skipping. Did you mean to send a PacketOffHandGunInfo?");
+		Util.log("Received off hand gun select packet on client. Skipping. Did you mean to send a PacketOffHandGunInfo?");
 	}
 }

@@ -2,6 +2,8 @@ package com.flansmod.common;
 
 import java.lang.reflect.Field;
 
+import com.flansmod.common.util.Util;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -48,19 +50,14 @@ public class FlansUtils
         return getSideForHand(getHandWithItem(entity, stack), entity);
     }
 
-    public static void copy(Object from, Object to)
-    {
-        for (Field field : from.getClass().getDeclaredFields())
-        {
+    public static void copy(Object from, Object to){
+        for(Field field : from.getClass().getDeclaredFields()){
             field.setAccessible(true);
-            try
-            {
+            try{
                 field.set(to, field.get(from));
             }
-            catch (IllegalAccessException e)
-            {
-                FlansMod.getLogger().error(String.format("Could not set field %s while copying class %s.",
-                        field.getName(), from.getClass().getName()));
+            catch(IllegalAccessException e){
+            	Util.error(String.format("Could not set field %s while copying class %s.", field.getName(), from.getClass().getName()), e);
             }
 
         }

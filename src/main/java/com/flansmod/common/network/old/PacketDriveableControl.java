@@ -7,7 +7,6 @@ import com.flansmod.common.network.PacketBase;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -134,7 +133,7 @@ public class PacketDriveableControl extends PacketBase
 			{
 				driveable = (EntityDriveable)obj;
 				driveable.driveableData.fuelInTank = fuelInTank;
-				if(driveable.seats[0] != null && EntUtil.getPassengerOf(driveable.seats[0]) == clientPlayer)
+				if(driveable.seats[0] != null && driveable.seats[0].getPassenger() == clientPlayer)
 					return;
 				break;
 			}

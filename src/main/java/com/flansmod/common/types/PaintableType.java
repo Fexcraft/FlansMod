@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.Paintjob;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -70,7 +71,7 @@ public abstract class PaintableType extends InfoType
 		} 
 		catch (Exception e)
 		{
-			FlansMod.log("Reading file failed : " + shortName);
+			Util.log("Reading file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}
@@ -88,23 +89,6 @@ public abstract class PaintableType extends InfoType
 	public Paintjob getPaintjob(int i)
 	{
 		return paintjobs.get(i);
-	}
-	
-	@Override
-	public void addDungeonLoot() 
-	{
-		if(dungeonChance > 0)
-		{
-			for(int i = 0; i < paintjobs.size(); i++)
-			{
-				ItemStack stack = new ItemStack(this.item);
-				NBTTagCompound tags = new NBTTagCompound();
-				tags.setString("Paint", paintjobs.get(i).name);
-				stack.setTagCompound(tags);
-				
-				addToRandomChest(stack, (float)(FlansMod.dungeonLootChance * dungeonChance) / (float)totalDungeonChance);
-			}
-		}
 	}
 
 	public float GetRecommendedScale()

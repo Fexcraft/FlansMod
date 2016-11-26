@@ -10,6 +10,7 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.ContainerMechaInventory;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.driveables.mechas.MechaType;
+import com.flansmod.common.util.Ticker;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -110,7 +111,7 @@ public class GuiMechaInventory extends GuiContainer
 		GL11.glScalef(-50F / type.cameraDistance, 50F / type.cameraDistance, 50F / type.cameraDistance);
 		GL11.glRotatef(180F, 0F, 0F, 1F);
 		GL11.glRotatef(30F, 1F, 0F, 0F);
-		GL11.glRotatef(FlansMod.ticker, 0F, 1F, 0F);
+		GL11.glRotatef(Ticker.tick, 0F, 1F, 0F);
 		mc.renderEngine.bindTexture(FlansModResourceHandler.getTexture(type));
 		mechaRenderer.render(mecha, 0, 0, 0, 0F, 0F);
 		//type.model.render(type);

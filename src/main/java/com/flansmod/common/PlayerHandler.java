@@ -8,7 +8,6 @@ import java.util.UUID;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.network.PacketHandler;
-import com.flansmod.common.teams.TeamsManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -131,9 +130,9 @@ public class PlayerHandler
 		{
 			EntityPlayer player = event.player;
 			UUID uuid = player.getUniqueID();
-			if(TeamsManager.getInstance().currentRound == null)
+			/*if(TeamsManager.getInstance().currentRound == null)
 				serverSideData.remove(uuid);
-			else clientsToRemoveAfterThisRound.add(uuid);
+			else clientsToRemoveAfterThisRound.add(uuid);*/
 			
 			PacketHandler.tryRemove(uuid);
 		}

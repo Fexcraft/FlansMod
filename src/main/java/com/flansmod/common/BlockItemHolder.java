@@ -1,5 +1,7 @@
 package com.flansmod.common;
 
+import com.flansmod.common.util.CTabs;
+
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
@@ -34,13 +36,13 @@ public class BlockItemHolder extends BlockContainer
 	{
 		super(Material.ROCK);
 		this.type = type;
-		setCreativeTab(FlansMod.tabFlanParts);
+		setCreativeTab(CTabs.parts);
 		setHardness(2F);
 		setResistance(4F);
 	    this.setRegistryName(FlansMod.MODID, type.shortName);
 	    this.setUnlocalizedName(this.getRegistryName().toString());
 	    GameRegistry.register(this);
-		setCreativeTab(FlansMod.tabFlanParts);
+		setCreativeTab(CTabs.parts);
 		setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		type.block = this;
 		type.item = Item.getItemFromBlock(this);

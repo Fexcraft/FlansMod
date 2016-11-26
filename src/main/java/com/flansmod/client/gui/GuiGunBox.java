@@ -10,6 +10,7 @@ import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntryTopLevel;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxPage;
 import com.flansmod.common.network.PacketBuyWeapon;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -246,7 +247,7 @@ public class GuiGunBox extends GuiContainer
 	{
 		if(type == null)
 		{
-			FlansMod.log("Null type when rendering!");
+			Util.log("Null type when rendering!");
 			return;
 		}
 		drawSlotInventory(new ItemStack(type.item), x, y);

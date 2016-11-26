@@ -10,6 +10,7 @@ import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.item.Item;
@@ -130,7 +131,7 @@ public class PlayerClass extends InfoType
 				}
 				if(matchingItem == null)
 				{
-					FlansMod.log("Tried to add " + split[1] + " to player class " + shortName + " but the item did not exist");
+					Util.log("Tried to add " + split[1] + " to player class " + shortName + " but the item did not exist");
 					return;
 				}
 				if(split.length > 2)

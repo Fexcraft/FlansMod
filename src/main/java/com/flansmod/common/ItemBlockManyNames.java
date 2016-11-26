@@ -1,5 +1,7 @@
 package com.flansmod.common;
 
+import com.flansmod.common.util.CTabs;
+
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemBlock;
@@ -30,6 +32,6 @@ public class ItemBlockManyNames extends ItemBlock{
 	@Override
 	public CreativeTabs[] getCreativeTabs()
 	{
-		return new CreativeTabs[]{ FlansMod.tabFlanDriveables, FlansMod.tabFlanGuns, FlansMod.tabFlanTeams, FlansMod.tabFlanParts };
+		return new CreativeTabs[]{ CTabs.vehicles, CTabs.weapons, CTabs.parts };
 	}
 }

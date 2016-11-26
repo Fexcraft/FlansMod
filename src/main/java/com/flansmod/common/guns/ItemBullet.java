@@ -6,6 +6,7 @@ import java.util.List;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.CTabs;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.api.item.IItem;
@@ -32,8 +33,8 @@ public class ItemBullet extends ItemShootable implements IFlanItem<BulletType>, 
 		type.item = this;
 		switch(type.weaponType)
 		{
-		case SHELL : case BOMB : case MINE : case MISSILE : setCreativeTab(FlansMod.tabFlanDriveables); break;
-		default : setCreativeTab(FlansMod.tabFlanGuns);
+		case SHELL : case BOMB : case MINE : case MISSILE : setCreativeTab(CTabs.weapons); break;
+		default : setCreativeTab(CTabs.weapons);
 		}
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);

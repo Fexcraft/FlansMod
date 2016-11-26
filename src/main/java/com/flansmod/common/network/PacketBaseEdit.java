@@ -1,9 +1,7 @@
 package com.flansmod.common.network;
 
 import com.flansmod.client.gui.GuiBaseEditor;
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.teams.ITeamBase;
-import com.flansmod.common.teams.TeamsManager;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -86,19 +84,19 @@ public class PacketBaseEdit extends PacketBase
 			return;
 		
 		//Find the base and change its attributes (or destroy it)
-		ITeamBase base = TeamsManager.getInstance().getBase(baseID);
-		if(destroy)
-		{
+		/*ITeamBase base = TeamsManager.getInstance().getBase(baseID);
+		if(destroy){
 			base.destroy();
 			return;
 		}
 		base.setDefaultOwnerID(teamID);
 		base.setOwnerID(teamID);
-		if(mapID != -1)
+		if(mapID != -1){
 			base.setMapFirstTime(TeamsManager.getInstance().getMapFromFullName(maps[mapID]));
-		base.setName(baseName);
+		}
+		base.setName(baseName);*/
 		
-		FlansMod.log(playerEntity.getName() + " modified attributes of base " + baseID);
+		Util.log(playerEntity.getName() + " modified attributes of base " + baseID);
 	}
 
 	@Override

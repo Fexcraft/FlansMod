@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Random;
 
 import com.flansmod.common.guns.EntityDamageSourceGun;
-import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Config;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -68,7 +68,7 @@ public class FlansModExplosion extends Explosion
 		this.affectedBlockPositions = Lists.newArrayList();
         this.isFlaming = flaming;
         this.isSmoking = true;
-        this.breaksBlocks = breaksBlocks && TeamsManager.explosions;
+        this.breaksBlocks = breaksBlocks && Config.explosions;
         this.position = new Vec3d(x, y, z);
         
         if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, this))

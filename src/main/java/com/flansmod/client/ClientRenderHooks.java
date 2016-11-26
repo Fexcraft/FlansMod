@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.Project;
 
 import com.flansmod.api.IControllable;
-import com.flansmod.client.gui.GuiTeamScores;
 import com.flansmod.client.model.ArmModelRenderer;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansUtils;
@@ -22,10 +21,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.network.PacketTeamInfo;
-import com.flansmod.common.network.PacketTeamInfo.PlayerScoreData;
 import com.flansmod.common.teams.ItemTeamArmour;
-import com.flansmod.common.teams.Team;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
 
@@ -45,7 +41,6 @@ import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderPlayer;
@@ -66,7 +61,6 @@ import net.minecraftforge.client.event.RenderItemInFrameEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class ClientRenderHooks 
 {
@@ -577,11 +571,11 @@ public class ClientRenderHooks
 			player.swingProgress = 0;
 		}
 
-		PlayerData data = PlayerHandler.getPlayerData(event.getEntityPlayer(), Side.CLIENT);
+		//PlayerData data = PlayerHandler.getPlayerData(event.getEntityPlayer(), Side.CLIENT);
 					
 		event.getRenderer().NAME_TAG_RANGE = 64F;
 		event.getRenderer().NAME_TAG_RANGE_SNEAK = 32F;		
-		if(event.getEntity() instanceof EntityPlayer && FlansModClient.teamInfo != null && FlansModClient.teamInfo.gametype != null && !"No Gametype".equals(FlansModClient.teamInfo.gametype))
+		/*if(event.getEntity() instanceof EntityPlayer && FlansModClient.teamInfo != null && FlansModClient.teamInfo.gametype != null && !"No Gametype".equals(FlansModClient.teamInfo.gametype))
 		{
 			PlayerScoreData rendering = FlansModClient.teamInfo.getPlayerScoreData(event.getEntity().getName());
 			PlayerScoreData thePlayer = FlansModClient.teamInfo.getPlayerScoreData(mc.thePlayer.getName());
@@ -622,7 +616,7 @@ public class ClientRenderHooks
 				event.getRenderer().NAME_TAG_RANGE = 0F;
 				event.getRenderer().NAME_TAG_RANGE_SNEAK = 0F;
 			}
-		}
+		}*/
 	}
 
 	public void cameraSetup(CameraSetup event)
@@ -659,7 +653,7 @@ public class ClientRenderHooks
 		int i = scaledresolution.getScaledWidth();
 		int j = scaledresolution.getScaledHeight();
 					
-		Tessellator tessellator = Tessellator.getInstance();
+		//Tessellator tessellator = Tessellator.getInstance();
 		
 		if(!event.isCancelable() && event.getType() == ElementType.HELMET)
 		{
@@ -717,7 +711,7 @@ public class ClientRenderHooks
 				
 				//ItemStack currentStack = mc.thePlayer.inventory.getCurrentItem();
 				//PlayerData data = PlayerHandler.getPlayerData(mc.thePlayer, Side.CLIENT);
-				double zLevel = 0D;
+				//double zLevel = 0D;
 				
 				/*tessellator.getWorldRenderer().startDrawingQuads();
 				tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 4d, j / 2 + 5d, zLevel, 0D / 16D, 9D / 16D);
@@ -838,18 +832,18 @@ public class ClientRenderHooks
 				}
 			}
 			
-			PacketTeamInfo teamInfo = FlansModClient.teamInfo;
+			//PacketTeamInfo teamInfo = FlansModClient.teamInfo;
 			
-			if(teamInfo != null && FlansModClient.minecraft.thePlayer != null && (teamInfo.numTeams > 0 || !teamInfo.sortedByTeam) && teamInfo.getPlayerScoreData(FlansModClient.minecraft.thePlayer.getName()) != null)
-			{
-				GL11.glEnable(3042 /* GL_BLEND */);
-				GL11.glDisable(2929 /* GL_DEPTH_TEST */);
-				GL11.glDepthMask(false);
-				GL11.glBlendFunc(770, 771);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glDisable(3008 /* GL_ALPHA_TEST */);
+			//if(teamInfo != null && FlansModClient.minecraft.thePlayer != null && (teamInfo.numTeams > 0 || !teamInfo.sortedByTeam) && teamInfo.getPlayerScoreData(FlansModClient.minecraft.thePlayer.getName()) != null)
+			//{
+				//GL11.glEnable(3042 /* GL_BLEND */);
+				//GL11.glDisable(2929 /* GL_DEPTH_TEST */);
+				//GL11.glDepthMask(false);
+				//GL11.glBlendFunc(770, 771);
+				//GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				//GL11.glDisable(3008 /* GL_ALPHA_TEST */);
 	
-				mc.renderEngine.bindTexture(GuiTeamScores.texture);
+				//mc.renderEngine.bindTexture(GuiTeamScores.texture);
 								
 				/*tessellator.getWorldRenderer().startDrawingQuads();
 				tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 43, 27, -90D, 85D / 256D, 27D / 256D);
@@ -859,7 +853,7 @@ public class ClientRenderHooks
 				tessellator.draw();*/
 				
 				//If we are in a two team gametype, draw the team scores at the top of the screen
-				if(teamInfo.numTeams == 2 && teamInfo.sortedByTeam)
+				/*if(teamInfo.numTeams == 2 && teamInfo.sortedByTeam)
 				{
 					//Draw team 1 colour bit
 					int colour = teamInfo.teamData[0].team.teamColour;	
@@ -871,7 +865,7 @@ public class ClientRenderHooks
 					tessellator.getWorldRenderer().addVertexWithUV(i / 2 - 43, 0D, -90D, 0D / 256D, 98D / 256D);
 					tessellator.draw();*/
 					//Draw team 2 colour bit
-					colour = teamInfo.teamData[1].team.teamColour;	
+					/*colour = teamInfo.teamData[1].team.teamColour;	
 					GL11.glColor4f(((colour >> 16) & 0xff) / 256F, ((colour >> 8) & 0xff) / 256F, (colour & 0xff) / 256F, 1.0F);
 					/*tessellator.getWorldRenderer().startDrawingQuads();
 					tessellator.getWorldRenderer().addVertexWithUV(i / 2 + 19, 27, -90D, 62D / 256D, 125D / 256D);
@@ -880,13 +874,13 @@ public class ClientRenderHooks
 					tessellator.getWorldRenderer().addVertexWithUV(i / 2 + 19, 0D, -90D, 62D / 256D, 98D / 256D);
 					tessellator.draw();*/
 					
-					GL11.glDepthMask(true);
-					GL11.glEnable(2929 /* GL_DEPTH_TEST */);
-					GL11.glEnable(3008 /* GL_ALPHA_TEST */);
-					GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+					//GL11.glDepthMask(true);
+					//GL11.glEnable(2929 /* GL_DEPTH_TEST */);
+					//GL11.glEnable(3008 /* GL_ALPHA_TEST */);
+					//GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 					
 					//Draw the team scores
-					if(teamInfo.teamData[0] != null && teamInfo.teamData[1] != null)
+					/*if(teamInfo.teamData[0] != null && teamInfo.teamData[1] != null)
 					{
 						mc.fontRendererObj.drawString(teamInfo.teamData[0].score + "", i / 2 - 35, 9, 0x000000);
 						mc.fontRendererObj.drawString(teamInfo.teamData[0].score + "", i / 2 - 36, 8, 0xffffff);
@@ -905,16 +899,16 @@ public class ClientRenderHooks
 				secondsLeft = secondsLeft % 60;
 				String timeLeft = minutesLeft + ":" + (secondsLeft < 10 ? "0" + secondsLeft : secondsLeft);
 				mc.fontRendererObj.drawString(timeLeft, i / 2 - mc.fontRendererObj.getStringWidth(timeLeft) / 2 - 1, 29, 0x000000);
-				mc.fontRendererObj.drawString(timeLeft, i / 2 - mc.fontRendererObj.getStringWidth(timeLeft) / 2, 30, 0xffffff);
+				mc.fontRendererObj.drawString(timeLeft, i / 2 - mc.fontRendererObj.getStringWidth(timeLeft) / 2, 30, 0xffffff);*/
 	
 				
-				GL11.glDepthMask(true);
-				GL11.glEnable(2929 /* GL_DEPTH_TEST */);
-				GL11.glEnable(3008 /* GL_ALPHA_TEST */);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				String playerUsername = FlansModClient.minecraft.thePlayer.getName();
+				//GL11.glDepthMask(true);
+				//GL11.glEnable(2929 /* GL_DEPTH_TEST */);
+				//GL11.glEnable(3008 /* GL_ALPHA_TEST */);
+				//GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				//String playerUsername = FlansModClient.minecraft.thePlayer.getName();
 				
-				if(teamInfo.getPlayerScoreData(playerUsername) != null)
+				/*if(teamInfo.getPlayerScoreData(playerUsername) != null)
 				{
 					mc.fontRendererObj.drawString(teamInfo.getPlayerScoreData(playerUsername).score + "", i / 2 - 7, 1, 0x000000);
 					mc.fontRendererObj.drawString(teamInfo.getPlayerScoreData(playerUsername).kills + "", i / 2 - 7, 9, 0x000000);
@@ -937,9 +931,9 @@ public class ClientRenderHooks
 			{
 				KillMessage killMessage = killMessages.get(n);
 				drawSlotInventory(mc.fontRendererObj, new ItemStack(killMessage.weapon.item), i - mc.fontRendererObj.getStringWidth("     " + killMessage.killedName) - 12, j - 36 - killMessage.line * 16);
-			}
-			GL11.glDisable(3042 /*GL_BLEND*/);
-			RenderHelper.disableStandardItemLighting();
+			}*/
+			//GL11.glDisable(3042 /*GL_BLEND*/);
+			/*RenderHelper.disableStandardItemLighting();
 			
 			//DEBUG vehicles
 			if(mc.thePlayer.getRidingEntity() instanceof EntitySeat)
@@ -961,7 +955,7 @@ public class ClientRenderHooks
 				{
 					mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
 				}
-			}
+			}*/
 		}
 	}
 	

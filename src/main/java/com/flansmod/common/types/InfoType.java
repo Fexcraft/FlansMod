@@ -3,7 +3,7 @@ package com.flansmod.common.types;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelBase;
@@ -18,8 +18,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class InfoType
-{
+public class InfoType {
 	/** infoTypes */
 	public static HashMap<Integer, InfoType> infoTypes = new HashMap<Integer, InfoType>();
 
@@ -51,16 +50,13 @@ public class InfoType
 	/** Used for scaling */
 	public static int totalDungeonChance = 0;
 	
-	public InfoType(TypeFile file)
-	{
+	public InfoType(TypeFile file){
 		contentPack = file.contentPack;
 	}
 	
-	public void read(TypeFile file)
-	{
+	public void read(TypeFile file){
 		preRead(file);
-		for(;;)
-		{
+		for(;;){
 			String line = null;
 			line = file.readLine();
 			if(line == null)
@@ -88,63 +84,48 @@ public class InfoType
 	public ModelBase getModel() { return null; }
 
 	/** Pack reader */
-	protected void read(String[] split, TypeFile file)
-	{
-		try
-		{
+	protected void read(String[] split, TypeFile file){
+		try{
 			if(split[0].equals("Model"))
 				modelString = split[1];
 			else if(split[0].equals("ModelScale"))
 				modelScale = Float.parseFloat(split[1]);
-			else if (split[0].equals("Name"))
-			{
+			else if(split[0].equals("Name")){
 				name = split[1];
-				for (int i = 0; i < split.length - 2; i++)
-				{
+				for(int i = 0; i < split.length - 2; i++){
 					name = name + " " + split[i + 2];
 				}
 			}
-			else if (split[0].equals("Description"))
-			{
+			else if(split[0].equals("Description")){
 				description = split[1];
-				for (int i = 0; i < split.length - 2; i++)
-				{
+				for(int i = 0; i < split.length - 2; i++){
 					description = description + " " + split[i + 2];
 				}
 			}
-			else if (split[0].equals("ShortName"))
-			{
+			else if(split[0].equals("ShortName")){
 				shortName = split[1];
 			}
-			else if (split[0].equals("Colour") || split[0].equals("Color"))
-			{
+			else if(split[0].equals("Colour") || split[0].equals("Color")){
 				colour = (Integer.parseInt(split[1]) << 16) + ((Integer.parseInt(split[2])) << 8) + ((Integer.parseInt(split[3])));
 			}
-			else if (split[0].equals("Icon"))
-			{
+			else if(split[0].equals("Icon")){
 				iconPath = split[1];
 			}
-			else if (split[0].equals("DungeonProbabilty") || split[0].equals("DungeonLootChance"))
-			{
+			else if(split[0].equals("DungeonProbabilty") || split[0].equals("DungeonLootChance")){
 				dungeonChance = Integer.parseInt(split[1]);
 			}
-			else if (split[0].equals("RecipeOutput"))
-			{
+			else if(split[0].equals("RecipeOutput")){
 				recipeOutput = Integer.parseInt(split[1]);
 			}
-			else if (split[0].equals("Recipe"))
-			{
+			else if(split[0].equals("Recipe")){
 				recipe = new Object[split.length + 2];
-				for (int i = 0; i < 3; i++)
-				{
+				for(int i = 0; i < 3; i++){
 					String line = null;
 					line = file.readLine();
-					if (line == null)
-					{
+					if(line == null){
 						continue;
 					}
-					if (line == null || line.startsWith("//"))
-					{
+					if(line == null || line.startsWith("//")){
 						i--;
 						continue;
 					}
@@ -153,87 +134,73 @@ public class InfoType
 				recipeLine = split;
 				shapeless = false;
 			}
-			else if (split[0].equals("ShapelessRecipe"))
-			{
+			else if(split[0].equals("ShapelessRecipe")){
 				recipeLine = split;
 				shapeless = true;
 			}
-			else if (split[0].equals("SmeltableFrom"))
-			{
+			else if(split[0].equals("SmeltableFrom")){
 				smeltableFrom = split[1];
 			}
 			else if(split[0].equals("CanDrop"))
 				canDrop = Boolean.parseBoolean(split[1]);
-		} catch (Exception e)
-		{
-			FlansMod.log("Reading file failed : " + shortName);
+		}
+		catch(Exception e){
+			Util.log("Reading file failed : " + shortName);
 			e.printStackTrace();
 		}
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString(){
 		return super.getClass().getSimpleName() + ": " + shortName;
 	}
 
-	public void addRecipe()
-	{
+	public void addRecipe(){
 		this.addRecipe(getItem());
 	}
 
 	/** Reimported from old code */
-	public void addRecipe(Item par1Item)
-	{
-		if (smeltableFrom != null)
-		{
+	public void addRecipe(Item par1Item){
+		if(smeltableFrom != null){
 			GameRegistry.addSmelting(getRecipeElement(smeltableFrom, 0), new ItemStack(item), 0.0F);
 		}
-		if (recipeLine == null)
+		if(recipeLine == null)
 			return;
-		try
-		{
-			if (!shapeless)
-			{
+		try{
+			if(!shapeless){
 				// Fix oversized recipes
 				int rows = 3;
 				// First column
-				if (((String) recipe[0]).charAt(0) == ' ' && ((String) recipe[1]).charAt(0) == ' ' && ((String) recipe[2]).charAt(0) == ' ')
-				{
-					for (int i = 0; i < 3; i++)
+				if (((String) recipe[0]).charAt(0) == ' ' && ((String) recipe[1]).charAt(0) == ' ' && ((String) recipe[2]).charAt(0) == ' '){
+					for(int i = 0; i < 3; i++)
 						recipe[i] = ((String) recipe[i]).substring(1);
 					// New first column
-					if (((String) recipe[0]).charAt(0) == ' ' && ((String) recipe[1]).charAt(0) == ' ' && ((String) recipe[2]).charAt(0) == ' ')
-					{
-						for (int i = 0; i < 3; i++)
+					if(((String) recipe[0]).charAt(0) == ' ' && ((String) recipe[1]).charAt(0) == ' ' && ((String) recipe[2]).charAt(0) == ' '){
+						for(int i = 0; i < 3; i++)
 							recipe[i] = ((String) recipe[i]).substring(1);
 					}
 				}
 				// Last column
 				int last = ((String) recipe[0]).length() - 1;
-				if (((String) recipe[0]).charAt(last) == ' ' && ((String) recipe[1]).charAt(last) == ' ' && ((String) recipe[2]).charAt(last) == ' ')
-				{
-					for (int i = 0; i < 3; i++)
+				if(((String) recipe[0]).charAt(last) == ' ' && ((String) recipe[1]).charAt(last) == ' ' && ((String) recipe[2]).charAt(last) == ' '){
+					for(int i = 0; i < 3; i++)
 						recipe[i] = ((String) recipe[i]).substring(0, last);
 					// New last column
 					last--;
-					if (((String) recipe[0]).charAt(last) == ' ' && ((String) recipe[1]).charAt(last) == ' ' && ((String) recipe[2]).charAt(last) == ' ')
-					{
+					if(((String) recipe[0]).charAt(last) == ' ' && ((String) recipe[1]).charAt(last) == ' ' && ((String) recipe[2]).charAt(last) == ' '){
 						for (int i = 0; i < 3; i++)
 							recipe[i] = ((String) recipe[i]).substring(0, 0);
 					}
 				}
 				// Top row
-				if (recipe[0].equals(" ") || recipe[0].equals("  ") || recipe[0].equals("   "))
-				{
+				if(recipe[0].equals(" ") || recipe[0].equals("  ") || recipe[0].equals("   ")){
 					Object[] newRecipe = new Object[recipe.length - 1];
 					newRecipe[0] = recipe[1];
 					newRecipe[1] = recipe[2];
 					recipe = newRecipe;
 					rows--;
 					// Next top row
-					if (recipe[0].equals(" ") || recipe[0].equals("  ") || recipe[0].equals("   "))
-					{
+					if (recipe[0].equals(" ") || recipe[0].equals("  ") || recipe[0].equals("   ")){
 						Object[] newRecipe1 = new Object[recipe.length - 1];
 						newRecipe1[0] = recipe[1];
 						recipe = newRecipe1;
@@ -241,147 +208,124 @@ public class InfoType
 					}
 				}
 				// Bottom row
-				if (recipe[rows - 1].equals(" ") || recipe[rows - 1].equals("  ") || recipe[rows - 1].equals("   "))
-				{
+				if(recipe[rows - 1].equals(" ") || recipe[rows - 1].equals("  ") || recipe[rows - 1].equals("   ")){
 					Object[] newRecipe = new Object[recipe.length - 1];
 					newRecipe[0] = recipe[0];
 					newRecipe[1] = recipe[1];
 					recipe = newRecipe;
 					rows--;
 					// Next bottom row
-					if (recipe[rows - 1].equals(" ") || recipe[rows - 1].equals("  ") || recipe[rows - 1].equals("   "))
-					{
+					if(recipe[rows - 1].equals(" ") || recipe[rows - 1].equals("  ") || recipe[rows - 1].equals("   ")){
 						Object[] newRecipe1 = new Object[recipe.length - 1];
 						newRecipe1[0] = recipe[0];
 						recipe = newRecipe1;
 						rows--;
 					}
 				}
-				for (int i = 0; i < (recipeLine.length - 1) / 2; i++)
-				{
+				for(int i = 0; i < (recipeLine.length - 1) / 2; i++){
 					recipe[i * 2 + rows] = recipeLine[i * 2 + 1].charAt(0);
 					// Split ID with . and if it contains a second part, use it
 					// as damage value.
-					if (recipeLine[i * 2 + 2].contains("."))
+					if(recipeLine[i * 2 + 2].contains("."))
 						recipe[i * 2 + rows + 1] = getRecipeElement(recipeLine[i * 2 + 2].split("\\.")[0], Integer.valueOf(recipeLine[i * 2 + 2].split("\\.")[1]));
 					else
 						recipe[i * 2 + rows + 1] = getRecipeElement(recipeLine[i * 2 + 2], 32767);
 				}
 				GameRegistry.addRecipe(new ItemStack(item, recipeOutput), recipe);
-			} else
-			{
+			}
+			else{
 				recipe = new Object[recipeLine.length - 1];
-				for (int i = 0; i < (recipeLine.length - 1); i++)
-				{
-					if (recipeLine[i + 1].contains("."))
+				for(int i = 0; i < (recipeLine.length - 1); i++){
+					if(recipeLine[i + 1].contains("."))
 						recipe[i] = getRecipeElement(recipeLine[i + 1].split("\\.")[0], Integer.valueOf(recipeLine[i + 1].split("\\.")[1]));
 					else
 						recipe[i] = getRecipeElement(recipeLine[i + 1], 32767);
 				}
 				GameRegistry.addShapelessRecipe(new ItemStack(item, recipeOutput), recipe);
 			}
-		} catch (Exception e)
-		{
-			FlansMod.log("Failed to add recipe for : " + shortName);
+		}
+		catch(Exception e){
+			Util.log("Failed to add recipe for : " + shortName);
 			e.printStackTrace();
 		}
 	}
 	
 	/** Return a dye damage value from a string name */
-	protected int getDyeDamageValue(String dyeName)
-	{
+	protected int getDyeDamageValue(String dyeName){
 		int damage = -1;
-		for(int i = 0; i < EnumDyeColor.values().length; i++)
-		{
+		for(int i = 0; i < EnumDyeColor.values().length; i++){
 			if(EnumDyeColor.byDyeDamage(i).getUnlocalizedName().equals(dyeName))
 				damage = i;
 		}
 		if(damage == -1)
-			FlansMod.log("Failed to find dye colour : " + dyeName + " while adding " + contentPack);
+			Util.log("Failed to find dye colour : " + dyeName + " while adding " + contentPack);
 		
 		return damage;
 	}
 
-	public Item getItem()
-	{
+	public Item getItem(){
 		return item;
 	}
 	
 	
-	public static ItemStack getRecipeElement(String s, int damage)
-	{
+	public static ItemStack getRecipeElement(String s, int damage){
 		return getRecipeElement(s, 1, damage);
 	}
 	
-	public static ItemStack getRecipeElement(String s, int amount, int damage)
-	{
+	public static ItemStack getRecipeElement(String s, int amount, int damage){
 		return getRecipeElement(s, amount, damage, "nothing");
 	}
 	
-	public static ItemStack getRecipeElement(String s, int amount, int damage, String requester)
-	{
-		if (s.equals("doorIron"))
-		{
+	public static ItemStack getRecipeElement(String s, int amount, int damage, String requester){
+		if(s.equals("doorIron")){
 			return new ItemStack(Items.IRON_DOOR, amount);
 		}
-		if (s.equals("clayItem"))
-		{
+		if(s.equals("clayItem")){
 			return new ItemStack(Items.CLAY_BALL, amount);
 		}
-		for(Object object : Item.REGISTRY)
-		{
+		for(Object object : Item.REGISTRY){
 			Item item = (Item)object;
-			if (item != null && item.getUnlocalizedName() != null && (item.getUnlocalizedName().equals("item." + s) || item.getUnlocalizedName().equals("tile." + s)))
-			{
+			if(item != null && item.getUnlocalizedName() != null && (item.getUnlocalizedName().equals("item." + s) || item.getUnlocalizedName().equals("tile." + s))){
 				return new ItemStack(item, amount, damage);
 			}
 		}
-		for(InfoType type : infoTypes.values())
-		{
+		for(InfoType type : infoTypes.values()){
 			if(type.shortName.equals(s))
 				return new ItemStack(type.item, amount, damage);
 		}
-		if (s.equals("gunpowder"))
-		{
+		if(s.equals("gunpowder")){
 			return new ItemStack(Items.GUNPOWDER, amount);
 		}
-		if (s.equals("iron"))
-		{
+		if(s.equals("iron")){
 			return new ItemStack(Items.IRON_INGOT, amount);
 		}
-		FlansMod.log("Could not find " + s + " when adding recipe for " + requester);
+		Util.log("Could not find " + s + " when adding recipe for " + requester);
 		return null;
 	}
 	
 	/** To be overriden by subtypes for model reloading */
-	public void reloadModel()
-	{
+	public void reloadModel(){
 		
 	}
 	
 	@Override
-	public int hashCode()
-	{
+	public int hashCode(){
 		return shortName.hashCode();
 	}
 	
-	public static InfoType getType(String s)
-	{
+	public static InfoType getType(String s){
 		return infoTypes.get(s.hashCode());
 	}
 	
-	public static InfoType getType(int hash)
-	{
+	public static InfoType getType(int hash){
 		return infoTypes.get(hash);
 	}
 
-	public void onWorldLoad(World world) 
-	{
+	public void onWorldLoad(World world) {
 		
 	}
 
-	public static InfoType getType(ItemStack itemStack) 
-	{
+	public static InfoType getType(ItemStack itemStack) {
 		if(itemStack == null)
 			return null;
 		Item item = itemStack.getItem();
@@ -390,47 +334,14 @@ public class InfoType
 		return null;
 	}
 	
-	public static PotionEffect getPotionEffect(String[] split)
-	{
+	public static PotionEffect getPotionEffect(String[] split){
 		int potionID = Integer.parseInt(split[1]);
 		int duration = Integer.parseInt(split[2]);
 		int amplifier = Integer.parseInt(split[3]);
 		return new PotionEffect(Potion.getPotionById(potionID), duration, amplifier, false, false);
 	}
 	
-	public static Material getMaterial(String mat)
-	{
+	public static Material getMaterial(String mat){
 		return Material.GROUND;
-	}
-
-	public void addDungeonLoot() 
-	{
-		if(dungeonChance > 0)
-		{
-			ItemStack stack = new ItemStack(this.item);
-			addToRandomChest(stack, (float)(FlansMod.dungeonLootChance * dungeonChance) / (float)totalDungeonChance);
-		}
-	}
-	
-	protected void addToRandomChest(ItemStack stack, float rawChance)
-	{
-		if(rawChance >= 1 || random.nextFloat() < rawChance)
-		{
-			/*int chance = MathHelper.ceiling_float_int(rawChance);
-			switch(random.nextInt(10))
-			{
-			//TODO
-			case 0 : ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 1 : ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 2 : ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 3 : ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 4 : ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 5 : ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 6 : ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 7 : ChestGenHooks.addItem(ChestGenHooks.VILLAGE_BLACKSMITH, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 8 : ChestGenHooks.addItem(ChestGenHooks.BONUS_CHEST, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			case 9 : ChestGenHooks.addItem(ChestGenHooks.NETHER_FORTRESS, new WeightedRandomChestContent(new ItemStack(this.item), 1, 1, chance)); break;
-			}*/
-		}
 	}
 }

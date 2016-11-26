@@ -5,20 +5,17 @@ import javax.annotation.Nullable;
 import org.lwjgl.input.Mouse;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.network.PacketAAGunAngles;
 import com.flansmod.common.network.PacketMGFire;
 import com.flansmod.common.network.PacketPlaySound;
-import com.flansmod.common.teams.Team;
-import com.flansmod.common.teams.TeamsManager;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -177,7 +174,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 			} else if(EntUtil.getPassengerOf(this) != null)
 			{
 				return EntUtil.getPassengerOf(this).attackEntityFrom(damagesource, i);
-			} else if(TeamsManager.canBreakGuns)
+			} else if(Config.canBreakGuns)
 			{
 				setDead();
 			}
@@ -220,7 +217,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		prevGunPitch = gunPitch;
 		
 		ticksSinceUsed++;
-		if(TeamsManager.aaLife > 0 && ticksSinceUsed > TeamsManager.aaLife * 20)
+		if(Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20)
 		{
 			setDead();
 		}
@@ -414,33 +411,20 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		return type.targetMobs || type.targetPlayers;
 	}
 	
-	public Entity getValidTarget()
-	{
+	public Entity getValidTarget(){
 		if(worldObj.isRemote)
 			return null;
 		if(placer == null && placerName != null)
 			placer = worldObj.getPlayerEntityByName(placerName);
-		for(Object obj : worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(type.targetRange, type.targetRange, type.targetRange)))
-		{
+		for(Object obj : worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(type.targetRange, type.targetRange, type.targetRange))){
 			Entity candidateEntity = (Entity)obj;
 			
-			if((type.targetMobs && candidateEntity instanceof EntityMob) || (type.targetPlayers && candidateEntity instanceof EntityPlayer))
-			{
+			if((type.targetMobs && candidateEntity instanceof EntityMob) || (type.targetPlayers && candidateEntity instanceof EntityPlayer)){
 				//Check that this entity is actually in range and visible
-				if(candidateEntity.getDistanceToEntity(this) < type.targetRange)
-				{
-					if(candidateEntity instanceof EntityPlayer)
-					{
-						if(candidateEntity == placer || candidateEntity.getName().equals(placerName))
+				if(candidateEntity.getDistanceToEntity(this) < type.targetRange){
+					if(candidateEntity instanceof EntityPlayer){
+						if(candidateEntity == placer || candidateEntity.getName().equals(placerName)){
 							continue;
-						if(TeamsManager.enabled && TeamsManager.getInstance().currentRound != null && placer != null)
-						{
-							PlayerData placerData = PlayerHandler.getPlayerData(placer, worldObj.isRemote ? Side.CLIENT : Side.SERVER);
-							PlayerData candidateData = PlayerHandler.getPlayerData((EntityPlayer)candidateEntity, worldObj.isRemote ? Side.CLIENT : Side.SERVER);
-							if(candidateData.team == Team.spectators || candidateData.team == null)
-								continue;
-							if(!TeamsManager.getInstance().currentRound.gametype.playerCanAttack((EntityPlayerMP)placer, placerData.team, (EntityPlayerMP)candidateEntity, candidateData.team))
-								continue;
 						}
 					}
 					return candidateEntity;
@@ -601,7 +585,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		}
 		catch(Exception e)
 		{
-			FlansMod.log("Failed to retreive AA gun type from server.");
+			Util.log("Failed to retreive AA gun type from server.");
 			super.setDead();
 			e.printStackTrace();
 		}

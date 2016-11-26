@@ -1,7 +1,7 @@
 package com.flansmod.client.model;
 
 import com.flansmod.client.ClientProxy;
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
@@ -34,7 +34,7 @@ public class RenderGunItem extends RenderEntityItem implements IRenderFactory
 	@Override
 	public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
 	{
-		FlansMod.log("test123");
+		Util.log("test123");
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 
 	}

@@ -3,6 +3,7 @@ package com.flansmod.common.teams;
 import com.flansmod.common.CraftingInstance;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.teams.ArmourBoxType.ArmourBoxEntry;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.block.IBlock;
 import net.fexcraft.mod.lib.util.block.BlockUtil;
@@ -30,7 +31,7 @@ public class BlockArmourBox extends Block implements IBlock
 
 		setHardness(2F);
 		setResistance(4F);
-		setCreativeTab(FlansMod.tabFlanTeams);
+		setCreativeTab(CTabs.other);
 		type.block = this;
 		type.item = Item.getItemFromBlock(this);
 		

@@ -7,13 +7,13 @@ import com.flansmod.common.network.PacketPlaneControl;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
-import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.tools.ItemTool;
+import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.util.cls.MathHelper;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -159,7 +159,7 @@ public class EntityPlane extends EntityDriveable
 			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
-		boolean canThrust = ((seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && ((EntityPlayer)EntUtil.getPassengerOf(seats[0])).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
+		boolean canThrust = ((seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
 		switch(key)
 		{
 			case 0 : //Accelerate : Increase the throttle, up to 1.
@@ -208,15 +208,17 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				if(EntUtil.getPassengerOf(seats[0]) != null)
-					EntUtil.getPassengerOf(seats[0]).dismountRidingEntity();;
+				if(seats[0].getPassenger() != null){
+					seats[0].getPassenger().dismountRidingEntity();;
+					//TODO seats[0].passenger = null;
+				}
 		  		return true;
 			}
 			case 7 : //Inventory : Check to see if this plane allows in-flight inventory editing or if the plane is on the ground
 			{
 				if(worldObj.isRemote && (type.invInflight || (Math.abs(throttle) < 0.1F && onGround)))
 				{
-					FlansMod.proxy.openDriveableMenu((EntityPlayer)EntUtil.getPassengerOf(seats[0]), worldObj, this);
+					FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getPassenger(), worldObj, this);
 				}
 				return true;
 			}
@@ -227,7 +229,7 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 10 : //Change control mode
 			{
-				FlansMod.proxy.changeControlMode((EntityPlayer)EntUtil.getPassengerOf(seats[0]));
+				FlansMod.proxy.changeControlMode((EntityPlayer)seats[0].getPassenger());
 				return true;
 			}
 			case 11 : //Roll left
@@ -324,18 +326,18 @@ public class EntityPlane extends EntityDriveable
 		DriveableData data = getDriveableData();
 		if(type == null)
 		{
-			FlansMod.log("Plane type null. Not ticking plane");
+			Util.log("Plane type null. Not ticking plane");
 			return;
 		}
 
 		//Work out if this is the client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)EntUtil.getPassengerOf(seats[0]));
+		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && EntUtil.getPassengerOf(seats[0]) != null)
+		if(!worldObj.isRemote && seats[0].getPassenger() != null)
 			ticksSinceUsed = 0;
-		if(!worldObj.isRemote && TeamsManager.planeLife > 0 && ticksSinceUsed > TeamsManager.planeLife * 20)
+		if(!worldObj.isRemote && Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20)
 		{
 			setDead();
 		}
@@ -405,7 +407,7 @@ public class EntityPlane extends EntityDriveable
 		//With a player default to 0.5 for helicopters (hover speed)
 		//And default to the range 0.25 ~ 0.5 for planes (taxi speed ~ take off speed)
 		float throttlePull = 0.99F;
-		if(seats[0] != null && EntUtil.getPassengerOf(seats[0]) != null && mode == EnumPlaneMode.HELI && canThrust())
+		if(seats[0] != null && seats[0].getPassenger() != null && mode == EnumPlaneMode.HELI && canThrust())
 			throttle = (throttle - 0.5F) * throttlePull + 0.5F;
 
 		//Get the speed of the plane
@@ -694,13 +696,13 @@ public class EntityPlane extends EntityDriveable
 		//Starting sound
 		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.startSound, false);
+			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.startSound, false);
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
 		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.engineSound, false);
+			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.engineSound, false);
 			soundPosition = type.engineSoundLength;
 		}
 
@@ -728,13 +730,13 @@ public class EntityPlane extends EntityDriveable
 		//float updateSpeed = 0.01F;
 		if(!worldObj.isRemote)// && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed))
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
+			FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 		}
 	}
 
 	public boolean canThrust() 
 	{
-		return (seats[0] != null && EntUtil.getPassengerOf(seats[0]) instanceof EntityPlayer && ((EntityPlayer)EntUtil.getPassengerOf(seats[0])).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
+		return (seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
 	}
 
 	@Override
@@ -773,7 +775,7 @@ public class EntityPlane extends EntityDriveable
 
 		PlaneType type = PlaneType.getPlane(driveableType);
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || EntUtil.getPassengerOf(seats[0]) == null))
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
 		{
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();

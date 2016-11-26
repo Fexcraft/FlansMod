@@ -2,8 +2,7 @@ package com.flansmod.common.teams;
 
 import java.util.List;
 
-import com.flansmod.client.FlansModClient;
-import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.CTabs;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.EnumPushReaction;
@@ -36,7 +35,7 @@ public class BlockSpawner extends BlockContainer
 	public BlockSpawner(Material material) 
 	{
 		super(material);
-		setCreativeTab(FlansMod.tabFlanTeams);
+		setCreativeTab(CTabs.other);
 		setDefaultState(blockState.getBaseState().withProperty(TYPE, Integer.valueOf(0)));
 		this.setRegistryName("teamsSpawner");
 		this.setUnlocalizedName(this.getRegistryName().toString());
@@ -45,7 +44,7 @@ public class BlockSpawner extends BlockContainer
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list)
     {
-    	if(tab == FlansMod.tabFlanTeams)
+    	if(tab == CTabs.other)
     	{
 	        list.add(new ItemStack(item, 1, 0));
 	        list.add(new ItemStack(item, 1, 1));
@@ -109,7 +108,7 @@ public class BlockSpawner extends BlockContainer
 	}
 	
 	//@Override //TODO only matching replace I found is "getBeaconColorMultiplier" ~fex
-	public int colorMultiplier(IBlockAccess access, BlockPos pos, int renderPass)
+	/*public int colorMultiplier(IBlockAccess access, BlockPos pos, int renderPass)
 	{		
 		if(!colouredPass)
 			return 0xffffff;
@@ -139,7 +138,7 @@ public class BlockSpawner extends BlockContainer
 		{
 			return 0xffffff;
 		}
-	}
+	}*/
 	
     @Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
@@ -159,7 +158,7 @@ public class BlockSpawner extends BlockContainer
     			spawner.spawnDelay = (spawner.spawnDelay + 200) % 6000;
     			player.addChatMessage(new TextComponentString("Set spawn delay to " + spawner.spawnDelay / 20));
     		}
-    		else if(!(item.getItem() instanceof ItemOpStick))
+    		/*else if(!(item.getItem() instanceof ItemOpStick))
     		{
     			spawner.stacksToSpawn.add(item.copy());
     			for(Entity entity : spawner.itemEntities)
@@ -167,7 +166,7 @@ public class BlockSpawner extends BlockContainer
     				entity.setDead();
     			}
     			spawner.currentDelay = 10;
-    		}
+    		}*///TODO
     	}
         return true;
     }

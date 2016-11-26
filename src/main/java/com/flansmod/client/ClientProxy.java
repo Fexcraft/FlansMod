@@ -30,8 +30,6 @@ import com.flansmod.client.model.RenderAAGun;
 import com.flansmod.client.model.RenderBullet;
 import com.flansmod.client.model.RenderCustomEntityItem;
 import com.flansmod.client.model.RenderCustomItem;
-import com.flansmod.client.model.RenderFlag;
-import com.flansmod.client.model.RenderFlagpole;
 import com.flansmod.client.model.RenderGrenade;
 import com.flansmod.client.model.RenderGun;
 import com.flansmod.client.model.RenderItemHolder;
@@ -69,12 +67,11 @@ import com.flansmod.common.network.PacketRepairDriveable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.teams.ArmourBoxType;
 import com.flansmod.common.teams.BlockArmourBox;
-import com.flansmod.common.teams.EntityFlag;
-import com.flansmod.common.teams.EntityFlagpole;
 import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -144,10 +141,10 @@ public class ClientProxy extends CommonProxy
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 2, new ModelResourceLocation("flansmod:flansWorkbench_parts", "inventory"));
 		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.workbench), new String[] {"flansmod:flansWorkbench_guns", "flansmod:flansWorkbench_parts", "flansmod:flansWorkbench_vehicles"});
 
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 0, new ModelResourceLocation("flansmod:opstick_Ownership", "inventory"));
+		/*Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 0, new ModelResourceLocation("flansmod:opstick_Ownership", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 1, new ModelResourceLocation("flansmod:opstick_Connecting", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 2, new ModelResourceLocation("flansmod:opstick_Mapping", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 3, new ModelResourceLocation("flansmod:opstick_Destruction", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 3, new ModelResourceLocation("flansmod:opstick_Destruction", "inventory"));*/
 		//ModelBakery.addVariantName(FlansMod.opStick, new String[] {"flansmod:opstick_Ownership", "flansmod:opstick_Connecting", "flansmod:opstick_Mapping", "flansmod:opstick_Destruction"});
 		
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.spawner), 0, new ModelResourceLocation("flansmod:teamsSpawner_items", "inventory"));
@@ -155,7 +152,7 @@ public class ClientProxy extends CommonProxy
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.spawner), 2, new ModelResourceLocation("flansmod:teamsSpawner_vehicles", "inventory"));
 		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.spawner), new String[] {"flansmod:teamsSpawner_items", "flansmod:teamsSpawner_players", "flansmod:teamsSpawner_vehicles"});
 
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.flag, 0, new ModelResourceLocation("flansmod:flagpole", "inventory"));
+		//Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.flag, 0, new ModelResourceLocation("flansmod:flagpole", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.rainbowPaintcan, 0, new ModelResourceLocation("flansmod:rainbowPaintcan", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.paintjobTable), 0, new ModelResourceLocation("flansmod:paintjobTable", "inventory"));
 		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.paintjobTable), new String[] {"flansmod:paintjobTable"});
@@ -219,16 +216,16 @@ public class ClientProxy extends CommonProxy
 				
 				} catch (Exception e)
 				{
-					FlansMod.log("Failed to load images for content pack : " + file.getName());
+					Util.log("Failed to load images for content pack : " + file.getName());
 					e.printStackTrace();
 				}
 				// Add the directory to the content pack list
-				FlansMod.log("Loaded content pack : " + file.getName());
+				Util.log("Loaded content pack : " + file.getName());
 				contentPacks.add(file);
 			}
 		}
 			
-		FlansMod.log("Loaded textures and models.");
+		Util.log("Loaded textures and models.");
 		return contentPacks;
 	}
 	
@@ -242,8 +239,6 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, RenderPlane::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, RenderVehicle::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, RenderAAGun::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlagpole.class, RenderFlagpole::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlag.class, RenderFlag::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
 		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityMG.class, RenderMG::new);
@@ -288,10 +283,10 @@ public class ClientProxy extends CommonProxy
 
 	/** Adds the client side text message regarding mouse control mode switching */
 	@Override
-	public void changeControlMode(EntityPlayer player)
-	{
-		if(FlansModClient.flipControlMode())
+	public void changeControlMode(EntityPlayer player){
+		if(FlansModClient.flipControlMode()){
 			player.addChatComponentMessage(new TextComponentString("Mouse Control mode is now set to " + FlansModClient.controlModeMouse));
+		}
 	}
 	
 	/** Whether the player is in mouse control mode for planes. Now the default setting for planes, but it can be deactivated to look around while flying */
@@ -368,7 +363,7 @@ public class ClientProxy extends CommonProxy
 		}
 		catch(Exception e)
 		{
-			FlansMod.log("Failed to load model : " + shortName + " (" + s + ")");
+			Util.log("Failed to load model : " + shortName + " (" + s + ")");
 			e.printStackTrace();
 		}
 		return null;

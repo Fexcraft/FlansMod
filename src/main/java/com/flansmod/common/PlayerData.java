@@ -8,7 +8,7 @@ import com.flansmod.common.guns.EntityMG;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.raytracing.PlayerSnapshot;
 import com.flansmod.common.teams.PlayerClass;
-import com.flansmod.common.teams.Team;
+import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -106,10 +106,6 @@ public class PlayerData
 	public boolean out;
 	/** The player's vote for the next round from 1 ~ 5. 0 is not yet voted */
 	public int vote;
-	/** The team this player is currently on */
-	public Team team;
-	/** The team this player will switch to upon respawning */
-	public Team newTeam;
 	/** The class the player is currently using */
 	public PlayerClass playerClass;
 	/** The class the player will switch to upon respawning */
@@ -123,7 +119,7 @@ public class PlayerData
 	public PlayerData(UUID uuid)
 	{
 		uniqueId = uuid;
-		snapshots = new PlayerSnapshot[FlansMod.numPlayerSnapshots];
+		snapshots = new PlayerSnapshot[Config.numPlayerSnapshots];
 	}
 	
 	public void tick(EntityPlayer player)
@@ -180,7 +176,6 @@ public class PlayerData
 	public void resetScore() 
 	{
 		score = zombieScore = kills = deaths = 0;
-		team = newTeam = null;
 		playerClass = newPlayerClass = null;
 	}
 	
@@ -188,7 +183,7 @@ public class PlayerData
 	{
 		mountingGun = null;
 		isShootingRight = isShootingLeft = false;
-		snapshots = new PlayerSnapshot[FlansMod.numPlayerSnapshots];
+		snapshots = new PlayerSnapshot[Config.numPlayerSnapshots];
 	}
 
 	/*

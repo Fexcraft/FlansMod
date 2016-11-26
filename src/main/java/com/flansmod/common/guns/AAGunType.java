@@ -7,6 +7,7 @@ import com.flansmod.client.model.ModelAAGun;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.util.Util;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.item.ItemStack;
@@ -154,9 +155,10 @@ public class AAGunType extends InfoType
 			{
 				targetRange = Float.parseFloat(split[1]);
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
-			FlansMod.log("" + e);
+			Util.log("" + e);
 		}
 	}
 
@@ -182,15 +184,8 @@ public class AAGunType extends InfoType
 	}
 	
 	/** To be overriden by subtypes for model reloading */
-	public void reloadModel()
-	{
+	public void reloadModel(){
 		model = FlansMod.proxy.loadModel(modelString, shortName, ModelAAGun.class);
-	}
-	
-	@Override
-	public void addDungeonLoot() 
-	{
-		//Do not add AA guns to dungeon chests. That would be so op.
 	}
 
 	@Override

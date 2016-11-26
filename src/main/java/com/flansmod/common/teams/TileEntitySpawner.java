@@ -10,7 +10,6 @@ import com.flansmod.common.guns.ItemAAGun;
 
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -19,16 +18,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
-public class TileEntitySpawner extends TileEntity implements ITeamObject, ITickable
+public class TileEntitySpawner extends TileEntity implements ITickable
 {
 	public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 2);
 	
 	//Server side
 	public int spawnDelay = 1200;
 	public List<ItemStack> stacksToSpawn = new ArrayList<ItemStack>();
-	public List<EntityTeamItem> itemEntities = new ArrayList<EntityTeamItem>();
+	//public List<EntityTeamItem> itemEntities = new ArrayList<EntityTeamItem>();
 	public Entity spawnedEntity;
-	public ITeamBase base;
+	//public ITeamBase base;
 	private int baseID = -1;
 	private int dimension;
 	public int currentDelay;
@@ -44,15 +43,15 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 	
 	public TileEntitySpawner()
 	{
-		TeamsManager.getInstance().registerObject(this);
+		//TeamsManager.getInstance().registerObject(this);
 	}
 	
 	@Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
         NBTTagCompound tags = new NBTTagCompound();
-        tags.setByte("TeamID", base == null ? (byte)0 : (byte)base.getOwnerID());
-        tags.setString("Map", base == null || base.getMap() == null ? "" : base.getMap().shortName);
+        //tags.setByte("TeamID", base == null ? (byte)0 : (byte)base.getOwnerID());
+        //tags.setString("Map", base == null || base.getMap() == null ? "" : base.getMap().shortName);
         return new SPacketUpdateTileEntity(pos, 1, tags);
     }
     
@@ -70,7 +69,7 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
     		return;
     	//updateChunkLoading();
 		//If the base was loaded after the spawner, check to see if the base has now been loaded
-		if(baseID >= 0 && base == null)
+		/*if(baseID >= 0 && base == null)
 		{
 			ITeamBase newBase = TeamsManager.getInstance().getBase(baseID);
 			if(newBase != null)
@@ -78,15 +77,14 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 				setBase(newBase);
 				newBase.addObject(this);
 			}
-		}
-		if(worldObj.getBlockState(pos).getBlock() != FlansMod.spawner)
-		{
-			destroy();
+		}*/
+		if(worldObj.getBlockState(pos).getBlock() != FlansMod.spawner){
+			//destroy();
 			return;
 		}
 		if(((Integer)worldObj.getBlockState(pos).getValue(TYPE)).intValue() == 1)
 			return;
-		for(int i = itemEntities.size() - 1; i >= 0; i--)
+		/*for(int i = itemEntities.size() - 1; i >= 0; i--)
 		{
 			if(itemEntities.get(i).isDead)
 				itemEntities.remove(i);
@@ -94,7 +92,7 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 		if(currentDelay > 0 && itemEntities.size() == 0)
 		{
 			currentDelay--;
-		}
+		}*/
 		if(currentDelay == 0)
 		{
 			currentDelay = spawnDelay;
@@ -122,8 +120,8 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 				}
 				else
 				{
-					EntityTeamItem itemEntity = new EntityTeamItem(this, i);
-					worldObj.spawnEntityInWorld(itemEntity);
+					//EntityTeamItem itemEntity = new EntityTeamItem(this, i);
+					//worldObj.spawnEntityInWorld(itemEntity);
 				}
 			}
 		}
@@ -146,14 +144,14 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 		return nbt;	
 	}
 	
-	@Override
+	/*@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
 		currentDelay = spawnDelay = nbt.getInteger("delay");
 		baseID = nbt.getInteger("Base");
 		dimension = nbt.getInteger("dim");
-		setBase(TeamsManager.getInstance().getBase(baseID));
+		//setBase(TeamsManager.getInstance().getBase(baseID));
 		if(base != null)
 			base.addObject(this);
 		for(int i = 0; i < nbt.getInteger("numStacks"); i++)
@@ -275,9 +273,9 @@ public class TileEntitySpawner extends TileEntity implements ITeamObject, ITicka
 	}
 */
 
-	@Override
+	/*@Override
 	public boolean forceChunkLoading() 
 	{
 		return false;
-	}
+	}*/
 }

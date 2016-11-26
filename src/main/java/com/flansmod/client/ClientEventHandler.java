@@ -3,7 +3,6 @@ package com.flansmod.client;
 import org.lwjgl.input.Keyboard;
 
 import com.flansmod.client.model.InstantBulletRenderer;
-import com.flansmod.client.model.RenderFlag;
 import com.flansmod.client.model.RenderGun;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.ItemGun;
@@ -68,7 +67,6 @@ public class ClientEventHandler
 			{
 		    	InstantBulletRenderer.UpdateAllTrails();
 				renderHooks.update();
-				RenderFlag.angle += 2F;
 				FlansModClient.tick();
 				
 				break;

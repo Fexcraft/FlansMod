@@ -3,7 +3,6 @@ package com.flansmod.common.network;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
@@ -14,6 +13,7 @@ import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
@@ -161,7 +161,7 @@ public class PacketShotData extends PacketBase
 			}
 			else
 			{
-				FlansMod.log("Only expect instant shot types on client side.");
+				Util.log("Only expect instant shot types on client side.");
 			}
 		}
 	}

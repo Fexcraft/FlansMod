@@ -7,15 +7,13 @@ import javax.annotation.Nullable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansModExplosion;
-import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.teams.ItemTeamArmour;
-import com.flansmod.common.teams.Team;
-import com.flansmod.common.teams.TeamsManager;
 import com.flansmod.common.types.InfoType;
+import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
@@ -24,7 +22,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -47,7 +44,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 	/** The entity that threw them */
 	public EntityLivingBase thrower;
 	/** This is to avoid players grenades teamkilling after they switch team */
-	public Team teamOfThrower;
+	//public Team teamOfThrower;
 	/** Yeah, I want my grenades to have fancy physics */
 	public RotatedAxes axes = new RotatedAxes();
 	public Vector3f angularVelocity = new Vector3f(0F, 0F, 0F);
@@ -77,10 +74,10 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 		type = g;
 		numUsesRemaining = type.numUses;
 		thrower = t;
-		if(thrower instanceof EntityPlayer && PlayerHandler.getPlayerData((EntityPlayer)thrower) != null)
+		/*if(thrower instanceof EntityPlayer && PlayerHandler.getPlayerData((EntityPlayer)thrower) != null)
 		{
 			teamOfThrower = PlayerHandler.getPlayerData((EntityPlayer)thrower).team;
-		}
+		}*/
 		setSize(g.hitBoxSize, g.hitBoxSize);
 		//Set the grenade to be facing the way the player is looking
 		axes.setAngles(t.rotationYaw + 90F, g.spinWhenThrown ? t.rotationPitch : 0F, 0F);
@@ -94,7 +91,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 		if(type.spinWhenThrown)
 			angularVelocity = new Vector3f(0F, 0F, 10F);
 		if(type.throwSound != null)
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.throwSound, true);
+			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.throwSound, true);
 	}
 	
 	@Override
@@ -115,16 +112,16 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 		{	
 			if(type.trailParticles)
 			{			
-				double dX = (posX - prevPosX) / 10;
+				/*double dX = (posX - prevPosX) / 10;
 				double dY = (posY - prevPosY) / 10;
 				double dZ = (posZ - prevPosZ) / 10;
 				for (int i = 0; i < 10; i++)
 				{
-					/*EntityFX particle = FlansModClient.getParticle(type.trailParticleType, worldObj, prevPosX + dX * i, prevPosY + dY * i, prevPosZ + dZ * i);
+					EntityFX particle = FlansModClient.getParticle(type.trailParticleType, worldObj, prevPosX + dX * i, prevPosY + dY * i, prevPosZ + dZ * i);
 					if(particle != null && Minecraft.getMinecraft().gameSettings.fancyGraphics)
-						particle.renderDistanceWeight = 100D;*///TODO
+						particle.renderDistanceWeight = 100D;//TODO
 					//worldObj.spawnEntityInWorld(particle);
-				}
+				}*/
 			}
 			
 
@@ -190,11 +187,11 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 					if(obj instanceof EntityLivingBase && getDistanceToEntity((Entity)obj) < type.livingProximityTrigger)
 					{
 						//If we are in a gametype and both thrower and triggerer are playing, check for friendly fire
-						if(TeamsManager.getInstance() != null && TeamsManager.getInstance().currentRound != null && obj instanceof EntityPlayerMP && thrower instanceof EntityPlayer)
+						/*if(TeamsManager.getInstance() != null && TeamsManager.getInstance().currentRound != null && obj instanceof EntityPlayerMP && thrower instanceof EntityPlayer)
 						{
 							if(!TeamsManager.getInstance().currentRound.gametype.playerAttacked((EntityPlayerMP)obj, new EntityDamageSourceGun(type.shortName, this, (EntityPlayer)thrower, type, false)))
 								continue;
-						}
+						}*/
 						if(type.damageToTriggerer > 0)
 							((EntityLivingBase)obj).attackEntityFrom(getGrenadeDamage(), type.damageToTriggerer);
 						detonate();
@@ -242,7 +239,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 					detonate();
 				
 				//If we hit glass and can break it, do so
-				else if(type.breaksGlass && mat == Material.GLASS && TeamsManager.canBreakGlass)
+				else if(type.breaksGlass && mat == Material.GLASS && Config.canBreakGlass)
 				{
 					worldObj.setBlockToAir(hit.getBlockPos());
 					//TODO FlansMod.proxy.playBlockBreakSound(hit.getBlockPos().getX(), hit.getBlockPos().getY(), hit.getBlockPos().getZ(), block);
@@ -389,7 +386,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 		detonated = true;
 		
 		//Play detonate sound
-		PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.detonateSound, true);
+		PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.detonateSound, true);
 		
 		//Explode
 		if(!worldObj.isRemote && type.explosionRadius > 0.1F)
@@ -397,7 +394,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 	        if((thrower instanceof EntityPlayer))
 	        	new FlansModExplosion(worldObj, this, (EntityPlayer)thrower, type, posX, posY, posZ, type.explosionRadius, type.fireRadius > 0, type.smokeRadius > 0, type.explosionBreaksBlocks);
 	        else 
-	        	worldObj.createExplosion(this, posX, posY, posZ, type.explosionRadius, TeamsManager.explosions && type.explosionBreaksBlocks);
+	        	worldObj.createExplosion(this, posX, posY, posZ, type.explosionRadius, Config.explosions && type.explosionBreaksBlocks);
 		}
 		
 		//Make fire

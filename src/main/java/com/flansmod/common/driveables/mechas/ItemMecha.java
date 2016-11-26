@@ -9,6 +9,7 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
+import com.flansmod.common.util.CTabs;
 
 import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.item.ItemUtil;
@@ -37,7 +38,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
-		setCreativeTab(FlansMod.tabFlanMechas);
+		setCreativeTab(CTabs.vehicles);
 		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 		ItemUtil.register(FlansMod.MODID, this);
 		ItemUtil.registerRender(this);
