@@ -163,7 +163,7 @@ public class RenderPlane extends Render implements IRenderFactory //implements I
 	public void renderWorld(RenderWorldLastEvent event)
 	{
 		//Get the world
-		World world = Minecraft.getMinecraft().theWorld;
+		World world = Minecraft.getMinecraft().world;
 		if(world == null)
 			return;
 

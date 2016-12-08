@@ -47,7 +47,7 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
     public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
     {
         Multimap multimap = super.getItemAttributeModifiers(equipmentSlot);
-        multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
+        multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
         return multimap;
     }
 	
@@ -64,7 +64,7 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
 	{
 		PlayerData data = PlayerHandler.getPlayerData(player, world.isRemote ? Side.CLIENT : Side.SERVER);
 		//If can throw grenade
@@ -76,13 +76,13 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 			EntityGrenade grenade = new EntityGrenade(world, type, player);
 			//Spawn the entity server side
 			if(!world.isRemote)
-				world.spawnEntityInWorld(grenade);
+				world.spawnEntity(grenade);
 			//If this can be remotely detonated, add it to the players detonate list
 			if(type.remote)
 				data.remoteExplosives.add(grenade);
 			//Consume an item
 			if(!player.capabilities.isCreativeMode)
-				stack.stackSize--;
+				player.getHeldItem(hand).shrink(1);;;
 			//Drop an item upon throwing if necessary
 			if(type.dropItemOnThrow != null)
 			{
@@ -94,10 +94,10 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 					itemName = itemName.split("\\.")[0];
 				}
 				ItemStack dropStack = InfoType.getRecipeElement(itemName, damage);
-				world.spawnEntityInWorld(new EntityItem(world, player.posX, player.posY, player.posZ, dropStack));
+				world.spawnEntity(new EntityItem(world, player.posX, player.posY, player.posZ, dropStack));
 			}
 		}
-		return new ActionResult(EnumActionResult.SUCCESS, stack);
+		return new ActionResult(EnumActionResult.SUCCESS, player.getHeldItem(hand));
 	}
 	
 	//TODO @Override
@@ -175,7 +175,7 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 			EntityLivingBase shooter)
 	{
 		EntityGrenade grenade = getGrenade(world, shooter);
-		world.spawnEntityInWorld(grenade);
+		world.spawnEntity(grenade);
 	}
 
 	@Override

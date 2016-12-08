@@ -139,12 +139,12 @@ public class FlansModExplosion extends Explosion
         
         this.affectedBlockPositions.addAll(hashset);
         float f3 = this.radius * 2.0F;
-        j = MathHelper.floor_double(this.x - (double)f3 - 1.0D);
-        k = MathHelper.floor_double(this.x + (double)f3 + 1.0D);
-        int j1 = MathHelper.floor_double(this.y - (double)f3 - 1.0D);
-        int l = MathHelper.floor_double(this.y + (double)f3 + 1.0D);
-        int k1 = MathHelper.floor_double(this.z - (double)f3 - 1.0D);
-        int i1 = MathHelper.floor_double(this.z + (double)f3 + 1.0D);
+        j = MathHelper.floor(this.x - (double)f3 - 1.0D);
+        k = MathHelper.floor(this.x + (double)f3 + 1.0D);
+        int j1 = MathHelper.floor(this.y - (double)f3 - 1.0D);
+        int l = MathHelper.floor(this.y + (double)f3 + 1.0D);
+        int k1 = MathHelper.floor(this.z - (double)f3 - 1.0D);
+        int i1 = MathHelper.floor(this.z + (double)f3 + 1.0D);
         List list = this.world.getEntitiesWithinAABBExcludingEntity(explosive, new AxisAlignedBB(j, j1, k1, k, l, i1));
         net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.world, this, list, f3);
         Vec3d Vec3d = new Vec3d(x, y, z);
@@ -162,7 +162,7 @@ public class FlansModExplosion extends Explosion
                     double d5 = entity.posX - x;
                     double d7 = entity.posY + (double)entity.getEyeHeight() - y;
                     double d9 = entity.posZ - z;
-                    double d13 = (double)MathHelper.sqrt_double(d5 * d5 + d7 * d7 + d9 * d9);
+                    double d13 = (double)MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
 
                     if (d13 != 0.0D)
                     {
@@ -225,7 +225,7 @@ public class FlansModExplosion extends Explosion
                     double d3 = d0 - this.x;
                     double d4 = d1 - this.y;
                     double d5 = d2 - this.z;
-                    double d6 = (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
+                    double d6 = (double)MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
                     d3 /= d6;
                     d4 /= d6;
                     d5 /= d6;

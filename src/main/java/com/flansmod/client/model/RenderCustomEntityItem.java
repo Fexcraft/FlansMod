@@ -115,7 +115,7 @@ public class RenderCustomEntityItem extends RenderEntityItem implements IRenderF
             }
 
             //renderer.renderItemEntity(entity,x,y,z, entityYaw, partialTicks);
-            renderer.renderPerspective(GROUND, null, itemstack, entity.worldObj);
+            renderer.renderPerspective(GROUND, null, itemstack, entity.world);
             GlStateManager.popMatrix();
         }
 

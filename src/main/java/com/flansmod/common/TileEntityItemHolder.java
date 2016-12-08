@@ -36,7 +36,7 @@ public class TileEntityItemHolder extends TileEntity implements IInventory//, IT
 	public ItemStack getStackInSlot(int index) { return getStack(); }
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) { if(getStack() != null) { getStack().stackSize -= count; if(getStack().stackSize <= 0) setStack(null); } return getStack(); }
+	public ItemStack decrStackSize(int index, int count) { if(getStack() != null) { getStack().shrink(count); if(getStack().getCount() <= 0) setStack(null); } return getStack(); }
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) { this.setStack(stack); }
@@ -45,7 +45,7 @@ public class TileEntityItemHolder extends TileEntity implements IInventory//, IT
 	public int getInventoryStackLimit() { return 64; }
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) { return true; }
+	public boolean isUsableByPlayer(EntityPlayer player) { return true; }
 
 	@Override
 	public void openInventory(EntityPlayer player) { }
@@ -86,7 +86,7 @@ public class TileEntityItemHolder extends TileEntity implements IInventory//, IT
 	{
 		super.readFromNBT(nbt);
 
-		setStack(ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("stack")));
+		setStack(new ItemStack(nbt.getCompoundTag("stack")));
 		type = ItemHolderType.getItemHolder(nbt.getString("type"));
 	}
 
@@ -127,4 +127,9 @@ public class TileEntityItemHolder extends TileEntity implements IInventory//, IT
 
 	@Override
 	public ItemStack removeStackFromSlot(int index){ return getStackInSlot(index); }
+
+	@Override
+	public boolean isEmpty(){
+		return stack == ItemStack.EMPTY || stack.isEmpty();
+	}
 }

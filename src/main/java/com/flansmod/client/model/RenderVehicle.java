@@ -240,7 +240,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 	public void renderWorld(RenderWorldLastEvent event)
 	{
 		//Get the world
-		World world = Minecraft.getMinecraft().theWorld;
+		World world = Minecraft.getMinecraft().world;
 		if(world == null)
 			return;
 

@@ -168,23 +168,23 @@ public class CommonProxy {
 				if(stackInSlot != null && stackInSlot.getItem() == recipeStack.getItem() && stackInSlot.getItemDamage() == recipeStack.getItemDamage())
 				{
 					//Work out the amount to take from the stack
-					int amountFound = Math.min(stackInSlot.stackSize, recipeStack.stackSize - totalAmountFound);
+					int amountFound = Math.min(stackInSlot.getCount(), recipeStack.getCount() - totalAmountFound);
 					//Take it
-					stackInSlot.stackSize -= amountFound;
+					stackInSlot.shrink(amountFound);
 					//Check for empty stacks
-					if(stackInSlot.stackSize <= 0)
+					if(stackInSlot.getCount() <= 0)
 						stackInSlot = null;
 					//Put the modified stack back in the inventory
 					player.inventory.setInventorySlotContents(n, stackInSlot);
 					//Increase the amount found counter
 					totalAmountFound += amountFound;
 					//If we have enough, stop looking
-					if(totalAmountFound == recipeStack.stackSize)
+					if(totalAmountFound == recipeStack.getCount())
 						break;
 				}
 			}
 			//If we didn't find enough, give the stack a red outline
-			if(totalAmountFound < recipeStack.stackSize)
+			if(totalAmountFound < recipeStack.getCount())
 			{
 				//For some reason, the player sent a craft packet, despite being unable to
 				canCraft = false;
@@ -218,7 +218,7 @@ public class CommonProxy {
 					//If we already have engines of this type, add these ones to the stack
 					if(engines.containsKey(partType))
 					{
-						engines.get(partType).stackSize += stackInSlot.stackSize;
+						engines.get(partType).grow(stackInSlot.getCount());
 					}
 					//Else, make this the first stack
 					else engines.put(partType, stackInSlot);
@@ -232,7 +232,7 @@ public class CommonProxy {
 		for(PartType part : engines.keySet())
 		{
 			//If this engine outperforms the currently selected best one and there are enough of them, swap
-			if(part.engineSpeed > bestEngineSpeed && engines.get(part).stackSize >= type.numEngines())
+			if(part.engineSpeed > bestEngineSpeed && engines.get(part).getCount() >= type.numEngines())
 			{
 				bestEngineSpeed = part.engineSpeed;
 				bestEngineStack = engines.get(part);
@@ -256,11 +256,11 @@ public class CommonProxy {
 			if(stackInSlot != null && stackInSlot.getItem() == bestEngineStack.getItem())
 			{
 				//Work out the amount to take from the stack
-				int amountFound = Math.min(stackInSlot.stackSize, type.numEngines() - numEnginesAcquired);
+				int amountFound = Math.min(stackInSlot.getCount(), type.numEngines() - numEnginesAcquired);
 				//Take it
-				stackInSlot.stackSize -= amountFound;
+				stackInSlot.shrink(amountFound);
 				//Check for empty stacks
-				if(stackInSlot.stackSize <= 0)
+				if(stackInSlot.getCount() <= 0)
 					stackInSlot = null;
 				//Put the modified stack back in the inventory
 				player.inventory.setInventorySlotContents(n, stackInSlot);
@@ -320,22 +320,22 @@ public class CommonProxy {
 				if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 				{
 					//Work out the amount to take from the stack
-					int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+					int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 					//Take it
-					stackInSlot.stackSize -= amountFound;
+					stackInSlot.shrink(amountFound);
 					//Check for empty stacks
-					if(stackInSlot.stackSize <= 0)
+					if(stackInSlot.getCount() <= 0)
 						stackInSlot = null;
 					//Put the modified stack back in the inventory
 					temporaryInventory.setInventorySlotContents(m, stackInSlot);
 					//Increase the amount found counter
 					totalAmountFound += amountFound;
 					//If we have enough, stop looking
-					if(totalAmountFound == stackNeeded.stackSize)
+					if(totalAmountFound == stackNeeded.getCount())
 						break;
 				}
 			}
-			if(totalAmountFound < stackNeeded.stackSize)
+			if(totalAmountFound < stackNeeded.getCount())
 				canRepair = false;
 		}
 		

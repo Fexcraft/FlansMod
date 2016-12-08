@@ -73,10 +73,11 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
     }
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
 	{
+		ItemStack itemstack = entityplayer.getHeldItem(hand);
 		if(type.foodness > 0)
-			super.onItemRightClick(itemstack, world, entityplayer, hand);
+			super.onItemRightClick(world, entityplayer, hand);
 		
 		else if(type.parachute)
 		{
@@ -84,7 +85,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 			if(!world.isRemote)
 			{
 				EntityParachute parachute = new EntityParachute(world, type, entityplayer);
-				world.spawnEntityInWorld(parachute);
+				world.spawnEntity(parachute);
 				entityplayer.startRiding(parachute);
 			}
 			
@@ -93,7 +94,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 				itemstack.setItemDamage(itemstack.getItemDamage() + 1);
 			//If the tool is damagable and is destroyed upon being used up, then destroy it
 			if(type.toolLife > 0 && type.destroyOnEmpty && itemstack.getItemDamage() == itemstack.getMaxDamage())
-				itemstack.stackSize--;
+				itemstack.shrink(1);;;
 			//Our work here is done. Let's be off
 			return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 		}
@@ -115,7 +116,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 					itemstack.setItemDamage(itemstack.getItemDamage() + 1);
 				//If the tool is damagable and is destroyed upon being used up, then destroy it
 				if(type.toolLife > 0 && type.destroyOnEmpty && itemstack.getItemDamage() == itemstack.getMaxDamage())
-					itemstack.stackSize--;
+					itemstack.shrink(1);
 				//Our work here is done. Let's be off
 				return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 			}
@@ -134,7 +135,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 	        
 	        if(world.isRemote && FlansMod.DEBUG)
 	        {
-	        	world.spawnEntityInWorld(new EntityDebugVector(world, new Vector3f(posVec), new Vector3f(posVec.subtract(lookVec)), 100));
+	        	world.spawnEntity(new EntityDebugVector(world, new Vector3f(posVec), new Vector3f(posVec.subtract(lookVec)), 100));
 	        }
 	        
 	        if(type.healDriveables)
@@ -164,7 +165,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 									itemstack.setItemDamage(itemstack.getItemDamage() + 1);
 								//If the tool is damagable and is destroyed upon being used up, then destroy it
 								if(type.toolLife > 0 && type.destroyOnEmpty && itemstack.getItemDamage() == itemstack.getMaxDamage())
-									itemstack.stackSize--;
+									itemstack.shrink(1);
 								//Our work here is done. Let's be off
 								return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 							}
@@ -210,7 +211,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 						itemstack.setItemDamage(itemstack.getItemDamage() + 1);
 					//If the tool is damagable and is destroyed upon being used up, then destroy it
 					if(type.toolLife > 0 && type.destroyOnEmpty && itemstack.getItemDamage() >= itemstack.getMaxDamage())
-						itemstack.stackSize--;
+						itemstack.shrink(1);
 				}
 			}
 		}

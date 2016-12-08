@@ -11,7 +11,7 @@ public class EntityCustomItem extends EntityItem
 {
 	public EntityCustomItem(EntityItem entity)
 	{
-		super(entity.worldObj, entity.posX, entity.posY, entity.posZ, entity.getEntityItem());
+		super(entity.world, entity.posX, entity.posY, entity.posZ, entity.getEntityItem());
 		this.motionX = entity.motionX;
 		this.motionY = entity.motionY;
 		this.motionZ = entity.motionZ;

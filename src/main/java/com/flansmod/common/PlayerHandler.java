@@ -58,7 +58,7 @@ public class PlayerHandler
 		
 	public void serverTick()
 	{
-		for(WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers)
+		for(WorldServer world : FMLCommonHandler.instance().getMinecraftServerInstance().worlds)
 		{
 			for(Object player : world.playerEntities)
 			{
@@ -69,9 +69,9 @@ public class PlayerHandler
 	
 	public void clientTick()
 	{
-		if(Minecraft.getMinecraft().theWorld != null)
+		if(Minecraft.getMinecraft().world != null)
 		{
-			for(Object player : Minecraft.getMinecraft().theWorld.playerEntities)
+			for(Object player : Minecraft.getMinecraft().world.playerEntities)
 			{
 				getPlayerData((EntityPlayer)player).tick((EntityPlayer)player);
 			}	
@@ -82,7 +82,7 @@ public class PlayerHandler
 	{
 		if(player == null)
 			return null;
-		return getPlayerData(player.getUniqueID(), player.worldObj.isRemote ? Side.CLIENT : Side.SERVER);
+		return getPlayerData(player.getUniqueID(), player.world.isRemote ? Side.CLIENT : Side.SERVER);
 	}
 	
 	public static PlayerData getPlayerData(UUID username)

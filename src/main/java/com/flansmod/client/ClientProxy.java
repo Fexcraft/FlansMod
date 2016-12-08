@@ -260,18 +260,18 @@ public class ClientProxy extends CommonProxy
 		{
 			FlansModClient.doneTutorial = true;
 			
-			player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.inventoryKey.getKeyCode()) + " to open the menu"));
-			player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode()) + " to get out"));
-			player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.controlSwitchKey.getKeyCode()) + " to switch controls"));
-			player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch VTOL mode"));
+			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.inventoryKey.getKeyCode()) + " to open the menu"));
+			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode()) + " to get out"));
+			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.controlSwitchKey.getKeyCode()) + " to switch controls"));
+			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch VTOL mode"));
 			if (entityType instanceof EntityPlane)
 			{
 				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasGear)
-					player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.gearKey.getKeyCode()) + " to switch the gear"));
+					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.gearKey.getKeyCode()) + " to switch the gear"));
 				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasDoor)
-					player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.doorKey.getKeyCode()) + " to switch the doors"));
+					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.doorKey.getKeyCode()) + " to switch the doors"));
 				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasWing)
-					player.addChatComponentMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch the wings"));
+					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch the wings"));
 			}
 		}
 	}
@@ -285,7 +285,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void changeControlMode(EntityPlayer player){
 		if(FlansModClient.flipControlMode()){
-			player.addChatComponentMessage(new TextComponentString("Mouse Control mode is now set to " + FlansModClient.controlModeMouse));
+			player.sendMessage(new TextComponentString("Mouse Control mode is now set to " + FlansModClient.controlModeMouse));
 		}
 	}
 	
@@ -381,7 +381,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public boolean isThePlayer(EntityPlayer player)
 	{
-		return player == FMLClientHandler.instance().getClient().thePlayer;
+		return player == FMLClientHandler.instance().getClient().player;
 	}
 	
 	/* Gun and armour box crafting methods */
@@ -389,7 +389,7 @@ public class ClientProxy extends CommonProxy
 	public void buyGun(GunBoxType type, InfoType gun)
 	{
 		FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, gun));
-		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().thePlayer);
+		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
 		data.shootTimeLeft = data.shootTimeRight = 10;
 	}
 	
@@ -397,7 +397,7 @@ public class ClientProxy extends CommonProxy
 	public void buyArmour(String shortName, int piece, ArmourBoxType box)
 	{
 		FlansMod.getPacketHandler().sendToServer(new PacketBuyArmour(box.shortName, shortName, piece));
-		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().thePlayer);
+		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
 		data.shootTimeLeft = data.shootTimeRight = 10;
 	}
 	
@@ -406,7 +406,7 @@ public class ClientProxy extends CommonProxy
 	{
 		//Craft it this side (so the inventory updates immediately) and then send a packet to the server so that it is crafted that side too
 		super.craftDriveable(player, type);
-		if(player.worldObj.isRemote)
+		if(player.world.isRemote)
 			FlansMod.getPacketHandler().sendToServer(new PacketCraftDriveable(type.shortName));
 	}
 	
@@ -415,7 +415,7 @@ public class ClientProxy extends CommonProxy
 	{
 		//Repair it this side (so the inventory updates immediately) and then send a packet to the server so that it is repaired that side too
 		super.repairDriveable(driver, driving, part);
-		if(driver.worldObj.isRemote)
+		if(driver.world.isRemote)
 			FlansMod.getPacketHandler().sendToServer(new PacketRepairDriveable(part.type));
 	}
 	

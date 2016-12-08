@@ -5,6 +5,7 @@ import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,7 +40,7 @@ public class EntityParachute extends Entity implements IEntityAdditionalSpawnDat
 	{
 		super.onUpdate();
 		
-		if(!worldObj.isRemote && (getPassengers() == null || getPassengers() != this))
+		if(!world.isRemote && (getPassengers() == null || getPassengers() != this))
 		{
 			setDead();
 		}
@@ -66,9 +67,9 @@ public class EntityParachute extends Entity implements IEntityAdditionalSpawnDat
 		motionX *= 0.8F;
 		motionZ *= 0.8F;
 		
-		moveEntity(motionX, motionY, motionZ);
+		move(MoverType.SELF, motionX, motionY, motionZ);
 		
-		if(onGround || worldObj.getBlockState(new BlockPos(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ))).getMaterial() == Material.WATER)
+		if(onGround || world.getBlockState(new BlockPos(MathHelper.floor(posX), MathHelper.floor(posY), MathHelper.floor(posZ))).getMaterial() == Material.WATER)
 		{
 			setDead();
 		}

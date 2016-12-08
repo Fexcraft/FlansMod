@@ -60,10 +60,10 @@ public class BlockGunBox extends Block implements IBlock
 					ItemStack stack = inventory.getStackInSlot(j);
 					if (stack != null && stack.getItem() == check.getItem() && stack.getItemDamage() == check.getItemDamage())
 					{
-						numMatchingStuff += stack.stackSize;
+						numMatchingStuff += stack.getCount();
 					}
 				}
-				if (numMatchingStuff < check.stackSize)
+				if (numMatchingStuff < check.getCount())
 				{
 					canBuy = false;
 				}
@@ -72,13 +72,13 @@ public class BlockGunBox extends Block implements IBlock
 			{
 				for (ItemStack remove : entry.requiredParts)
 				{
-					int amountLeft = remove.stackSize;
+					int amountLeft = remove.getCount();
 					for (int j = 0; j < inventory.getSizeInventory(); j++)
 					{
 						ItemStack stack = inventory.getStackInSlot(j);
 						if (amountLeft > 0 && stack != null && stack.getItem() == remove.getItem() && stack.getItemDamage() == remove.getItemDamage())
 						{
-							amountLeft -= inventory.decrStackSize(j, amountLeft).stackSize;
+							amountLeft -= inventory.decrStackSize(j, amountLeft).getCount();
 						}
 					}
 				}
@@ -113,7 +113,7 @@ public class BlockGunBox extends Block implements IBlock
 	}
 	
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
 		if(player.isSneaking())
 			return false;

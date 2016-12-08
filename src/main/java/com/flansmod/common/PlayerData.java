@@ -124,7 +124,7 @@ public class PlayerData
 	
 	public void tick(EntityPlayer player)
 	{
-		if(player.worldObj.isRemote)
+		if(player.world.isRemote)
 			clientTick(player);
 		if(shootTimeRight > 0)
 			shootTimeRight--;

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.lwjgl.input.Mouse;
 
 import com.flansmod.common.FlansMod;
@@ -101,9 +99,9 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		{
 			setDead();
 		}
-		if (worldObj.getBlockState(new BlockPos(blockX, blockY - 1, blockZ)).getBlock() == Blocks.AIR)
+		if (world.getBlockState(new BlockPos(blockX, blockY - 1, blockZ)).getBlock() == Blocks.AIR)
 		{
-			if(!worldObj.isRemote)
+			if(!world.isRemote)
 			{
 				setDead();
 			}
@@ -169,12 +167,12 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 				PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.reloadSound, false);
 			}
 		}
-		if (worldObj.isRemote && gunner != null && gunner == FMLClientHandler.instance().getClient().thePlayer && type.mode == EnumFireMode.FULLAUTO)
+		if (world.isRemote && gunner != null && gunner == FMLClientHandler.instance().getClient().player && type.mode == EnumFireMode.FULLAUTO)
 		{
 			//Send a packet!
 			checkForShooting();
 		}
-		if(!worldObj.isRemote && isShooting)
+		if(!world.isRemote && isShooting)
 		{
 			if(gunner == null || gunner.isDead)
 				isShooting = false;
@@ -188,7 +186,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			if (gunner != null && !gunner.capabilities.isCreativeMode)
 				ammo.damageItem(1, gunner);
 			shootDelay = type.shootDelay;
-			worldObj.spawnEntityInWorld(((ItemBullet)ammo.getItem()).getEntity(worldObj, 
+			world.spawnEntity(((ItemBullet)ammo.getItem()).getEntity(world, 
 					new Vec3d(blockX + 0.5D, blockY + type.pivotHeight, blockZ + 0.5D), 
 					(direction * 90F + rotationYaw), 
 					rotationPitch, 
@@ -249,9 +247,9 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 				if (gunner != null && !gunner.capabilities.isCreativeMode)
 					ammo.damageItem(1, (EntityLiving) player);
 				shootDelay = type.shootDelay;
-				if (!worldObj.isRemote)
+				if (!world.isRemote)
 				{
-					worldObj.spawnEntityInWorld(((ItemBullet)ammo.getItem()).getEntity(worldObj, 
+					world.spawnEntity(((ItemBullet)ammo.getItem()).getEntity(world, 
 							(EntityLivingBase) player, 
 							bullet.bulletSpread * type.bulletSpread, 
 							type.damage, 
@@ -279,7 +277,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	}
 
 	@Override
-	public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) //interact : change back when Forge updates
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand) //interact : change back when Forge updates
 	{
 		// Player right clicked on gun
 		// Mount gun
@@ -287,7 +285,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		{
 			return true;
 		}
-		if (!worldObj.isRemote)
+		if (!world.isRemote)
 		{
 			//If this is the player currently using this MG, dismount
 			if(gunner == player)
@@ -331,7 +329,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	{
 		if(player == null)
 			return;
-		Side side = worldObj.isRemote ? Side.CLIENT : Side.SERVER;
+		Side side = world.isRemote ? Side.CLIENT : Side.SERVER;
 		if(PlayerHandler.getPlayerData(player, side) == null)
 			return;
 		if(mounting)
@@ -363,12 +361,12 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	public void setDead()
 	{
 		// Drop gun
-		if(!worldObj.isRemote)
+		if(!world.isRemote)
 		{
 			if(Config.weaponDrops == 2)
 			{
-				EntityGunItem gunEntity = new EntityGunItem(worldObj, posX, posY, posZ, new ItemStack(type.getItem()), Arrays.asList(ammo));
-				worldObj.spawnEntityInWorld(gunEntity);
+				EntityGunItem gunEntity = new EntityGunItem(world, posX, posY, posZ, new ItemStack(type.getItem()), Arrays.asList(ammo));
+				world.spawnEntity(gunEntity);
 			}
 			else if(Config.weaponDrops == 1)
 			{
@@ -406,7 +404,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		blockY = nbttagcompound.getInteger("BlockY");
 		blockZ = nbttagcompound.getInteger("BlockZ");
 		direction = nbttagcompound.getByte("Dir");
-		ammo = ItemStack.loadItemStackFromNBT(nbttagcompound.getCompoundTag("Ammo"));
+		ammo = new ItemStack(nbttagcompound.getCompoundTag("Ammo"));
 	}
 
 	@Override

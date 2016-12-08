@@ -65,7 +65,7 @@ public class TileEntitySpawner extends TileEntity implements ITickable
 	@Override
 	public void update()
     {
-    	if(worldObj.isRemote)
+    	if(world.isRemote)
     		return;
     	//updateChunkLoading();
 		//If the base was loaded after the spawner, check to see if the base has now been loaded
@@ -78,11 +78,11 @@ public class TileEntitySpawner extends TileEntity implements ITickable
 				newBase.addObject(this);
 			}
 		}*/
-		if(worldObj.getBlockState(pos).getBlock() != FlansMod.spawner){
+		if(world.getBlockState(pos).getBlock() != FlansMod.spawner){
 			//destroy();
 			return;
 		}
-		if(((Integer)worldObj.getBlockState(pos).getValue(TYPE)).intValue() == 1)
+		if(((Integer)world.getBlockState(pos).getValue(TYPE)).intValue() == 1)
 			return;
 		/*for(int i = itemEntities.size() - 1; i >= 0; i--)
 		{
@@ -98,7 +98,7 @@ public class TileEntitySpawner extends TileEntity implements ITickable
 			currentDelay = spawnDelay;
 			for(int i = 0; i < stacksToSpawn.size(); i++)
 			{
-				if(((Integer)worldObj.getBlockState(pos).getValue(TYPE)).intValue() == 2)
+				if(((Integer)world.getBlockState(pos).getValue(TYPE)).intValue() == 2)
 				{
 					if(spawnedEntity != null && !spawnedEntity.isDead)
 					{
@@ -107,15 +107,15 @@ public class TileEntitySpawner extends TileEntity implements ITickable
 					ItemStack stack = stacksToSpawn.get(i);
 					if(stack != null && stack.getItem() instanceof ItemPlane)
 					{
-						spawnedEntity = ((ItemPlane)stack.getItem()).spawnPlane(worldObj, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, stack);
+						spawnedEntity = ((ItemPlane)stack.getItem()).spawnPlane(world, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, stack);
 					}					
 					if(stack != null && stack.getItem() instanceof ItemVehicle)
 					{
-						spawnedEntity = ((ItemVehicle)stack.getItem()).spawnVehicle(worldObj, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, stack);
+						spawnedEntity = ((ItemVehicle)stack.getItem()).spawnVehicle(world, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, stack);
 					}
 					if(stack != null && stack.getItem() instanceof ItemAAGun)
 					{
-						spawnedEntity = ((ItemAAGun)stack.getItem()).spawnAAGun(worldObj, pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F, stack);
+						spawnedEntity = ((ItemAAGun)stack.getItem()).spawnAAGun(world, pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F, stack);
 					}
 				}
 				else
@@ -133,7 +133,7 @@ public class TileEntitySpawner extends TileEntity implements ITickable
 		super.writeToNBT(nbt);
 		nbt.setInteger("delay", spawnDelay);
 		nbt.setInteger("Base", baseID);
-		nbt.setInteger("dim", worldObj.provider.getDimension());
+		nbt.setInteger("dim", world.provider.getDimension());
 		nbt.setInteger("numStacks", stacksToSpawn.size());
 		for(int i = 0; i < stacksToSpawn.size(); i++)
 		{

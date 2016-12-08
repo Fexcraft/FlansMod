@@ -2,10 +2,14 @@ package com.flansmod.common.network;
 
 import com.flansmod.common.network.handlers.DriveableControlPacketHandler;
 import com.flansmod.common.network.handlers.DriveableKeyPacketHandler;
+import com.flansmod.common.network.handlers.SeatDismountPacketHandler;
+import com.flansmod.common.network.handlers.SeatRemovalPacketHandler;
 import com.flansmod.common.network.handlers.SeatUpdatePacketHandler;
 import com.flansmod.common.network.handlers.VehicleControlPacketHandler;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketSeatDismount;
+import com.flansmod.common.network.packets.PacketSeatRemoval;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 
@@ -34,6 +38,8 @@ public class FPacketHandler {
 		instance.registerMessage(VehicleControlPacketHandler.Client.class,        PacketVehicleControl.class,      id++, Side.CLIENT);
 		instance.registerMessage(SeatUpdatePacketHandler.Server.class,            PacketSeatUpdate.class,          id++, Side.SERVER);
 		instance.registerMessage(SeatUpdatePacketHandler.Client.class,            PacketSeatUpdate.class,          id++, Side.CLIENT);
+		instance.registerMessage(SeatRemovalPacketHandler.Client.class,           PacketSeatRemoval.class,         id++, Side.CLIENT);
+		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
 		Print.log("[Flan's Mod Minus] Done initialising Packet Handler.");
 	}
 	

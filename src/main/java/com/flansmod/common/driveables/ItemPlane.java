@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -103,7 +104,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips)
 	{
-		NBTTagCompound tags = getTagCompound(stack, player.worldObj);
+		NBTTagCompound tags = getTagCompound(stack, player.world);
 		String engineName = tags.getString("Engine");
 		PartType part = PartType.getPart(engineName);
 		if(part != null)
@@ -111,8 +112,10 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	}
 	
 	@Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer, EnumHand hand)
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
     {
+		ItemStack itemstack = entityplayer.getHeldItemMainhand();
+		
     	//Raytracing
         float cosYaw = MathHelper.cos(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
         float sinYaw = MathHelper.sin(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
@@ -138,11 +141,11 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	            {
 	            	DriveableData data = getPlaneData(itemstack, world);
 	            	if(data != null)
-	            		world.spawnEntityInWorld(new EntityPlane(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, data));
+	            		world.spawnEntity(new EntityPlane(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, data));
 	            }
 				if(!entityplayer.capabilities.isCreativeMode)
 				{	
-					itemstack.stackSize--;
+					itemstack.shrink(1);
 				}
 			}
 		}
@@ -157,7 +160,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 			Entity entity = new EntityPlane(world, x, y, z, type, data);
 			if(!world.isRemote)
 			{
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 			}
 			return entity;
 		}
@@ -178,7 +181,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
     
     /** Make sure that creatively spawned planes have nbt data */
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, List list)
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
     {
     	ItemStack planeStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();

@@ -86,7 +86,7 @@ public class ClientEventHandler
 	@SubscribeEvent
 	public void CheckForOffHandWeaponSwitch(MouseEvent event)
 	{
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		if(player.getHeldItemMainhand() != null && player.getHeldItemMainhand().getItem() instanceof ItemGun)
 		{
 			if(((ItemGun)player.getHeldItemMainhand().getItem()).getInfoType().oneHanded &&

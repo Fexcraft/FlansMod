@@ -520,7 +520,7 @@ public class RenderGun implements RenderCustomItem
 						case RIFLE:
 						{
 							float thing = clipPosition * model.numBulletsInReloadAnimation;
-							int bulletNum = MathHelper.floor_float(thing);
+							int bulletNum = MathHelper.floor(thing);
 							float bulletProgress = thing - bulletNum;
 
 							GL11.glRotatef(bulletProgress * 15F, 0F, 1F, 0F);
@@ -532,7 +532,7 @@ public class RenderGun implements RenderCustomItem
 						case RIFLE_TOP:
 						{
 							float thing = clipPosition * model.numBulletsInReloadAnimation;
-							int bulletNum = MathHelper.floor_float(thing);
+							int bulletNum = MathHelper.floor(thing);
 							float bulletProgress = thing - bulletNum;
 
 							GL11.glRotatef(bulletProgress * 55F, 0F, 1F, 0F);
@@ -545,7 +545,7 @@ public class RenderGun implements RenderCustomItem
 						case STRIKER:
 						{
 							float thing = clipPosition * model.numBulletsInReloadAnimation;
-							int bulletNum = MathHelper.floor_float(thing);
+							int bulletNum = MathHelper.floor(thing);
 							float bulletProgress = thing - bulletNum;
 
 							GL11.glRotatef(bulletProgress * -30F, 0F, 0F, 1F);

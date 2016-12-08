@@ -1,7 +1,5 @@
 package com.flansmod.common.teams;
 
-import java.util.List;
-
 import com.flansmod.common.util.CTabs;
 
 import net.minecraft.block.BlockContainer;
@@ -20,6 +18,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -42,7 +41,7 @@ public class BlockSpawner extends BlockContainer
 	}
 
     @Override
-    public void getSubBlocks(Item item, CreativeTabs tab, List list)
+    public void getSubBlocks(Item item, CreativeTabs tab, NonNullList<ItemStack> list)
     {
     	if(tab == CTabs.other)
     	{
@@ -141,7 +140,7 @@ public class BlockSpawner extends BlockContainer
 	}*/
 	
     @Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
     	if(world.isRemote)
     		return true;
@@ -156,7 +155,7 @@ public class BlockSpawner extends BlockContainer
     		if(item == null || item.getItem() == null)
     		{
     			spawner.spawnDelay = (spawner.spawnDelay + 200) % 6000;
-    			player.addChatMessage(new TextComponentString("Set spawn delay to " + spawner.spawnDelay / 20));
+    			player.sendMessage(new TextComponentString("Set spawn delay to " + spawner.spawnDelay / 20));
     		}
     		/*else if(!(item.getItem() instanceof ItemOpStick))
     		{

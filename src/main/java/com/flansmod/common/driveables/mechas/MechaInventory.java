@@ -39,7 +39,7 @@ public class MechaInventory implements IInventory
 			return;
 		for(EnumMechaSlotType type : EnumMechaSlotType.values())
 		{
-			stacks.put(type, ItemStack.loadItemStackFromNBT(tags.getCompoundTag(type.toString())));
+			stacks.put(type, new ItemStack(tags.getCompoundTag(type.toString())));
 		}
 	}
 	
@@ -80,11 +80,11 @@ public class MechaInventory implements IInventory
 		if(slot == null)
 			return null;
 		
-		int numToTake = Math.min(j, slot.stackSize);		
+		int numToTake = Math.min(j, slot.getCount());		
 		ItemStack returnStack = slot.copy();
-		returnStack.stackSize = numToTake;
-		slot.stackSize -= numToTake;
-		if(slot.stackSize <= 0)
+		returnStack.setCount(numToTake);
+		slot.shrink(numToTake);
+		if(slot.getCount() <= 0)
 			slot = null;
 		
 		setInventorySlotContents(i, slot);
@@ -124,7 +124,7 @@ public class MechaInventory implements IInventory
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) 
+	public boolean isUsableByPlayer(EntityPlayer entityplayer) 
 	{
 		return mecha != null && entityplayer.getDistanceToEntity(mecha) <= 10D;
 	}
@@ -195,5 +195,10 @@ public class MechaInventory implements IInventory
 	public void clear() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean isEmpty(){
+		return stacks.isEmpty();
 	}
 }

@@ -86,7 +86,7 @@ public class KeyInputHandler
 		if(FMLClientHandler.instance().isGUIOpen(GuiChat.class) || mc.currentScreen != null)
 			return;
 		
-		EntityPlayer player = mc.thePlayer;
+		EntityPlayer player = mc.player;
 		Entity ridingEntity = player.getRidingEntity();
 		
 		//Handle universal keys

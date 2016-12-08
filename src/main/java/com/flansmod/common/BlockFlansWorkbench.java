@@ -1,7 +1,5 @@
 package com.flansmod.common;
 
-import java.util.List;
-
 import com.flansmod.common.util.CTabs;
 
 import net.minecraft.block.Block;
@@ -16,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -32,7 +31,7 @@ public class BlockFlansWorkbench extends Block{
     }
     
     @Override
-    public void getSubBlocks(Item item, CreativeTabs tab, List par3List)
+    public void getSubBlocks(Item item, CreativeTabs tab, NonNullList<ItemStack> par3List)
     {
     	if(tab == CTabs.vehicles)
     		par3List.add(new ItemStack(item, 1, 0));
@@ -43,12 +42,12 @@ public class BlockFlansWorkbench extends Block{
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityplayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
     	switch(((Integer)world.getBlockState(pos).getValue(TYPE)).intValue())
     	{
-    	case 0 : if(world.isRemote) entityplayer.openGui(FlansMod.INSTANCE, 0, world, pos.getX(), pos.getY(), pos.getZ()); break;
-    	case 1 : if(!world.isRemote) entityplayer.openGui(FlansMod.INSTANCE, 2, world, pos.getX(), pos.getY(), pos.getZ()); break; 
+    	case 0 : if(world.isRemote) player.openGui(FlansMod.INSTANCE, 0, world, pos.getX(), pos.getY(), pos.getZ()); break;
+    	case 1 : if(!world.isRemote) player.openGui(FlansMod.INSTANCE, 2, world, pos.getX(), pos.getY(), pos.getZ()); break; 
     	}    	
 		return true;
     }

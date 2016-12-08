@@ -67,6 +67,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -157,7 +158,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		NBTTagList ammoTagsList = gun.getTagCompound().getTagList("ammo", Constants.NBT.TAG_COMPOUND);
 		//Get the specific ammo tags required
 		NBTTagCompound ammoTags = ammoTagsList.getCompoundTagAt(id);
-		return ItemStack.loadItemStackFromNBT(ammoTags);
+		return new ItemStack(ammoTags);
 	}
 	
 	/** Set the bullet item stack stored in the gun's NBT data (the loaded magazine / bullets) */
@@ -209,8 +210,9 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	
 	/** Deployable guns only */
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
 	{
+		ItemStack itemstack = entityplayer.getHeldItemMainhand();
 		if (type.deployable)
 		{
 	    	//Raytracing
@@ -228,7 +230,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			{
 				if (look.sideHit == EnumFacing.UP)
 				{
-					int playerDir = MathHelper.floor_double(((entityplayer.rotationYaw * 4F) / 360F) + 0.5D) & 3;
+					int playerDir = MathHelper.floor(((entityplayer.rotationYaw * 4F) / 360F) + 0.5D) & 3;
 					int i = look.getBlockPos().getX();
 					int j = look.getBlockPos().getY();
 					int k = look.getBlockPos().getZ();
@@ -252,11 +254,11 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 								{
 									mg.ammo = getBulletItemStack(itemstack, 0);
 								}
-								world.spawnEntityInWorld(mg);
+								world.spawnEntity(mg);
 								
 							}
 							if (!entityplayer.capabilities.isCreativeMode)
-								itemstack.stackSize = 0;
+								itemstack.setCount(0);
 						}
 					}
 				}
@@ -471,7 +473,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 							
 							if(FlansMod.DEBUG)
 							{
-								world.spawnEntityInWorld(new EntityDebugDot(world, gunOrigin, 100, 1.0f, 1.0f, 1.0f));
+								world.spawnEntity(new EntityDebugDot(world, gunOrigin, 100, 1.0f, 1.0f, 1.0f));
 							}
 	
 							ShotData shotData = new InstantShotData(hand, gunSlot, type, shootableType, player, gunOrigin, firstHit, hitPos, type.getDamage(gunstack), i < type.numBullets * shootableType.numBullets - 1);
@@ -515,7 +517,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			
 			if(FlansMod.DEBUG)
 			{
-				world.spawnEntityInWorld(new EntityDebugDot(world, gunOrigin, 100, 1.0f, 1.0f, 1.0f));
+				world.spawnEntity(new EntityDebugDot(world, gunOrigin, 100, 1.0f, 1.0f, 1.0f));
 			}
 			
 			// Now send shooting data to the server
@@ -694,7 +696,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			
 			if(FlansMod.DEBUG)
 			{
-				world.spawnEntityInWorld(new EntityDebugVector(world, origin, Vector3f.sub(hit, origin, null), 100, 0.5f, 0.5f, 1.0f));
+				world.spawnEntity(new EntityDebugVector(world, origin, Vector3f.sub(hit, origin, null), 100, 0.5f, 0.5f, 1.0f));
 			}
 			
 			InstantBulletRenderer.AddTrail(new InstantShotTrail(origin, hit, (BulletType)shotType));
@@ -731,7 +733,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			
 			if(world.isRemote)
 			{
-				if(shooter == Minecraft.getMinecraft().thePlayer)
+				if(shooter == Minecraft.getMinecraft().player)
 				{
 					if(hitData instanceof EntityHit || hitData instanceof PlayerBulletHit || hitData instanceof DriveableHit)
 					{
@@ -893,13 +895,13 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 							
 					//Load the new magazine
 					ItemStack stackToLoad = newBulletStack.copy();
-					stackToLoad.stackSize = 1;
+					stackToLoad.setCount(1);
 					setBulletItemStack(gunstack, stackToLoad, i);					
 					
 					//Remove the magazine from the inventory
 					if(!isCreative)
-						newBulletStack.stackSize--;
-					if(newBulletStack.stackSize <= 0)
+						newBulletStack.shrink(1);
+					if(newBulletStack.getCount() <= 0)
 						newBulletStack = null;
 					inventory.setInventorySlotContents(bestSlot, newBulletStack);
 								
@@ -1245,7 +1247,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		if(type.secondaryFunction == EnumSecondaryFunction.CUSTOM_MELEE)
 		{
 			//Do animation
-			if(entityLiving.worldObj.isRemote)
+			if(entityLiving.world.isRemote)
 			{
 				GunAnimations animations = FlansModClient.getGunAnimations(entityLiving, FlansUtils.getSideWithItem(entityLiving, stack));
 				animations.doMelee(type.meleeTime);
@@ -1287,7 +1289,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 	// ----------------- Paintjobs -----------------
 	
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, List list){
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
     	GunType type = ((ItemGun)item).type;
     	if(Config.addAllPaintjobsToCreative){
     		for(Paintjob paintjob : type.paintjobs){
@@ -1347,11 +1349,11 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		}
 		Multimap<String, AttributeModifier> map = super.getAttributeModifiers(slot, stack);
 		if(type.knockbackModifier != 0F)
-			map.put(SharedMonsterAttributes.KNOCKBACK_RESISTANCE.getAttributeUnlocalizedName(), new AttributeModifier("KnockbackResist", type.knockbackModifier, 0));
+			map.put(SharedMonsterAttributes.KNOCKBACK_RESISTANCE.getName(), new AttributeModifier("KnockbackResist", type.knockbackModifier, 0));
 		if(type.moveSpeedModifier != 1F)
-			map.put(SharedMonsterAttributes.MOVEMENT_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "MovementSpeed", type.moveSpeedModifier - 1F, 2));
+			map.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "MovementSpeed", type.moveSpeedModifier - 1F, 2));
 		if(type.secondaryFunction == EnumSecondaryFunction.MELEE)
-			map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
+			map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
 		return map;
 	}
 

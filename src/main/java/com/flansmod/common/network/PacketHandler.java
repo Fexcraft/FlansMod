@@ -226,7 +226,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 	{
 		channels = NetworkRegistry.INSTANCE.newChannel("FlansMod", this);
 		
-		registerPacket(PacketAAGunAngles.class);
+		/*registerPacket(PacketAAGunAngles.class);
 		registerPacket(PacketBaseEdit.class);
 		registerPacket(PacketBreakSound.class);
 		registerPacket(PacketBuyArmour.class);
@@ -254,7 +254,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 		registerPacket(PacketSelectOffHandGun.class);	
 		registerPacket(PacketShotData.class);	
 		//registerPacket(PacketVehicleControl.class);
-		registerPacket(PacketRequestDebug.class);
+		registerPacket(PacketRequestDebug.class);*/
 	}
 
 	/** Post-Initialisation method called from FMLPostInitializationEvent in FlansMod 
@@ -283,7 +283,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 	@SideOnly(Side.CLIENT)
 	private EntityPlayer getClientPlayer() 
 	{
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 	
 	/** Send a packet to all players */
@@ -353,7 +353,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
 	/** Send a packet to the server */
 	public void sendToServer(Packet packet)
 	{
-		Minecraft.getMinecraft().thePlayer.connection.sendPacket(packet);//.sendQueue.addToSendQueue(packet);
+		Minecraft.getMinecraft().player.connection.sendPacket(packet);//.sendQueue.addToSendQueue(packet);
 	}
 
 	/** Send a packet to all around a point without having to create one's own TargetPoint */

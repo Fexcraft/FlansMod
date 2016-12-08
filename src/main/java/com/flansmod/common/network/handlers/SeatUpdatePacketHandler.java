@@ -27,7 +27,7 @@ public class SeatUpdatePacketHandler {
 				public void run(){
 					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
 					EntityDriveable driveable = null;
-					for(Object obj : player.worldObj.loadedEntityList){
+					for(Object obj : player.world.loadedEntityList){
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							break;
@@ -51,10 +51,10 @@ public class SeatUpdatePacketHandler {
 			ls.addScheduledTask(new Runnable(){
 				@Override
 				public void run(){
-					EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+					EntityPlayer player = Minecraft.getMinecraft().player;
 					EntityDriveable driveable = null;
-					for(int i = 0; i < player.worldObj.loadedEntityList.size(); i++){
-						Object obj = player.worldObj.loadedEntityList.get(i);
+					for(int i = 0; i < player.world.loadedEntityList.size(); i++){
+						Object obj = player.world.loadedEntityList.get(i);
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							break;
@@ -62,7 +62,7 @@ public class SeatUpdatePacketHandler {
 					}
 					if(driveable != null){
 						//If this is the player who sent the packet in the first place, don't read it
-						if(driveable.seats[packet.seatId] == null || driveable.seats[packet.seatId].getPassenger() == player){
+						if(driveable.seats[packet.seatId] == null || driveable.seats[packet.seatId].getControllingPassenger() == player){
 							return;
 						}
 						driveable.seats[packet.seatId].prevLooking = driveable.seats[packet.seatId].looking.clone();

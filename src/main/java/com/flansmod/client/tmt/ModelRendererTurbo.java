@@ -835,9 +835,9 @@ public class ModelRendererTurbo extends ModelRenderer
 	 */
 	public void addBox(float x, float y, float z, float w, float h, float d)
 	{
-		int rw = MathHelper.ceiling_float_int(w);
-		int rh = MathHelper.ceiling_float_int(h);
-		int rd = MathHelper.ceiling_float_int(d);
+		int rw = MathHelper.ceil(w);
+		int rh = MathHelper.ceil(h);
+		int rd = MathHelper.ceil(d);
 		w -= rw;
 		h -= rh;
 		d -= rd;

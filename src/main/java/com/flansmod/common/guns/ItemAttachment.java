@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -57,7 +58,7 @@ public class ItemAttachment extends Item implements IPaintableItem<AttachmentTyp
 	// ----------------- Paintjobs -----------------
 	
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, List list)
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
     {
     	PaintableType type = ((IPaintableItem)item).getInfoType();
     	if(Config.addAllPaintjobsToCreative){

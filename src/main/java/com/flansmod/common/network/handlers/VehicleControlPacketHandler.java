@@ -25,8 +25,8 @@ public class VehicleControlPacketHandler {
 				public void run(){
 					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
 					EntityDriveable driveable = null;
-					for(int i = 0; i < player.worldObj.loadedEntityList.size(); i++){
-						Object obj = player.worldObj.loadedEntityList.get(i);
+					for(int i = 0; i < player.world.loadedEntityList.size(); i++){
+						Object obj = player.world.loadedEntityList.get(i);
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							break;
@@ -50,16 +50,16 @@ public class VehicleControlPacketHandler {
 			ls.addScheduledTask(new Runnable(){
 				@Override
 				public void run(){
-					EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-					if(player == null || player.worldObj == null){
+					EntityPlayer player = Minecraft.getMinecraft().player;
+					if(player == null || player.world == null){
 						return;
 					}
 					EntityDriveable driveable = null;
-					for(Object obj : player.worldObj.loadedEntityList){
+					for(Object obj : player.world.loadedEntityList){
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							driveable.driveableData.fuelInTank = packet.fuelInTank;
-							if(driveable.seats[0] != null && driveable.seats[0].getPassenger() == player){
+							if(driveable.seats[0] != null && driveable.seats[0].getControllingPassenger() == player){
 								return;
 							}
 							break;

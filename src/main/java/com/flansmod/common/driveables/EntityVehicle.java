@@ -1,7 +1,5 @@
 package com.flansmod.common.driveables;
 
-import javax.annotation.Nullable;
-
 import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.PacketPlaySound;
@@ -16,6 +14,7 @@ import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.cls.MathHelper;
 import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -115,11 +114,11 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	}
 			
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand)
+	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand)
 	{
 		if(isDead)
 			return false;
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			return false;
 		
 		//If they are using a repair tool, don't put them in
@@ -131,7 +130,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Check each seat in order to see if the player can sit in it
 		for(int i = 0; i <= type.numPassengers; i++)
 		{
-			if(seats[i].processInitialInteract(entityplayer, stack, hand))//.interactFirst(entityplayer))
+			if(seats[i].processInitialInteract(entityplayer, hand))//.interactFirst(entityplayer))
 			{
 				if(i == 0)
 				{
@@ -149,7 +148,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		try{
 			VehicleType type = getVehicleType();
 			//Send keys which require server side updates to the server
-			if(worldObj.isRemote && (key == 6 || key == 8 || key == 9)){
+			if(world.isRemote && (key == 6 || key == 8 || key == 9)){
 				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 				return true;
 			}
@@ -196,15 +195,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				}
 				case 6 : //Exit : Get out
 				{
-					seats[0].getPassenger().dismountRidingEntity();
-					//TODO seats[0].passenger = null;
+					seats[0].removeSeatPassenger();
 			  		return true;
 				}
 				case 7 : //Inventory
 				{
-					if(worldObj.isRemote)
+					if(world.isRemote)
 					{
-						FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getPassenger(), worldObj, this);
+						FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getControllingPassenger(), world, this);
 					}
 					return true;
 				}
@@ -236,7 +234,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 					{
 						varDoor = !varDoor;
 						if(type.hasDoor)
-							player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
+							player.sendMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
 						toggleTimer = 10;
 						FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
 					}
@@ -285,14 +283,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		}
 
 		//Work out if this is the client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
+		boolean thePlayerIsDrivingThis = world.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger());
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && seats[0].getPassenger() != null){
+		if(!world.isRemote && seats[0].getControllingPassenger() != null){
 			ticksSinceUsed = 0;
 		}
-		if(!worldObj.isRemote && Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20){
+		if(!world.isRemote && Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20){
 			setDead();
 		}
 		
@@ -324,7 +322,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			wheelsYaw = -20;
 		
 		//Player is not driving this. Update its position from server update packets 
-		if(worldObj.isRemote && !thePlayerIsDrivingThis)
+		if(world.isRemote && !thePlayerIsDrivingThis)
 		{
 			//The driveable is currently moving towards its server position. Continue doing so.
 			if (serverPositionTransitionTicker > 0)
@@ -352,7 +350,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		
 		for(EntityWheel wheel : wheels)
 		{
-			if(wheel != null && worldObj != null)
+			if(wheel != null && world != null)
 			{
 				wheel.prevPosX = wheel.posX;
 				wheel.prevPosY = wheel.posY;
@@ -386,7 +384,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			
 			//Apply velocity
 			//If the player driving this is in creative, then we can thrust, no matter what
-			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
 			if(canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption * throttle)
 			{
@@ -431,12 +429,12 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				}
 			}
 			
-			if(type.floatOnWater && worldObj.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox()))
+			if(type.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox()))
 			{
 				wheel.motionY += type.buoyancy;
 			}
 
-			wheel.moveEntity(wheel.motionX, wheel.motionY, wheel.motionZ);
+			wheel.move(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
 			
 			//Pull wheels towards car
 			Vector3f targetWheelPos = axes.findLocalVectorGlobally(getVehicleType().wheelPositions[wheel.ID].position);
@@ -446,13 +444,13 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				
 			if(dPos.length() > 0.001F)
 			{
-				wheel.moveEntity(dPos.x, dPos.y, dPos.z);
+				wheel.move(MoverType.SELF, dPos.x, dPos.y, dPos.z);
 				dPos.scale(0.5F);
 				Vector3f.sub(amountToMoveCar, dPos, amountToMoveCar);
 			}
 		}
 		
-		moveEntity(amountToMoveCar.x, amountToMoveCar.y, amountToMoveCar.z);
+		move(MoverType.SELF, amountToMoveCar.x, amountToMoveCar.y, amountToMoveCar.z);
 		
 		if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null)
 		{
@@ -520,7 +518,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		}
 		
 		//If this is the server, send position updates to everyone, having received them from the driver
-		if(!worldObj.isRemote && ticksExisted % 5 == 0)
+		if(!world.isRemote && ticksExisted % 5 == 0)
 		{
 			//FlansMod.getPacketHandler().sendToAllAround(new PacketVehicleControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
 			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
@@ -602,12 +600,12 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float i)
 	{
-		if(worldObj.isRemote || isDead)
+		if(world.isRemote || isDead)
 			return true;
 
 		VehicleType type = getVehicleType();
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack vehicleStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();
@@ -661,11 +659,12 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	}
 	
 	@Override
-	public void setDead()
-	{
+	public void setDead(){
 		super.setDead();
-		for(EntityWheel wheel : wheels)
-			if(wheel != null)
+		for(EntityWheel wheel : wheels){
+			if(wheel != null){
 				wheel.setDead();
+			}
+		}
 	}
 }

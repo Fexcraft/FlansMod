@@ -1,7 +1,5 @@
 package com.flansmod.common.guns;
 
-import javax.annotation.Nullable;
-
 import org.lwjgl.input.Mouse;
 
 import com.flansmod.common.FlansMod;
@@ -14,6 +12,7 @@ import com.flansmod.common.util.Util;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -182,7 +181,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		{
 			setBeenAttacked();
 			health -= i;
-			if (!worldObj.isRemote && health <= 0)
+			if (!world.isRemote && health <= 0)
 				setDead();
 		}
 		return true;
@@ -275,20 +274,20 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 			
 		// apply gravity
 
-		if (!onGround && !worldObj.isRemote)
+		if (!onGround && !world.isRemote)
 			motionY -= 9.8D / 400D;
 
 		// update motion
 		motionX *= 0.5;
 		motionZ *= 0.5;
-		moveEntity(motionX, motionY, motionZ);
+		move(MoverType.SELF, motionX, motionY, motionZ);
 		
-		if (worldObj.isRemote && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) == FMLClientHandler.instance().getClient().thePlayer)
+		if (world.isRemote && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) == FMLClientHandler.instance().getClient().player)
 		{
 			checkForShooting();
 		}
 
-		if (worldObj.isRemote)
+		if (world.isRemote)
 		{
 			if (sUpdateTime > 0)
 			{
@@ -345,7 +344,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		}
 
 		
-		if(!worldObj.isRemote && reloadTimer <= 0 && shootDelay <= 0)
+		if(!world.isRemote && reloadTimer <= 0 && shootDelay <= 0)
 		{
 			if(mouseHeld && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) instanceof EntityPlayer)
 			{
@@ -365,7 +364,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 								type.barrelY[currentBarrel] / 16D, 
 								type.barrelX[currentBarrel] / 16D + type.barrelZ[currentBarrel] / 16D).addVector(posX, posY, posZ);
 						
-						worldObj.spawnEntityInWorld(((ItemBullet)ammo[j].getItem()).getEntity(worldObj, 
+						world.spawnEntity(((ItemBullet)ammo[j].getItem()).getEntity(world, 
 								origin, gunYaw + 90F, gunPitch, player, type.accuracy, type.damage, type));
 						
 						PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.shootSound, true);
@@ -392,7 +391,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 								type.barrelY[currentBarrel] / 16D, 
 								type.barrelX[currentBarrel] / 16D + type.barrelZ[currentBarrel] / 16D).addVector(posX, posY + 1.5F, posZ);
 						
-						worldObj.spawnEntityInWorld(((ItemBullet)ammo[ammoSlot].getItem()).getEntity(worldObj, 
+						world.spawnEntity(((ItemBullet)ammo[ammoSlot].getItem()).getEntity(world, 
 								origin, gunYaw + 90F, gunPitch, placer, type.accuracy, type.damage, type));
 						PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.shootSound, true);
 					}
@@ -400,7 +399,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 				currentBarrel = (currentBarrel + 1) % type.numBarrels;
 			}
 		}
-		if(!worldObj.isRemote)
+		if(!world.isRemote)
 		{
 			FlansMod.getPacketHandler().sendToAllAround(new PacketAAGunAngles(this), posX, posY, posZ, 50F, dimension);
 		}
@@ -412,11 +411,11 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 	}
 	
 	public Entity getValidTarget(){
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			return null;
 		if(placer == null && placerName != null)
-			placer = worldObj.getPlayerEntityByName(placerName);
-		for(Object obj : worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(type.targetRange, type.targetRange, type.targetRange))){
+			placer = world.getPlayerEntityByName(placerName);
+		for(Object obj : world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(type.targetRange, type.targetRange, type.targetRange))){
 			Entity candidateEntity = (Entity)obj;
 			
 			if((type.targetMobs && candidateEntity instanceof EntityMob) || (type.targetPlayers && candidateEntity instanceof EntityPlayer)){
@@ -455,7 +454,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 	{
 		super.setDead();
 		// Drop gun
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			return;
 		dropItem(type.getItem(), 1);
 		// Drop ammo boxes
@@ -513,13 +512,13 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		rotationPitch = nbttagcompound.getFloat("RotationPitch");
 		for (int i = 0; i < type.numBarrels; i++)
 		{
-			ammo[i] = ItemStack.loadItemStackFromNBT(nbttagcompound.getCompoundTag("Ammo " + i));
+			ammo[i] = new ItemStack(nbttagcompound.getCompoundTag("Ammo " + i));
 		}
 		placerName = nbttagcompound.getString("Placer");
 	}
 
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand) //interact : change back when Forge updates
+	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand) //interact : change back when Forge updates
 	{
 		// Player right clicked on gun
 		// Mount gun
@@ -527,7 +526,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		{
 			return true;
 		}
-		if (!worldObj.isRemote)
+		if (!world.isRemote)
 		{
 			if (EntUtil.getPassengerOf(this) == entityplayer)
 			{
@@ -544,7 +543,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 					if (slot >= 0)
 					{
 						ammo[i] = entityplayer.inventory.getStackInSlot(slot).copy();
-						ammo[i].stackSize = 1;
+						ammo[i].setCount(1);
 						if(!entityplayer.capabilities.isCreativeMode)
 							entityplayer.inventory.decrStackSize(slot, 1);
 						reloadTimer = type.reloadTime;

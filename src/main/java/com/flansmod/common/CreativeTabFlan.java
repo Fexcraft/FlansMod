@@ -6,7 +6,6 @@ import com.flansmod.common.util.Ticker;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CreativeTabFlan extends CreativeTabs
@@ -22,7 +21,7 @@ public class CreativeTabFlan extends CreativeTabs
 	}
 
 	@Override
-	public Item getTabIconItem(){
+	public ItemStack getTabIconItem(){
 		return null;
 	}
 	

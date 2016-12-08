@@ -21,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -51,7 +52,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 		{
 			Collections.addAll(lines, type.description.split("_"));
 		}
-		NBTTagCompound tags = getTagCompound(stack, player.worldObj);
+		NBTTagCompound tags = getTagCompound(stack, player.world);
 		String engineName = tags.getString("Engine");
 		PartType part = PartType.getPart(engineName);
 		if(part != null)
@@ -81,8 +82,10 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	}
 	
 	@Override
-	public ActionResult onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer, EnumHand hand)
+	public ActionResult onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
     {
+		ItemStack itemstack = entityplayer.getHeldItemMainhand();
+		
     	//Raytracing
         float cosYaw = MathHelper.cos(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
         float sinYaw = MathHelper.sin(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
@@ -103,11 +106,11 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
         	BlockPos pos = movingobjectposition.getBlockPos();
             if(!world.isRemote)
             {
-				world.spawnEntityInWorld(new EntityMecha(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.5F + type.yOffset, (double)pos.getZ() + 0.5F, entityplayer, type, getData(itemstack, world), getTagCompound(itemstack, world)));
+				world.spawnEntity(new EntityMecha(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.5F + type.yOffset, (double)pos.getZ() + 0.5F, entityplayer, type, getData(itemstack, world), getTagCompound(itemstack, world)));
             }
 			if(!entityplayer.capabilities.isCreativeMode)
 			{	
-				itemstack.stackSize--;
+				itemstack.shrink(1);
 			}
 		}
 		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
@@ -126,7 +129,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	}
 	
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, List list)
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
     {
     	ItemStack mechaStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();

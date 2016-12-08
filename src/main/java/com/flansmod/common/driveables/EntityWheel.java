@@ -58,9 +58,9 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
     {
 		if(vehicle == null || k <= 0) 
 			return;
-		int i = MathHelper.ceiling_float_int(k - 3F);
+		int i = MathHelper.ceil(k - 3F);
 		if(i > 0)
-			vehicle.attackPart(vehicle.getDriveableType().wheelPositions[ID].part, DamageSource.fall, i);
+			vehicle.attackPart(vehicle.getDriveableType().wheelPositions[ID].part, DamageSource.FALL, i);
 	}
 
 	@Override
@@ -89,11 +89,11 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
 		//prevPosZ = posZ;
 		
 		//If on the client and the vehicle parent has yet to be found, search for it
-		if(worldObj.isRemote && !foundVehicle)
+		if(world.isRemote && !foundVehicle)
 		{
-			if(!(worldObj.getEntityByID(vehicleID) instanceof EntityDriveable))
+			if(!(world.getEntityByID(vehicleID) instanceof EntityDriveable))
 				return;
-			vehicle = (EntityDriveable)worldObj.getEntityByID(vehicleID);
+			vehicle = (EntityDriveable)world.getEntityByID(vehicleID);
 			foundVehicle = true;
 			vehicle.wheels[ID] = this;
 		}	
@@ -102,7 +102,7 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
 			return;
 		
 		if(!addedToChunk)
-			worldObj.spawnEntityInWorld(this);
+			world.spawnEntity(this);
 		/*
 		//Update angles
 		rotationYaw = vehicle.rotationYaw;
@@ -177,8 +177,8 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
 	{
 		vehicleID = data.readInt();
 		ID = data.readInt();
-		if(worldObj.getEntityByID(vehicleID) instanceof EntityDriveable)
-			vehicle = (EntityDriveable)worldObj.getEntityByID(vehicleID);
+		if(world.getEntityByID(vehicleID) instanceof EntityDriveable)
+			vehicle = (EntityDriveable)world.getEntityByID(vehicleID);
 		if(vehicle != null)
 			setPosition(posX, posY, posZ);
 	}

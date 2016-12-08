@@ -121,7 +121,7 @@ public class ClientRenderHooks
 	{
 
 		//remove custom model if player is in first person.
-		Render playerRenderer = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(Minecraft.getMinecraft().thePlayer);
+		Render playerRenderer = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(Minecraft.getMinecraft().player);
 		if (Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && playerRenderer instanceof RenderPlayer)
 		{
 			//TODO first person model manipulation based on holdingType
@@ -167,7 +167,7 @@ public class ClientRenderHooks
 	        if(mc.gameSettings.thirdPersonView == 0 && !flag && !mc.gameSettings.hideGUI && mc.playerController != null && !mc.playerController.isSpectator())
 	        {
 	        	renderer.enableLightmap();
-				EnumHandSide mainSide = FlansUtils.getSideForHand(EnumHand.MAIN_HAND, mc.thePlayer);
+				EnumHandSide mainSide = FlansUtils.getSideForHand(EnumHand.MAIN_HAND, mc.player);
 				if (hasGunMainHand)
 				{
 					renderItemInFirstPerson(itemToRenderMainHand, itemRenderer,  partialTicks, mainSide, EnumHand.MAIN_HAND);
@@ -199,7 +199,7 @@ public class ClientRenderHooks
 		float progressMovement = hand == EnumHand.MAIN_HAND ? 1.0F - (prevEquippedProgressMainHand + (equippedProgressMainHand - prevEquippedProgressMainHand) * partialTicks)
 				: 1.0F - (prevEquippedProgressOffHand + (equippedProgressOffHand - prevEquippedProgressOffHand) * partialTicks);
 
-		EntityPlayerSP entityplayersp = this.mc.thePlayer;
+		EntityPlayerSP entityplayersp = this.mc.player;
         float swingProgress = 0; //entityplayersp.getSwingProgress(partialTicks);
         float pitch = entityplayersp.prevRotationPitch + (entityplayersp.rotationPitch - entityplayersp.prevRotationPitch) * partialTicks;
         float yaw = entityplayersp.prevRotationYaw + (entityplayersp.rotationYaw - entityplayersp.prevRotationYaw) * partialTicks;
@@ -213,7 +213,7 @@ public class ClientRenderHooks
         GlStateManager.popMatrix();
         
         //Do lighting
-        int i = this.mc.theWorld.getCombinedLight(new BlockPos(entityplayersp.posX, entityplayersp.posY + (double)entityplayersp.getEyeHeight(), entityplayersp.posZ), 0);
+        int i = this.mc.world.getCombinedLight(new BlockPos(entityplayersp.posX, entityplayersp.posY + (double)entityplayersp.getEyeHeight(), entityplayersp.posZ), 0);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)(i & 65535), (float)(i >> 16));
         
         //Do hand rotations
@@ -227,8 +227,8 @@ public class ClientRenderHooks
 
         //Do vanilla weapon swing
 
-		float f7 = -0.4F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
-        float f8 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI * 2.0F);
+		float f7 = -0.4F * MathHelper.sin(MathHelper.sqrt(swingProgress) * (float)Math.PI);
+        float f8 = 0.2F * MathHelper.sin(MathHelper.sqrt(swingProgress) * (float)Math.PI * 2.0F);
         float f9 = -0.2F * MathHelper.sin(swingProgress * (float)Math.PI);
         GlStateManager.translate(f7, f8, f9);
         
@@ -239,7 +239,7 @@ public class ClientRenderHooks
 
 		GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
         float f10 = MathHelper.sin(swingProgress * swingProgress * (float)Math.PI);
-        float f11 = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
+        float f11 = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float)Math.PI);
         GlStateManager.rotate(f10 * -20.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f11 * -20.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(f11 * -80.0F, 1.0F, 0.0F, 0.0F);
@@ -247,7 +247,7 @@ public class ClientRenderHooks
 
 
 		TransformType transformType = side == EnumHandSide.LEFT ? FIRST_PERSON_LEFT_HAND : FIRST_PERSON_RIGHT_HAND;
-        ClientProxy.gunRenderer.renderItem(transformType, stack, mc.thePlayer);
+        ClientProxy.gunRenderer.renderItem(transformType, stack, mc.player);
 
         GlStateManager.popMatrix();
         GlStateManager.disableRescaleNormal();
@@ -310,7 +310,7 @@ public class ClientRenderHooks
             f1 /= (1.0F - 500.0F / (f2 + 500.0F)) * 2.0F + 1.0F;
         }
 
-        IBlockState block = ActiveRenderInfo.getBlockStateAtEntityViewpoint(this.mc.theWorld, entity, partialTicks);
+        IBlockState block = ActiveRenderInfo.getBlockStateAtEntityViewpoint(this.mc.world, entity, partialTicks);
 
         if (block.getMaterial() == Material.WATER)
             f1 = f1 * 60.0F / 70.0F;
@@ -341,14 +341,14 @@ public class ClientRenderHooks
         fovModifierPrev = this.fovModifier;
         this.fovModifier += (fovModifier - this.fovModifier) * 0.5F;
 		//Limit FOV modifier to a certain range
-		this.fovModifier = MathHelper.clamp_float(fovModifier,0.1F, 1.5F);
+		this.fovModifier = MathHelper.clamp(fovModifier,0.1F, 1.5F);
 
         //And update the itemToRender, for item switching
         
         prevEquippedProgressMainHand = equippedProgressMainHand;
 		prevEquippedProgressOffHand = equippedProgressOffHand;
 
-		EntityPlayerSP thePlayer = mc.thePlayer;
+		EntityPlayerSP thePlayer = mc.player;
         if(thePlayer != null)
         {
         	//MainHand
@@ -378,7 +378,7 @@ public class ClientRenderHooks
 
 	        float maxChange = 0.4F;
 	        float targetProgress = equippedGun ? 0.0F : 1.0F;
-	        float difference = MathHelper.clamp_float(targetProgress - equippedProgressMainHand, -maxChange, maxChange);
+	        float difference = MathHelper.clamp(targetProgress - equippedProgressMainHand, -maxChange, maxChange);
 	        equippedProgressMainHand += difference;
 	
 	        if(equippedProgressMainHand < 0.1F)
@@ -415,7 +415,7 @@ public class ClientRenderHooks
 
 			maxChange = 0.4F;
 			targetProgress = equippedGun ? 0.0F : 1.0F;
-			difference = MathHelper.clamp_float(targetProgress - equippedProgressOffHand, -maxChange, maxChange);
+			difference = MathHelper.clamp(targetProgress - equippedProgressOffHand, -maxChange, maxChange);
 			equippedProgressOffHand += difference;
 
 			if(equippedProgressOffHand < 0.1F)
@@ -621,13 +621,13 @@ public class ClientRenderHooks
 
 	public void cameraSetup(CameraSetup event)
 	{
-		if(mc.thePlayer.getRidingEntity() instanceof IControllable)
+		if(mc.player.getRidingEntity() instanceof IControllable)
 		{
-			IControllable cont = (IControllable)mc.thePlayer.getRidingEntity();
+			IControllable cont = (IControllable)mc.player.getRidingEntity();
 			float roll = interpolateRotation(cont.getPrevPlayerRoll(), cont.getPlayerRoll(), (float)event.getRenderPartialTicks());
 			//If we are driving a vehicle with the roll component enabled, having the camera roll with the vehicle is disorientating at best, so we disable the roll component for these vehicles
-			if(((EntitySeat)mc.thePlayer.getRidingEntity()).driveable != null){
-			EntityDriveable ent = ((EntitySeat)mc.thePlayer.getRidingEntity()).driveable;
+			if(((EntitySeat)mc.player.getRidingEntity()).driveable != null){
+			EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;
 			
 			if(ent.getDriveableType().canRoll){
 				roll = 0F;
@@ -663,9 +663,9 @@ public class ClientRenderHooks
 			{
 				overlayTexture = FlansModClient.currentScope.getZoomOverlay();
 			}
-			else if(mc.thePlayer != null)
+			else if(mc.player != null)
 			{
-				ItemStack stack = mc.thePlayer.inventory.armorInventory[3];
+				ItemStack stack = mc.player.inventory.armorInventory.get(3);
 				if(stack != null && stack.getItem() instanceof ItemTeamArmour)
 				{
 					overlayTexture = ((ItemTeamArmour)stack.getItem()).type.overlay;
@@ -767,11 +767,11 @@ public class ClientRenderHooks
 		*/
 		if(!event.isCancelable() && event.getType() == ElementType.HOTBAR)
 		{
-			if(mc.thePlayer != null)
+			if(mc.player != null)
 			{
 
-				EnumHand rightHand = FlansUtils.getHandForSide(EnumHandSide.RIGHT, mc.thePlayer);
-				ItemStack stackRightHand = mc.thePlayer.getHeldItem(rightHand);
+				EnumHand rightHand = FlansUtils.getHandForSide(EnumHandSide.RIGHT, mc.player);
+				ItemStack stackRightHand = mc.player.getHeldItem(rightHand);
 				if(stackRightHand != null && stackRightHand.getItem() instanceof ItemGun)
 				{
 					ItemGun gunItem = (ItemGun)stackRightHand.getItem();
@@ -798,7 +798,7 @@ public class ClientRenderHooks
 					}
 				}
 				EnumHand leftHand = rightHand == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
-				ItemStack stackLeftHand = mc.thePlayer.getHeldItem(leftHand);
+				ItemStack stackLeftHand = mc.player.getHeldItem(leftHand);
 
 				if(stackLeftHand != null && stackLeftHand.getItem() instanceof ItemGun)
 				{

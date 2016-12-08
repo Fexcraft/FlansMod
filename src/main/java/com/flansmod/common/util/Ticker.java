@@ -56,7 +56,7 @@ public class Ticker {
 			ItemStack stack = ((EntityItem) event.getEntity()).getEntityItem();
 			if(stack.getItem() instanceof ItemGun && ((ItemGun)stack.getItem()).getInfoType().modelString != null){
 				EntityCustomItem replacementItem = new EntityCustomItem((EntityItem)event.getEntity());
-				event.getWorld().spawnEntityInWorld(replacementItem);
+				event.getWorld().spawnEntity(replacementItem);
 				event.setCanceled(true);
 			}
 		}

@@ -40,8 +40,9 @@ public class ItemAAGun extends Item implements IFlanItem<AAGunType>, IItem
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
 	{
+		ItemStack itemstack = entityplayer.getHeldItemMainhand();
     	//Raytracing
         float cosYaw = MathHelper.cos(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
         float sinYaw = MathHelper.sin(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
@@ -64,11 +65,11 @@ public class ItemAAGun extends Item implements IFlanItem<AAGunType>, IItem
 			int k = movingobjectposition.getBlockPos().getZ();
 			if (!world.isRemote && world.isSideSolid(movingobjectposition.getBlockPos(), EnumFacing.UP))
 			{
-				world.spawnEntityInWorld(new EntityAAGun(world, type, (double) i + 0.5F, (double) j + 1F, (double) k + 0.5F, entityplayer));
+				world.spawnEntity(new EntityAAGun(world, type, (double) i + 0.5F, (double) j + 1F, (double) k + 0.5F, entityplayer));
 			}
 			if (!entityplayer.capabilities.isCreativeMode)
 			{
-				itemstack.stackSize--;
+				itemstack.shrink(1);
 			}
 		}
 		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
@@ -79,7 +80,7 @@ public class ItemAAGun extends Item implements IFlanItem<AAGunType>, IItem
 		Entity entity = new EntityAAGun(world, type, x, y, z, null);
 		if(!world.isRemote)
 		{
-			world.spawnEntityInWorld(entity);
+			world.spawnEntity(entity);
         }
     	return entity;
     }

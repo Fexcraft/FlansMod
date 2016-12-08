@@ -118,7 +118,7 @@ public class PlayerSnapshot
 	{
 		for(PlayerHitbox hitbox : hitboxes)
 		{
-			hitbox.renderHitbox(player.worldObj, pos);
+			hitbox.renderHitbox(player.world, pos);
 		}
 	}
 	

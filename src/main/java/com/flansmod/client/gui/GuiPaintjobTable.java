@@ -154,7 +154,7 @@ public class GuiPaintjobTable extends GuiContainer
 		
         for(int i = 0; i < 4 * 9 + 2; i++)
         {
-        	inventorySlots.getSlot(i).xDisplayPosition += dPos;
+        	inventorySlots.getSlot(i).xPos += dPos;
         }
         
         if(movingFlatTextureWindow)
@@ -341,13 +341,13 @@ public class GuiPaintjobTable extends GuiContainer
     	        	boolean[] haveDyes = new boolean[numDyes];
     	        	for(int n = 0; n < numDyes; n++)
     	        	{
-    	        		int amountNeeded = hoveringOver.dyesNeeded[n].stackSize;
+    	        		int amountNeeded = hoveringOver.dyesNeeded[n].getCount();
     	        		for(int s = 0; s < inventory.getSizeInventory(); s++)
     	        		{
     	        			ItemStack stack = inventory.getStackInSlot(s);
     	        			if(stack != null && stack.getItem() == Items.DYE && stack.getItemDamage() == hoveringOver.dyesNeeded[n].getItemDamage())
     	        			{
-    	        				amountNeeded -= stack.stackSize;
+    	        				amountNeeded -= stack.getCount();
     	        			}
     	        		}
     					if(amountNeeded <= 0)

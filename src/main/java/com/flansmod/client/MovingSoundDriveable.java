@@ -36,12 +36,12 @@ public class MovingSoundDriveable extends MovingSound
 			xPosF = (float)driveable.posX;
 			yPosF = (float)driveable.posY;
 			zPosF = (float)driveable.posZ;
-			float f = MathHelper.sqrt_double(driveable.motionX * driveable.motionX + driveable.motionZ * driveable.motionZ);
+			float f = MathHelper.sqrt(driveable.motionX * driveable.motionX + driveable.motionZ * driveable.motionZ);
 	
 			if ((double)f >= 0.01D)
 			{
-				field_147669_l = MathHelper.clamp_float(field_147669_l + 0.0025F, 0.0F, 1.0F);
-				volume = 0.0F + MathHelper.clamp_float(f, 0.0F, 0.5F) * 0.7F;
+				field_147669_l = MathHelper.clamp(field_147669_l + 0.0025F, 0.0F, 1.0F);
+				volume = 0.0F + MathHelper.clamp(f, 0.0F, 0.5F) * 0.7F;
 			}
 			else
 			{

@@ -167,23 +167,23 @@ public class GuiDriveableRepair extends GuiScreen
 							if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 							{
 								//Work out the amount to take from the stack
-								int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+								int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 								//Take it
-								stackInSlot.stackSize -= amountFound;
+								stackInSlot.shrink(amountFound);
 								//Check for empty stacks
-								if(stackInSlot.stackSize <= 0)
+								if(stackInSlot.getCount() <= 0)
 									stackInSlot = null;
 								//Put the modified stack back in the inventory
 								temporaryInventory.setInventorySlotContents(m, stackInSlot);
 								//Increase the amount found counter
 								totalAmountFound += amountFound;
 								//If we have enough, stop looking
-								if(totalAmountFound == stackNeeded.stackSize)
+								if(totalAmountFound == stackNeeded.getCount())
 									break;
 							}
 						}
 						//If we did not find enough in the inventory
-						if(totalAmountFound < stackNeeded.stackSize)
+						if(totalAmountFound < stackNeeded.getCount())
 						{
 							mc.renderEngine.bindTexture(texture);
 							drawTexturedModalRect(guiOriginX + 67 + 18 * n, guiOriginY + y + 22, 202, 0, 16, 16);
@@ -209,10 +209,10 @@ public class GuiDriveableRepair extends GuiScreen
 			if(driving instanceof EntityMecha)
 			{
 				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
-				(driver).openGui(FlansMod.INSTANCE, 10, driver.worldObj, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
+				(driver).openGui(FlansMod.INSTANCE, 10, driver.world, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
 			}
 			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.worldObj, driving));
+			 mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.world, driving));
 	}
 
 	/** Item stack renderering method */

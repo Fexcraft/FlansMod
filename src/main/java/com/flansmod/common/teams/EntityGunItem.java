@@ -3,8 +3,6 @@ package com.flansmod.common.teams;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.GunType;
@@ -14,6 +12,7 @@ import com.flansmod.common.guns.ItemShootable;
 import com.flansmod.common.guns.ShootableType;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -42,7 +41,7 @@ public class EntityGunItem extends EntityCustomItem
 	
 	public EntityGunItem(EntityItem entity)
 	{
-		super(entity.worldObj, entity.posX, entity.posY, entity.posZ, entity.getEntityItem().copy());
+		super(entity.world, entity.posX, entity.posY, entity.posZ, entity.getEntityItem().copy());
 		setSize(1F, 1F);
 		ammoStacks = new ArrayList<ItemStack>();
 	}
@@ -90,7 +89,7 @@ public class EntityGunItem extends EntityCustomItem
 		if(getEntityItem() == null || getEntityItem().getItem() == null || !(getEntityItem().getItem() instanceof ItemGun))
 			setDead();
 		
-		if(!worldObj.isRemote && ammoStacks == null)
+		if(!world.isRemote && ammoStacks == null)
 			setDead();
 
         prevPosX = posX;
@@ -101,14 +100,14 @@ public class EntityGunItem extends EntityCustomItem
         {
         	pushOutOfBlocks(posX, (getEntityBoundingBox().minY + getEntityBoundingBox().maxY) / 2.0D, posZ); //PushOutOfBlocks
         }
-        moveEntity(motionX, motionY, motionZ);
+        move(MoverType.SELF, motionX, motionY, motionZ);
 
         float var2 = 0.98F;
 
         if (onGround)
         {
             var2 = 0.58800006F;
-            Block block = worldObj.getBlockState(new BlockPos(MathHelper.floor_double(posX), MathHelper.floor_double(getEntityBoundingBox().minY) - 1, MathHelper.floor_double(posZ))).getBlock();
+            Block block = world.getBlockState(new BlockPos(MathHelper.floor(posX), MathHelper.floor(getEntityBoundingBox().minY) - 1, MathHelper.floor(posZ))).getBlock();
 
             if (block != null)
             {
@@ -130,9 +129,9 @@ public class EntityGunItem extends EntityCustomItem
         //TODO
         ItemStack item = getEntityItem();//getDataWatcher().getWatchableObjectItemStack(10);
 
-        if(!worldObj.isRemote && age >= lifespan){
+        if(!world.isRemote && age >= lifespan){
             if(item != null){   
-                ItemExpireEvent event = new ItemExpireEvent(this, (item.getItem() == null ? 6000 : item.getItem().getEntityLifespan(item, worldObj)));
+                ItemExpireEvent event = new ItemExpireEvent(this, (item.getItem() == null ? 6000 : item.getItem().getEntityLifespan(item, world)));
                 if (MinecraftForge.EVENT_BUS.post(event)){
                     lifespan += event.getExtraLife();
                 }
@@ -145,12 +144,12 @@ public class EntityGunItem extends EntityCustomItem
             }
         }
 
-        if(item != null && item.stackSize <= 0){
+        if(item != null && item.getCount() <= 0){
             setDead();
         }
         
 		//Temporary fire glitch fix
-		if(worldObj.isRemote){
+		if(world.isRemote){
 			extinguish();
 		}
 	}
@@ -163,7 +162,7 @@ public class EntityGunItem extends EntityCustomItem
 	@Override
 	public void onCollideWithPlayer(EntityPlayer player)
 	{
-		if (!worldObj.isRemote)
+		if (!world.isRemote)
 		{
 			if(ammoStacks != null && ammoStacks.size() > 0)
 			{
@@ -197,9 +196,9 @@ public class EntityGunItem extends EntityCustomItem
 	}
 
 	@Override //TODO
-	public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack is, EnumHand hand) //interact
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand) //interact
 	{
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			return true;
 		EntityItemPickupEvent event = new EntityItemPickupEvent(player, this);
 		//TODO fsu implementation? 
@@ -224,8 +223,8 @@ public class EntityGunItem extends EntityCustomItem
 						}
 					}
 				}
-				EntityGunItem newGunItem = new EntityGunItem(worldObj, posX, posY, posZ, currentItem.copy(), newAmmoStacks);
-				worldObj.spawnEntityInWorld(newGunItem);
+				EntityGunItem newGunItem = new EntityGunItem(world, posX, posY, posZ, currentItem.copy(), newAmmoStacks);
+				world.spawnEntity(newGunItem);
 				player.inventory.setInventorySlotContents(player.inventory.currentItem, getEntityItem());
 				for(ItemStack stack : ammoStacks)
 				{

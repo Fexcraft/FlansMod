@@ -87,7 +87,7 @@ public class GuiMechaInventory extends GuiContainer
 		if(scroll == maxScroll)
 			drawTexturedModalRect(j + 336, k + 53, 350, 10, 10, 10);
 	
-		long newTime = mc.theWorld.getWorldInfo().getWorldTime();
+		long newTime = mc.world.getWorldInfo().getWorldTime();
 		if(newTime > lastTime)
 		{
 			lastTime = newTime;

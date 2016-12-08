@@ -42,7 +42,7 @@ public class GuiDriveableFuel extends GuiContainer
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i1, int j1)
 	{
-		long newTime = mc.theWorld.getWorldInfo().getWorldTime();
+		long newTime = mc.world.getWorldInfo().getWorldTime();
 		if(newTime > lastTime)
 		{
 			lastTime = newTime;

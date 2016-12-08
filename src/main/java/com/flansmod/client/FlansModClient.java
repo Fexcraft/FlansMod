@@ -94,11 +94,11 @@ public class FlansModClient extends FlansMod
 	//private static final ResourceLocation zombieSkin = new ResourceLocation("flansmod", "skins/zombie.png");
 
 	public static void tick(){
-		if (minecraft.thePlayer == null || minecraft.theWorld == null)
+		if (minecraft.player == null || minecraft.world == null)
 			return;
 		
-		if(minecraft.thePlayer.getRidingEntity() instanceof IControllable && minecraft.currentScreen == null)
-			minecraft.displayGuiScreen(new GuiDriveableController((IControllable)minecraft.thePlayer.getRidingEntity()));
+		if(minecraft.player.getRidingEntity() instanceof IControllable && minecraft.currentScreen == null)
+			minecraft.displayGuiScreen(new GuiDriveableController((IControllable)minecraft.player.getRidingEntity()));
 		
 		//Teams GUI lock at end of rounds
 		/*if(teamsScoreGUILock > 0){
@@ -115,10 +115,10 @@ public class FlansModClient extends FlansMod
 			playerRecoil *= 0.8F;
 		if(hitMarkerTime > 0)
 			hitMarkerTime--;
-		minecraft.thePlayer.rotationPitch -= playerRecoil;
+		minecraft.player.rotationPitch -= playerRecoil;
 		antiRecoil += playerRecoil;
 
-		minecraft.thePlayer.rotationPitch += antiRecoil * 0.2F;
+		minecraft.player.rotationPitch += antiRecoil * 0.2F;
 		antiRecoil *= 0.8F;
 		
 		//Update gun animations for the gun in hand
@@ -131,13 +131,13 @@ public class FlansModClient extends FlansMod
 			g.update();
 		}		
 		
-		for(Object obj : minecraft.theWorld.playerEntities)
+		for(Object obj : minecraft.world.playerEntities)
 		{
 			EntityPlayer player = (EntityPlayer)obj;
 			ItemStack currentItem = player.getHeldItemMainhand();
 			if(currentItem != null && currentItem.getItem() instanceof ItemGun)
 			{
-				/*if(player == minecraft.thePlayer && minecraft.gameSettings.thirdPersonView == 0)
+				/*if(player == minecraft.player && minecraft.gameSettings.thirdPersonView == 0)
 					player.clearItemInUse();
 				else
 				{
@@ -149,7 +149,7 @@ public class FlansModClient extends FlansMod
 
 		//If the currently held item is not a gun or is the wrong gun, unscope
 		Item itemInHand = null;
-		ItemStack itemstackInHand = minecraft.thePlayer.inventory.getCurrentItem();
+		ItemStack itemstackInHand = minecraft.player.inventory.getCurrentItem();
 		if (itemstackInHand != null)
 			itemInHand = itemstackInHand.getItem();
 		if (currentScope != null)
@@ -180,10 +180,10 @@ public class FlansModClient extends FlansMod
 			zoomProgress = 1F - (1F - zoomProgress) * 0.66F; 
 		}
 		
-		if(minecraft.thePlayer.getRidingEntity() instanceof IControllable){
+		if(minecraft.player.getRidingEntity() instanceof IControllable){
 			inPlane = true;	
 			try{
-				ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, minecraft.entityRenderer, ((IControllable)minecraft.thePlayer.getRidingEntity()).getCameraDistance(), "thirdPersonDistance", "q", "field_78490_B");
+				ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, minecraft.entityRenderer, ((IControllable)minecraft.player.getRidingEntity()).getCameraDistance(), "thirdPersonDistance", "q", "field_78490_B");
 			}
 			catch (Exception e){
 				Util.log("I forgot to update obfuscated reflection D:");
@@ -272,7 +272,7 @@ public class FlansModClient extends FlansMod
 			return false;
 		}
 		controlModeMouse = !controlModeMouse;
-		FMLClientHandler.instance().getClient().displayGuiScreen(controlModeMouse ? new GuiDriveableController((IControllable)FMLClientHandler.instance().getClient().thePlayer.getRidingEntity()) : null);
+		FMLClientHandler.instance().getClient().displayGuiScreen(controlModeMouse ? new GuiDriveableController((IControllable)FMLClientHandler.instance().getClient().player.getRidingEntity()) : null);
 		controlModeSwitchTimer = 40;
 		return true;
 	}
@@ -446,7 +446,7 @@ public class FlansModClient extends FlansMod
 	public static void UpdateFlashlights(Minecraft mc)
 	{
 		//Handle lighting from flashlights and glowing bullets
-		if(Ticker.tick % lightOverrideRefreshRate == 0 && mc.theWorld != null)
+		if(Ticker.tick % lightOverrideRefreshRate == 0 && mc.world != null)
 		{
 			//Check graphics setting and adjust refresh rate
 			lightOverrideRefreshRate = mc.gameSettings.fancyGraphics ? 10 : 20;
@@ -454,13 +454,13 @@ public class FlansModClient extends FlansMod
 			//Reset old light values
 			for(Vector3i v : blockLightOverrides)
 			{
-				mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(v.x, v.y, v.z));
+				mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(v.x, v.y, v.z));
 			}
 			//Clear the list
 			blockLightOverrides.clear();
 			
 			//Find all flashlights
-			for(Object obj : mc.theWorld.playerEntities)
+			for(Object obj : mc.world.playerEntities)
 			{
 				EntityPlayer player = (EntityPlayer)obj;
 				ItemStack currentHeldItem = player.getHeldItemMainhand();
@@ -489,55 +489,55 @@ public class FlansModClient extends FlansMod
 								case EAST : x++; break;
 								}
 								blockLightOverrides.add(new Vector3i(x, y, z));
-								mc.theWorld.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 12);
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
-								mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
+								mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 12);
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
 							}
 						}
 					}
 				}
 			}
 			
-			for(Object obj : mc.theWorld.loadedEntityList)
+			for(Object obj : mc.world.loadedEntityList)
 			{
 				if(obj instanceof EntityBullet)
 				{
 					EntityBullet bullet = (EntityBullet)obj;
 					if(!bullet.isDead && bullet.type.hasLight)
 					{
-						int x = MathHelper.floor_double(bullet.posX);
-						int y = MathHelper.floor_double(bullet.posY);
-						int z = MathHelper.floor_double(bullet.posZ);
+						int x = MathHelper.floor(bullet.posX);
+						int y = MathHelper.floor(bullet.posY);
+						int z = MathHelper.floor(bullet.posZ);
 						blockLightOverrides.add(new Vector3i(x, y, z));
-						mc.theWorld.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 15);
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
+						mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 15);
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
 					}
 				}
 				else if(obj instanceof EntityMecha)
 				{
 					EntityMecha mecha = (EntityMecha)obj;
-					int x = MathHelper.floor_double(mecha.posX);
-					int y = MathHelper.floor_double(mecha.posY);
-					int z = MathHelper.floor_double(mecha.posZ);
+					int x = MathHelper.floor(mecha.posX);
+					int y = MathHelper.floor(mecha.posY);
+					int z = MathHelper.floor(mecha.posZ);
 					if(mecha.lightLevel() > 0)
 					{
 						blockLightOverrides.add(new Vector3i(x, y, z));
-						mc.theWorld.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), Math.max(mc.theWorld.getLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z)), mecha.lightLevel()));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
-						mc.theWorld.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
+						mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), Math.max(mc.world.getLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z)), mecha.lightLevel()));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
+						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
 					}
 					if(mecha.forceDark())
 					{
@@ -551,7 +551,7 @@ public class FlansModClient extends FlansMod
 									int yd = j + y;
 									int zd = k + z;
 									blockLightOverrides.add(new Vector3i(xd, yd, zd));
-									mc.theWorld.setLightFor(EnumSkyBlock.SKY, new BlockPos(xd, yd, zd), Math.abs(i) + Math.abs(j) + Math.abs(k));
+									mc.world.setLightFor(EnumSkyBlock.SKY, new BlockPos(xd, yd, zd), Math.abs(i) + Math.abs(j) + Math.abs(k));
 								}
 							}
 						}

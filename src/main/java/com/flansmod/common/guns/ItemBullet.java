@@ -99,7 +99,7 @@ public class ItemBullet extends ItemShootable implements IFlanItem<BulletType>, 
 	@Override
 	public void Shoot(World world, Vector3f origin, Vector3f direction, float damageModifier, float spreadModifier, float speedModifier, InfoType shotFrom, EntityLivingBase shooter) 
 	{
-		world.spawnEntityInWorld(getEntity(world, shooter, spreadModifier, damageModifier, speedModifier, false, shotFrom));
+		world.spawnEntity(getEntity(world, shooter, spreadModifier, damageModifier, speedModifier, false, shotFrom));
 	}
 
 	@Override

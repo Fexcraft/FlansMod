@@ -300,22 +300,22 @@ public class GunBoxType extends BoxType
 					if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 					{
 						//Work out the amount to take from the stack
-						int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+						int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 						//Take it
-						stackInSlot.stackSize -= amountFound;
+						stackInSlot.shrink(amountFound);
 						//Check for empty stacks
-						if(stackInSlot.stackSize <= 0)
+						if(stackInSlot.getCount() <= 0)
 							stackInSlot = null;
 						//Put the modified stack back in the inventory
 						temporaryInventory.setInventorySlotContents(m, stackInSlot);
 						//Increase the amount found counter
 						totalAmountFound += amountFound;
 						//If we have enough, stop looking
-						if(totalAmountFound == stackNeeded.stackSize)
+						if(totalAmountFound == stackNeeded.getCount())
 							break;
 					}
 				}
-				if(totalAmountFound < stackNeeded.stackSize)
+				if(totalAmountFound < stackNeeded.getCount())
 					canCraft = false;
 			}
 			

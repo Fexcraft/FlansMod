@@ -211,23 +211,23 @@ public class GuiDriveableCrafting extends GuiScreen
 							if(stackInSlot != null && stackInSlot.getItem() == recipeStack.getItem() && stackInSlot.getItemDamage() == recipeStack.getItemDamage())
 							{
 								//Work out the amount to take from the stack
-								int amountFound = Math.min(stackInSlot.stackSize, recipeStack.stackSize - totalAmountFound);
+								int amountFound = Math.min(stackInSlot.getCount(), recipeStack.getCount() - totalAmountFound);
 								//Take it
-								stackInSlot.stackSize -= amountFound;
+								stackInSlot.shrink(amountFound);
 								//Check for empty stacks
-								if(stackInSlot.stackSize <= 0)
+								if(stackInSlot.getCount() <= 0)
 									stackInSlot = null;
 								//Put the modified stack back in the inventory
 								temporaryInventory.setInventorySlotContents(n, stackInSlot);
 								//Increase the amount found counter
 								totalAmountFound += amountFound;
 								//If we have enough, stop looking
-								if(totalAmountFound == recipeStack.stackSize)
+								if(totalAmountFound == recipeStack.getCount())
 									break;
 							}
 						}
 						//If we didn't find enough, give the stack a red outline
-						if(totalAmountFound < recipeStack.stackSize)
+						if(totalAmountFound < recipeStack.getCount())
 						{
 							mc.renderEngine.bindTexture(texture);
 							drawTexturedModalRect(guiOriginX + 8 + c * 18, guiOriginY + 138 + r * 18, 195, 11, 16, 16);
@@ -257,7 +257,7 @@ public class GuiDriveableCrafting extends GuiScreen
 						//If we already have engines of this type, add these ones to the stack
 						if(engines.containsKey(partType))
 						{
-							engines.get(partType).stackSize += stackInSlot.stackSize;
+							engines.get(partType).grow(stackInSlot.getCount());
 						}
 						//Else, make this the first stack
 						else engines.put(partType, stackInSlot);
@@ -271,7 +271,7 @@ public class GuiDriveableCrafting extends GuiScreen
 			for(PartType part : engines.keySet())
 			{
 				//If this engine outperforms the currently selected best one and there are enough of them, swap
-				if(part.engineSpeed > bestEngineSpeed && engines.get(part).stackSize >= selectedType.numEngines())
+				if(part.engineSpeed > bestEngineSpeed && engines.get(part).getCount() >= selectedType.numEngines())
 				{
 					bestEngineSpeed = part.engineSpeed;
 					bestEngineStack = engines.get(part);
@@ -321,7 +321,7 @@ public class GuiDriveableCrafting extends GuiScreen
 	{
 		if (i == 1 || i == mc.gameSettings.keyBindInventory.getKeyCode())
 		{
-			mc.thePlayer.closeScreen();
+			mc.player.closeScreen();
 		}
 	}
 	

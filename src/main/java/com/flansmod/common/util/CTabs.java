@@ -7,7 +7,6 @@ import com.flansmod.common.guns.GunType;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CTabs {
@@ -28,7 +27,7 @@ public class CTabs {
 		}
 
 		@Override
-		public Item getTabIconItem(){
+		public ItemStack getTabIconItem(){
 			return null;
 		}
 		
