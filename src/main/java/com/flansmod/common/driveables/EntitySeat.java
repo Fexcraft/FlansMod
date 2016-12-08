@@ -686,7 +686,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		if(!world.isRemote){
 			this.getControllingPassenger().dismountRidingEntity();
 			Print.spam(1, "DMKP");
-			dismount = true;
 		}
 	}
 	
