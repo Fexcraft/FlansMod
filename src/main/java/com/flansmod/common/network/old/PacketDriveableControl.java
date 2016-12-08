@@ -133,7 +133,7 @@ public class PacketDriveableControl extends PacketBase
 			{
 				driveable = (EntityDriveable)obj;
 				driveable.driveableData.fuelInTank = fuelInTank;
-				if(driveable.seats[0] != null && driveable.seats[0].getPassenger() == clientPlayer)
+				if(driveable.seats[0] != null && driveable.seats[0].getControllingPassenger() == clientPlayer)
 					return;
 				break;
 			}

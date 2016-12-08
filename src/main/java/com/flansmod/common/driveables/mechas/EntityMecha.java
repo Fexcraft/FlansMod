@@ -233,7 +233,7 @@ public class EntityMecha extends EntityDriveable
 			}
 			case 4 : //Jump
 			{
-				boolean canThrustCreatively = seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode;
+				boolean canThrustCreatively = seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode;
 				if(onGround && (jumpDelay == 0) && (canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption) && isPartIntact(EnumDriveablePart.hips))
 				{
 					jumpDelay = 20;
@@ -249,14 +249,14 @@ public class EntityMecha extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				seats[0].getPassenger().dismountRidingEntity();
+				seats[0].getControllingPassenger().dismountRidingEntity();
 				//TODO seats[0].passenger = null;
 		  		return true;
 			}
 			case 7 : //Inventory
 			{
 				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
-				((EntityPlayer)seats[0].getPassenger()).openGui(FlansMod.INSTANCE, 10, worldObj, chunkCoordX, chunkCoordY, chunkCoordZ);
+				((EntityPlayer)seats[0].getControllingPassenger()).openGui(FlansMod.INSTANCE, 10, worldObj, chunkCoordX, chunkCoordY, chunkCoordZ);
 				return true;
 			}
 			case 8 : //UseR
@@ -306,7 +306,7 @@ public class EntityMecha extends EntityDriveable
 	
 	protected boolean creative()
 	{
-		return !(seats[0].getPassenger() instanceof EntityPlayer) || ((EntityPlayer) seats[0].getPassenger()).capabilities.isCreativeMode;
+		return !(seats[0].getControllingPassenger() instanceof EntityPlayer) || ((EntityPlayer) seats[0].getControllingPassenger()).capabilities.isCreativeMode;
 	}
 	
 	protected boolean useItem(boolean left)
@@ -327,7 +327,7 @@ public class EntityMecha extends EntityDriveable
 				
 				float reach = toolType.reach * mechaType.reach;
 				
-				Vector3f lookOrigin = new Vector3f((float)mechaType.seats[0].x / 16F, (float)mechaType.seats[0].y / 16F + seats[0].getPassenger().getMountedYOffset(), (float)mechaType.seats[0].z / 16F);
+				Vector3f lookOrigin = new Vector3f((float)mechaType.seats[0].x / 16F, (float)mechaType.seats[0].y / 16F + seats[0].getControllingPassenger().getMountedYOffset(), (float)mechaType.seats[0].z / 16F);
 				lookOrigin = axes.findLocalVectorGlobally(lookOrigin);
 				Vector3f.add(lookOrigin, new Vector3f(posX, posY, posZ), lookOrigin);
 		
@@ -339,7 +339,7 @@ public class EntityMecha extends EntityDriveable
 				
 				RayTraceResult hit = worldObj.rayTraceBlocks(lookOrigin.toVec3(), lookTarget.toVec3());
 				
-				//MovingObjectPosition hit = ((EntityLivingBase)seats[0].getPassenger()).rayTrace(reach, 1F);
+				//MovingObjectPosition hit = ((EntityLivingBase)seats[0].getControllingPassenger()).rayTrace(reach, 1F);
 				if(hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK)
 				{
 					BlockPos pos = hit.getBlockPos();
@@ -443,7 +443,7 @@ public class EntityMecha extends EntityDriveable
 				worldObj.spawnEntityInWorld(((ItemShootable)bulletStack.getItem()).getEntity(worldObj, 
 						bulletOrigin, 
 						armVector, 
-						(EntityLivingBase)(seats[0].getPassenger()), 
+						(EntityLivingBase)(seats[0].getControllingPassenger()), 
 						gunType.getSpread(stack) / 2F, 
 						gunType.getDamage(stack), 
 						speed,
@@ -501,7 +501,7 @@ public class EntityMecha extends EntityDriveable
 			}
 		}
 
-		else if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
+		else if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack mechaStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();
@@ -531,7 +531,7 @@ public class EntityMecha extends EntityDriveable
 		if(soundDelayRight > 0) soundDelayRight--;
 		
 		//If the player left the driver's seat, stop digging / whatever
-		if(!worldObj.isRemote && (seats[0] == null || seats[0].getPassenger() == null))
+		if(!worldObj.isRemote && (seats[0] == null || seats[0].getControllingPassenger() == null))
 			rightMouseHeld = leftMouseHeld = false;
 		
 		//Update gun animations
@@ -555,7 +555,7 @@ public class EntityMecha extends EntityDriveable
 			for(EnumDriveablePart part: EnumDriveablePart.values())
 			{
 				DriveablePart thisPart = data.parts.get(part);
-				boolean hasCreativePlayer = seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode;
+				boolean hasCreativePlayer = seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode;
 				if(thisPart != null && thisPart.health != 0 && thisPart.health < thisPart.maxHealth && (hasCreativePlayer || data.fuelInTank >= 10F))
 				{
 					thisPart.health += 1;
@@ -566,7 +566,7 @@ public class EntityMecha extends EntityDriveable
 			toggleTimer = 20;
 		}
 
-		if(diamondDetect() != null && diamondTimer == 0 && worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger()))
+		if(diamondDetect() != null && diamondTimer == 0 && worldObj.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger()))
 		{
 			float sqDistance = 901;
 			for(float i = -30; i <= 30; i++)
@@ -606,12 +606,12 @@ public class EntityMecha extends EntityDriveable
 		}
 		
 		//Work out of this is client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
-		boolean driverIsLiving = seats[0] != null && seats[0].getPassenger() instanceof EntityLivingBase;
+		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger());
+		boolean driverIsLiving = seats[0] != null && seats[0].getControllingPassenger() instanceof EntityLivingBase;
 		
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && seats[0].getPassenger() != null)
+		if(!worldObj.isRemote && seats[0].getControllingPassenger() != null)
 			ticksSinceUsed = 0;
 		if(!worldObj.isRemote && Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20)
 		{
@@ -649,12 +649,12 @@ public class EntityMecha extends EntityDriveable
 		
 		if(seats[0] != null)
 		{
-			//if(seats[0].getPassenger() == null)
+			//if(seats[0].getControllingPassenger() == null)
 			//{
 			//	axes.rotateGlobalYaw(2F);
 			//}
-			if(seats[0].getPassenger() instanceof EntityLivingBase && !(seats[0].getPassenger() instanceof EntityPlayer))
-				axes.setAngles(((EntityLivingBase)seats[0].getPassenger()).renderYawOffset + 90F, 0F, 0F);
+			if(seats[0].getControllingPassenger() instanceof EntityLivingBase && !(seats[0].getControllingPassenger() instanceof EntityPlayer))
+				axes.setAngles(((EntityLivingBase)seats[0].getControllingPassenger()).renderYawOffset + 90F, 0F, 0F);
 			else
 			{
 				//Function to limit Head Movement Left/Right
@@ -687,12 +687,12 @@ public class EntityMecha extends EntityDriveable
 		moveZ = 0;
 		
 		float jetPack = jetPackPower();
-		if(!onGround && thePlayerIsDrivingThis && Minecraft.getMinecraft().currentScreen instanceof GuiDriveableController && FlansMod.proxy.isKeyDown(4) && shouldFly() && (((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode || data.fuelInTank >= (10F*jetPack)))
+		if(!onGround && thePlayerIsDrivingThis && Minecraft.getMinecraft().currentScreen instanceof GuiDriveableController && FlansMod.proxy.isKeyDown(4) && shouldFly() && (((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode || data.fuelInTank >= (10F*jetPack)))
 		{
 			motionY *= 0.95;
 			motionY += (0.07*jetPack);
 			fallDistance = 0;
-			if(!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+			if(!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 				data.fuelInTank -= (10F*jetPack);
 			if(rocketTimer <= 0 && rocketPack().soundEffect != null)
 			{
@@ -712,7 +712,7 @@ public class EntityMecha extends EntityDriveable
 		
 		if(driverIsLiving)
 		{
-			EntityLivingBase entity = (EntityLivingBase)seats[0].getPassenger();
+			EntityLivingBase entity = (EntityLivingBase)seats[0].getControllingPassenger();
 			boolean driverIsCreative = entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isCreativeMode;
 			if(thePlayerIsDrivingThis && Minecraft.getMinecraft().currentScreen instanceof GuiDriveableController)
 			{
@@ -721,12 +721,12 @@ public class EntityMecha extends EntityDriveable
 				if(FlansMod.proxy.isKeyDown(2)) moveZ = -1;
 				if(FlansMod.proxy.isKeyDown(3)) moveZ = 1;
 			}
-			else if(seats[0].getPassenger() instanceof EntityLiving && !(seats[0].getPassenger() instanceof EntityPlayer))
+			else if(seats[0].getControllingPassenger() instanceof EntityLiving && !(seats[0].getControllingPassenger() instanceof EntityPlayer))
 			{
 
 				moveZ = 1;
 				/*
-				EntityLiving ent = (EntityLiving)seats[0].getPassenger();
+				EntityLiving ent = (EntityLiving)seats[0].getControllingPassenger();
 				//System.out.println(ent.moveForward);
 				Vec3 target = Vec3.createVectorHelper(0D, 0D, 0D);
 				if(ent.getNavigator().getPath() != null)
@@ -761,7 +761,7 @@ public class EntityMecha extends EntityDriveable
 				
 				intent.scale((type.moveSpeed * data.engine.engineSpeed * speedMultiplier())*(4.3F/20F));
 				
-				boolean canThrustCreatively = seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode;
+				boolean canThrustCreatively = seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode;
 
 				if((canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption) && isPartIntact(EnumDriveablePart.hips))
 				{
@@ -876,63 +876,63 @@ public class EntityMecha extends EntityDriveable
 									for(ItemStack stack : blockHit.getDrops(worldObj, new BlockPos(breakingBlock.x, breakingBlock.y, breakingBlock.z), state, 0))
 									{
 										//Check for iron regarding refining
-										boolean fuelCheck = (data.fuelInTank >= 5F || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										boolean fuelCheck = (data.fuelInTank >= 5F || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && refineIron() && stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).block == Blocks.IRON_ORE)
 										{
 											stack = (new ItemStack(Items.IRON_INGOT, 1, 0));
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 5F;
 										}
 										
 										//Check for waste to be compacted
-										fuelCheck = (data.fuelInTank >= 0.1F || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 0.1F || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && wasteCompact() && stack.getItem() instanceof ItemBlock && (((ItemBlock)stack.getItem()).block == Blocks.COBBLESTONE || ((ItemBlock)stack.getItem()).block == Blocks.DIRT || ((ItemBlock)stack.getItem()).block == Blocks.SAND))
 										{
 											stack.stackSize = 0;
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 0.1F;
 										}
 										
 										//Check for item multipliers
-										fuelCheck = (data.fuelInTank >= 3F*diamondMultiplier() || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 3F*diamondMultiplier() || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && stack.getItem() == Items.DIAMOND)
 										{
 											float multiplier = diamondMultiplier();
 											stack.stackSize *= MathHelper.floor_float(multiplier) + (rand.nextFloat() < tailFloat(multiplier) ? 1 : 0);
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 3F*diamondMultiplier();
 										}
-										fuelCheck = (data.fuelInTank >= 2F*redstoneMultiplier() || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 2F*redstoneMultiplier() || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && stack.getItem() == Items.REDSTONE)
 										{
 											float multiplier = redstoneMultiplier();
 											stack.stackSize *= MathHelper.floor_float(multiplier) + (rand.nextFloat() < tailFloat(multiplier) ? 1 : 0);
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 2F*redstoneMultiplier();
 										}
-										fuelCheck = (data.fuelInTank >= 2F*coalMultiplier() || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 2F*coalMultiplier() || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && stack.getItem() == Items.COAL)
 										{
 											float multiplier = coalMultiplier();
 											stack.stackSize *= MathHelper.floor_float(multiplier) + (rand.nextFloat() < tailFloat(multiplier) ? 1 : 0);
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 2F*coalMultiplier();
 										}
-										fuelCheck = (data.fuelInTank >= 2F*emeraldMultiplier() || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 2F*emeraldMultiplier() || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										if(fuelCheck && stack.getItem() == Items.EMERALD)
 										{
 											float multiplier = emeraldMultiplier();
 											stack.stackSize *= MathHelper.floor_float(multiplier) + (rand.nextFloat() < tailFloat(multiplier) ? 1 : 0);
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 2F*emeraldMultiplier();
 										}
-										fuelCheck = (data.fuelInTank >= 2F*ironMultiplier() || ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+										fuelCheck = (data.fuelInTank >= 2F*ironMultiplier() || ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 										//check for refineIron OTHERWISE NICE DUPE. think about it and you will get why
 										if(fuelCheck && (stack.getItem() == Items.IRON_INGOT) && refineIron())
 										{
 											float multiplier = ironMultiplier();
 											stack.stackSize *= MathHelper.floor_float(multiplier) + (rand.nextFloat() < tailFloat(multiplier) ? 1 : 0);
-											if (!((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode)
+											if (!((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode)
 												data.fuelInTank -= 2F*ironMultiplier();
 										}
 										

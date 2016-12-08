@@ -159,7 +159,7 @@ public class EntityPlane extends EntityDriveable
 			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
-		boolean canThrust = ((seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
+		boolean canThrust = ((seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
 		switch(key)
 		{
 			case 0 : //Accelerate : Increase the throttle, up to 1.
@@ -208,17 +208,14 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				if(seats[0].getPassenger() != null){
-					seats[0].getPassenger().dismountRidingEntity();;
-					//TODO seats[0].passenger = null;
-				}
+				seats[0].removeSeatPassenger();
 		  		return true;
 			}
 			case 7 : //Inventory : Check to see if this plane allows in-flight inventory editing or if the plane is on the ground
 			{
 				if(worldObj.isRemote && (type.invInflight || (Math.abs(throttle) < 0.1F && onGround)))
 				{
-					FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getPassenger(), worldObj, this);
+					FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getControllingPassenger(), worldObj, this);
 				}
 				return true;
 			}
@@ -229,7 +226,7 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 10 : //Change control mode
 			{
-				FlansMod.proxy.changeControlMode((EntityPlayer)seats[0].getPassenger());
+				FlansMod.proxy.changeControlMode((EntityPlayer)seats[0].getControllingPassenger());
 				return true;
 			}
 			case 11 : //Roll left
@@ -331,11 +328,11 @@ public class EntityPlane extends EntityDriveable
 		}
 
 		//Work out if this is the client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
+		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger());
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && seats[0].getPassenger() != null)
+		if(!worldObj.isRemote && seats[0].getControllingPassenger() != null)
 			ticksSinceUsed = 0;
 		if(!worldObj.isRemote && Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20)
 		{
@@ -407,7 +404,7 @@ public class EntityPlane extends EntityDriveable
 		//With a player default to 0.5 for helicopters (hover speed)
 		//And default to the range 0.25 ~ 0.5 for planes (taxi speed ~ take off speed)
 		float throttlePull = 0.99F;
-		if(seats[0] != null && seats[0].getPassenger() != null && mode == EnumPlaneMode.HELI && canThrust())
+		if(seats[0] != null && seats[0].getControllingPassenger() != null && mode == EnumPlaneMode.HELI && canThrust())
 			throttle = (throttle - 0.5F) * throttlePull + 0.5F;
 
 		//Get the speed of the plane
@@ -736,7 +733,7 @@ public class EntityPlane extends EntityDriveable
 
 	public boolean canThrust() 
 	{
-		return (seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
+		return (seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
 	}
 
 	@Override
@@ -775,7 +772,7 @@ public class EntityPlane extends EntityDriveable
 
 		PlaneType type = PlaneType.getPlane(driveableType);
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();

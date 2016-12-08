@@ -59,7 +59,7 @@ public class VehicleControlPacketHandler {
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
 							driveable.driveableData.fuelInTank = packet.fuelInTank;
-							if(driveable.seats[0] != null && driveable.seats[0].getPassenger() == player){
+							if(driveable.seats[0] != null && driveable.seats[0].getControllingPassenger() == player){
 								return;
 							}
 							break;

@@ -272,7 +272,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 
 	protected boolean canSit(int seat)
 	{
-		return getDriveableType().numPassengers >= seat && seats[seat].getPassenger() == null;
+		return getDriveableType().numPassengers >= seat && seats[seat].getControllingPassenger() == null;
 	}
 	
 	@Override
@@ -326,9 +326,11 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		if(worldObj.isRemote)
 			camera.setDead();
 		
-		for(EntitySeat seat : seats)
-			if(seat != null)
-				seat.setDead();
+		for(EntitySeat seat : seats){
+			if(seat != null){
+				seat.remove();
+			}
+		}
 	}
 	
 	@Override
@@ -463,7 +465,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public void shoot(boolean secondary)
 	{
 		DriveableType type = getDriveableType();
-		if(seats[0] == null && !(seats[0].getPassenger() instanceof EntityLivingBase))
+		if(seats[0] == null && !(seats[0].getControllingPassenger() instanceof EntityLivingBase))
 			return;
 		//Check shoot delay
 		while(getShootDelay(secondary) <= 0.0f)
@@ -489,13 +491,13 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 
 	private boolean driverIsCreative()
 	{
-		return seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode;
+		return seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode;
 	}
 	
 	private EntityPlayer getDriver()
 	{
-		if(seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer)
-			return ((EntityPlayer)seats[0].getPassenger());
+		if(seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer)
+			return ((EntityPlayer)seats[0].getControllingPassenger());
 		else return null;
 	}
 	
@@ -596,7 +598,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 								motionX, 
 								motionY, 
 								motionZ, 
-								(EntityLivingBase)seats[0].getPassenger(), 
+								(EntityLivingBase)seats[0].getControllingPassenger(), 
 								damageMultiplier, 
 								type);
 						
@@ -647,7 +649,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 						EntityShootable bulletEntity = bulletItem.getEntity(worldObj, 
 								Vector3f.add(new Vector3f(posX, posY, posZ), gunVec, null), 
 								lookVector, 
-								(EntityLivingBase)seats[0].getPassenger(), 
+								(EntityLivingBase)seats[0].getControllingPassenger(), 
 								spread, 
 								damageMultiplier, 
 								shellSpeed, 
@@ -758,9 +760,9 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
   						IBlockState block = worldObj.getBlockState(new BlockPos(blockX, blockY, blockZ));
   						
   						boolean cancelled = false;
-						if(seats[0] != null && seats[0].getPassenger() instanceof EntityPlayerMP)
+						if(seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayerMP)
 						{
-							int eventOutcome = ForgeHooks.onBlockBreakEvent(worldObj, ((EntityPlayerMP)seats[0].getPassenger()).capabilities.isCreativeMode ? GameType.CREATIVE : ((EntityPlayerMP)seats[0].getPassenger()).capabilities.allowEdit ? GameType.SURVIVAL : GameType.ADVENTURE, (EntityPlayerMP)seats[0].getPassenger(), new BlockPos(blockX, blockY, blockZ));
+							int eventOutcome = ForgeHooks.onBlockBreakEvent(worldObj, ((EntityPlayerMP)seats[0].getControllingPassenger()).capabilities.isCreativeMode ? GameType.CREATIVE : ((EntityPlayerMP)seats[0].getControllingPassenger()).capabilities.allowEdit ? GameType.SURVIVAL : GameType.ADVENTURE, (EntityPlayerMP)seats[0].getControllingPassenger(), new BlockPos(blockX, blockY, blockZ));
 							cancelled = eventOutcome == -1;
 						}
 						if(!cancelled)
@@ -901,7 +903,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		boolean canThrust = driverIsCreative() || driveableData.fuelInTank > 0;
 
 		//If there's no player in the driveable or it cannot thrust, slow the plane and turn off mouse held actions
-		if((seats[0] != null && seats[0].getPassenger() == null) || !canThrust && getDriveableType().maxThrottle != 0 && getDriveableType().maxNegativeThrottle != 0)
+		if((seats[0] != null && seats[0].getControllingPassenger() == null) || !canThrust && getDriveableType().maxThrottle != 0 && getDriveableType().maxNegativeThrottle != 0)
 		{
 			throttle *= 0.98F;
 			rightMouseHeld = leftMouseHeld = false;
@@ -1157,7 +1159,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				continue;
 			if(ent == seat)
 				return true;
-			if(seats[0].getPassenger() == ent)
+			if(seats[0].getControllingPassenger() == ent)
 				return true;
 		}
 		return ent == this;	
@@ -1197,14 +1199,14 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	
 
 	public boolean hasFuel(){
-		if(seats == null || seats[0] == null || seats[0].getPassenger() == null){
+		if(seats == null || seats[0] == null || seats[0].getControllingPassenger() == null){
 			return false;
 		}
 		return driverIsCreative() || driveableData.fuelInTank > 0;
 	}
 
 	public boolean hasEnoughFuel(){
-		if(seats == null || seats[0] == null || seats[0].getPassenger() == null){
+		if(seats == null || seats[0] == null || seats[0].getControllingPassenger() == null){
 			return false;
 		}
 		return driverIsCreative() || driveableData.fuelInTank > driveableData.engine.fuelConsumption * throttle;

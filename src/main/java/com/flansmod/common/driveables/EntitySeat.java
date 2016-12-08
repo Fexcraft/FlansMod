@@ -13,12 +13,15 @@ import com.flansmod.common.guns.ShootableType;
 import com.flansmod.common.network.PacketDriveableKeyHeld;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketSeatDismount;
+import com.flansmod.common.network.packets.PacketSeatRemoval;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -76,40 +79,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	private float prevPlayerYaw, prevPlayerPitch;
 	private boolean shooting;
 	
-	/*public static Entity passenger;
-	
-	public Entity getPassenger(){
-		if(this.getPassengers().isEmpty()){
-			if(passenger != null){
-				passenger.dismountRidingEntity();
-				passenger.startRiding(this, true);
-				return passenger;
-			}
-			return null;
-		}
-		else{
-			if(passenger != null){
-				if(this.getPassengers().get(0) != passenger){
-					this.removePassengers();
-					passenger.startRiding(this, true);
-					return this.getPassengers().get(0);
-				}
-				else return this.getPassengers().get(0);
-			}
-			else{
-				this.removePassengers();
-				return null;
-			}
-		}
-	}*/
-	
-	public Entity getPassenger(){
-		if(this.getPassengers().isEmpty()){
-			return null;
-		}
-		else return this.getPassengers().get(0);
-	}
-	
 	/** Default constructor for spawning client side 
 	 * Should not be called server side EVER */
 	public EntitySeat(World world) 
@@ -153,7 +122,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		prevPosY = posY;
 		prevPosZ = posZ;
 		
-	    if(driver && getPassenger() == null){//tt
+	    if(driver && getControllingPassenger() == null){//tt
 	        prevLooking = looking.clone();
 	        prevPlayerLooking = playerLooking.clone();
 	    }
@@ -207,7 +176,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			pitchSoundDelay = seatInfo.pitchSoundLength;
 		}
 		
-		boolean isThePlayer = getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)getPassenger());
+		boolean isThePlayer = getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)getControllingPassenger());
 		
 		//Reset traverse sounds if player exits the vehicle
 		
@@ -229,8 +198,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 		}
 
-		if(getPassenger() instanceof EntityPlayer && shooting)
-			pressKey(9, (EntityPlayer)getPassenger());
+		if(getControllingPassenger() instanceof EntityPlayer && shooting)
+			pressKey(9, (EntityPlayer)getControllingPassenger());
 		
 		minigunSpeed *= 0.95F;
 		minigunAngle += minigunSpeed;
@@ -240,7 +209,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	/** Set the position to be that of the driveable plus the local position, rotated */
 	public void updatePosition()
 	{
-		Entity passenger = getPassenger();
+		Entity passenger = getControllingPassenger();
 		
 		//If we haven't found our driveable, give up
 		if(worldObj.isRemote && !foundDriveable)
@@ -276,7 +245,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		if(passenger != null)
 		{
 	    	//DriveableType type = driveable.getDriveableType();
-			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, getPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, getPassenger().getEyeHeight(), 0);
+			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, getControllingPassenger().getEyeHeight(), 0);
 			//driveable.rotate(0, passenger.getYOffset(), 0).toVec3();
 			
 			playerPosX = posX + yOffset.xCoord;
@@ -300,7 +269,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			if(dYaw < -180)
 				prevPlayerYaw -= 360F;
 			
-			if(getPassenger() instanceof EntityPlayer)
+			if(getControllingPassenger() instanceof EntityPlayer)
 			{
 				passenger.prevRotationYaw = prevPlayerYaw;
 				passenger.prevRotationPitch = prevPlayerPitch;
@@ -601,8 +570,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		
 		//Exit key pressed
-		if(key == 6 && getPassenger() != null){
-			getPassenger().dismountRidingEntity();
+		if(key == 6 && getControllingPassenger() != null){
+			getControllingPassenger().dismountRidingEntity();
 			//TODO passenger = null;
 		}
 				
@@ -636,7 +605,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 							worldObj.spawnEntityInWorld(((ItemShootable)bulletItemStack.getItem()).getEntity(worldObj, 
 									Vector3f.add(yOffset, new Vector3f(gunOrigin.x, gunOrigin.y, gunOrigin.z), null), 
 									shootVec, 
-									(EntityLivingBase)getPassenger(), 
+									(EntityLivingBase)getControllingPassenger(), 
 									bullet.bulletSpread * gun.bulletSpread, 
 									gun.damage, 
 									gun.bulletSpeed <= 0.0f ? 5.0f : gun.bulletSpeed, // TODO : Fix nasty hack 
@@ -656,7 +625,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 							{
 								//Set the damage to 0 and consume one ammo item (unless in creative)
 								bulletItemStack.setItemDamage(0);
-								if(!((EntityPlayer)getPassenger()).capabilities.isCreativeMode)
+								if(!((EntityPlayer)getControllingPassenger()).capabilities.isCreativeMode)
 									driveable.getDriveableData().decrStackSize(3 + seatID, 1);
 							}
 							//Reset the shoot delay
@@ -682,10 +651,10 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			return true;
 		/*if(currentItem != null && currentItem.getItem() instanceof ItemLead)
 		{
-			if(getPassenger() != null && getPassenger() instanceof EntityLiving && !(getPassenger() instanceof EntityPlayer))
+			if(getControllingPassenger() != null && getControllingPassenger() instanceof EntityLiving && !(getControllingPassenger() instanceof EntityPlayer))
 			{
-				EntityLiving mob = (EntityLiving)getPassenger();
-				getPassenger().dismountRidingEntity();
+				EntityLiving mob = (EntityLiving)getControllingPassenger();
+				getControllingPassenger().dismountRidingEntity();
 				passenger = null;
 				mob.setLeashedToEntity(entityplayer, true);
 				return true;
@@ -706,7 +675,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			return true;
 		}*/
 		//Put them in the seat
-		if(getPassenger() == null && !driveable.getDriveableData().engine.isAIChip)
+		if(getControllingPassenger() == null && !driveable.getDriveableData().engine.isAIChip)
 		{
 			entityplayer.startRiding(this);
 			//TODO this.passenger = entityplayer;
@@ -718,27 +687,78 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	@Override
 	public Entity getControllingEntity() 
 	{
-		return getPassenger();
+		return getControllingPassenger();
+	}
+	
+	@Override
+	public void addPassenger(Entity entity){
+		super.addPassenger(entity);
+		//Print.spam(1, "AP => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
+	}
+	
+	public void removeSeatPassenger(){
+		if(!worldObj.isRemote){
+			this.getControllingPassenger().dismountRidingEntity();
+			Print.spam(1, "DMKP");
+		}
+	}
+	
+	public boolean dismount = false;
+	
+	@Override
+	public void removePassenger(Entity entity){
+		if(worldObj.isRemote){
+			if(!dismount){
+				//Print.spam(1, "Received 'removePassenger(<ENT>)' call, but ignoring it since it wasn't sent from the server.");
+			}
+			else{
+				super.removePassenger(entity);
+			}
+		}
+		else{
+			super.removePassenger(entity);
+			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatDismount(this));//TODO ranged packet maybe?
+		}
+		//Print.spam(1, "RM => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 
 	@Override
-	public boolean isDead() 
-	{
+	public boolean isDead() {
 		return isDead;
 	}
+	
+	public void remove(){
+		this.exists = false;
+		this.setDead();
+	}
 
+	public boolean exists = true;
+	
 	@Override
-	public void setDead()
-	{
-		super.setDead();
+	public void setDead(){
+		if(worldObj.isRemote){
+			if(exists){
+				//Print.spam(1, "Received 'setDead()' call, but ignoring it since it wasn't sent from the server.");
+			}
+			else{
+				super.setDead();
+			}
+		}
+		else{
+			super.setDead();
+			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatRemoval(this));//TODO ranged packet maybe?
+		}
+		//Print.spam(1, "DD => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
+	}
+	
+	@Override
+	public Entity getControllingPassenger(){
+		return this.getPassengers().isEmpty() ? null : (Entity)this.getPassengers().get(0);
 	}
 	
 	
 	@Override
     public void updatePassenger(Entity passenger){
-		if(passenger != getPassenger()){
-			passenger = getPassenger();
-		}
 		if(passenger instanceof EntityPlayer){
 			passenger.rotationYaw = playerYaw;
 			passenger.rotationPitch = playerPitch;

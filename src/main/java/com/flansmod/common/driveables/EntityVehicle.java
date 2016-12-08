@@ -196,15 +196,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				}
 				case 6 : //Exit : Get out
 				{
-					seats[0].getPassenger().dismountRidingEntity();
-					//TODO seats[0].passenger = null;
+					seats[0].removeSeatPassenger();
 			  		return true;
 				}
 				case 7 : //Inventory
 				{
 					if(worldObj.isRemote)
 					{
-						FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getPassenger(), worldObj, this);
+						FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getControllingPassenger(), worldObj, this);
 					}
 					return true;
 				}
@@ -285,11 +284,11 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		}
 
 		//Work out if this is the client side and the player is driving
-		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getPassenger());
+		boolean thePlayerIsDrivingThis = worldObj.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger());
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && seats[0].getPassenger() != null){
+		if(!worldObj.isRemote && seats[0].getControllingPassenger() != null){
 			ticksSinceUsed = 0;
 		}
 		if(!worldObj.isRemote && Config.vehicleLife > 0 && ticksSinceUsed > Config.vehicleLife * 20){
@@ -386,7 +385,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			
 			//Apply velocity
 			//If the player driving this is in creative, then we can thrust, no matter what
-			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getPassenger()).capabilities.isCreativeMode);
+			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
 			if(canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption * throttle)
 			{
@@ -607,7 +606,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 
 		VehicleType type = getVehicleType();
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getPassenger() == null))
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack vehicleStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();

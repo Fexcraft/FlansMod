@@ -62,7 +62,7 @@ public class SeatUpdatePacketHandler {
 					}
 					if(driveable != null){
 						//If this is the player who sent the packet in the first place, don't read it
-						if(driveable.seats[packet.seatId] == null || driveable.seats[packet.seatId].getPassenger() == player){
+						if(driveable.seats[packet.seatId] == null || driveable.seats[packet.seatId].getControllingPassenger() == player){
 							return;
 						}
 						driveable.seats[packet.seatId].prevLooking = driveable.seats[packet.seatId].looking.clone();
