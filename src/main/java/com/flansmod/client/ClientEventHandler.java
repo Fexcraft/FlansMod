@@ -4,7 +4,6 @@ import org.lwjgl.input.Keyboard;
 
 import com.flansmod.client.model.InstantBulletRenderer;
 import com.flansmod.client.model.RenderGun;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.ItemGun;
 
 import net.minecraft.client.Minecraft;
@@ -23,8 +22,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 /** All handled events for the client should go through here and be passed on. Makes it easier to see which events are being handled by the mod */
-public class ClientEventHandler
-{
+public class ClientEventHandler {
 	private KeyInputHandler keyInputHandler = new KeyInputHandler();
 	private ClientRenderHooks renderHooks = new ClientRenderHooks();
 
@@ -59,13 +57,13 @@ public class ClientEventHandler
 			case START :
 			{
 				//Handle all packets received since last tick
-				FlansMod.getPacketHandler().handleClientPackets();
+				//FlansMod.getPacketHandler().handleClientPackets();
 				FlansModClient.UpdateFlashlights(Minecraft.getMinecraft());
 				break;
 			}
 			case END :
 			{
-		    	InstantBulletRenderer.UpdateAllTrails();
+		    	//InstantBulletRenderer.UpdateAllTrails();
 				renderHooks.update();
 				FlansModClient.tick();
 				
@@ -96,9 +94,8 @@ public class ClientEventHandler
 	}
 	
 	@SubscribeEvent
-	public void CheckKeyInput(KeyInputEvent event)
-	{
-		keyInputHandler.CheckKeyInput(event);
+	public void checkKeyInput(KeyInputEvent event){
+		keyInputHandler.checkKeyInput(event);
 	}
 	
 	@SubscribeEvent

@@ -277,21 +277,19 @@ public class FlansModClient extends FlansMod
 		return true;
 	}
 	
-	public static void reloadModels(boolean reloadSkins)
-	{
-		for(InfoType type : InfoType.infoTypes.values())
-		{
+	public static void reloadModels(boolean reloadSkins){
+		for(InfoType type : InfoType.infoTypes.values()){
 			type.reloadModel();
 		}
-		if(reloadSkins)
+		if(reloadSkins){
 			proxy.forceReload();
+		}
 	}
 	
 	public static Minecraft minecraft = FMLClientHandler.instance().getClient();
 	
-	public static EnumParticleTypes getParticleType(String s)
-	{
-		if(s.equals("hugeexplosion")) 		return EnumParticleTypes.EXPLOSION_HUGE;
+	public static EnumParticleTypes getParticleType(String s){
+		     if(s.equals("hugeexplosion"))  return EnumParticleTypes.EXPLOSION_HUGE;
 		else if(s.equals("largeexplode"))	return EnumParticleTypes.EXPLOSION_LARGE;
 		else if(s.equals("explode"))		return EnumParticleTypes.EXPLOSION_NORMAL;
 		else if(s.equals("fireworksSpark"))	return EnumParticleTypes.FIREWORKS_SPARK;
@@ -500,6 +498,52 @@ public class FlansModClient extends FlansMod
 						}
 					}
 				}
+				/*if(player.getRidingEntity() instanceof IControllable){
+					EntityDriveable icon = ((EntitySeat)player.getRidingEntity()).driveable;
+					for(int j = 0; j < 3; j++){
+						for(int i = 0; i < 10; i++){
+							float f = 10 / 2f * (i + 1);
+					        Vec3d vec3d = new Vec3d(icon.posX, (icon.posY - 1) + (j * 0.75), icon.posZ);
+					        Vec3d vec3d1 = Util.getVectorForRotation(icon.axes.getPitch(), icon.axes.getYaw() - 90);
+					        Vec3d vec = vec3d.addVector(vec3d1.xCoord * f, vec3d1.yCoord * f, vec3d1.zCoord * f);
+							RayTraceResult ray = mc.world.rayTraceBlocks(vec3d, vec);
+							if(ray != null){
+								int x = ray.getBlockPos().getX();
+								int y = ray.getBlockPos().getY();
+								int z = ray.getBlockPos().getZ();
+								EnumFacing side = ray.sideHit;
+								switch(side){
+									case DOWN:
+										y--;
+										break;
+									case UP:
+										y++;
+										break;
+									case NORTH:
+										z--;
+										break;
+									case SOUTH:
+										z++;
+										break;
+									case WEST:
+										x--;
+										break;
+									case EAST:
+										x++;
+										break;
+								}
+								blockLightOverrides.add(new Vector3i(x, y, z));
+								mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 8);
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
+								mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
+							}
+						}
+					}
+				}*/
 			}
 			
 			for(Object obj : mc.world.loadedEntityList)

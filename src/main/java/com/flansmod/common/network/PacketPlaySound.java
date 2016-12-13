@@ -3,7 +3,6 @@ package com.flansmod.common.network;
 import java.util.Random;
 
 import com.flansmod.client.FlansModResourceHandler;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
@@ -33,7 +32,7 @@ public class PacketPlaySound extends PacketBase
 	
 	public static void sendSoundPacket(double x, double y, double z, double range, int dimension, String s, boolean distort, boolean silenced)
 	{
-		FlansMod.getPacketHandler().sendToAllAround(new PacketPlaySound(x, y, z, s, distort, silenced), x, y, z, (float)range, dimension);
+		//FlansMod.getPacketHandler().sendToAllAround(new PacketPlaySound(x, y, z, s, distort, silenced), x, y, z, (float)range, dimension);
 	}
 
 	public PacketPlaySound(double x, double y, double z, String s)

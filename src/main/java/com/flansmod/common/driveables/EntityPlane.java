@@ -1,7 +1,6 @@
 package com.flansmod.common.driveables;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.network.PacketPlaneControl;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
@@ -715,7 +714,7 @@ public class EntityPlane extends EntityDriveable
 		//Calculate movement on the client and then send position, rotation etc to the server
 		if(thePlayerIsDrivingThis)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketPlaneControl(this));
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketPlaneControl(this));
 			serverPosX = posX;
 			serverPosY = posY;
 			serverPosZ = posZ;
@@ -726,7 +725,7 @@ public class EntityPlane extends EntityDriveable
 		//float updateSpeed = 0.01F;
 		if(!world.isRemote)// && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed))
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+			//TODO FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 		}
 	}
 

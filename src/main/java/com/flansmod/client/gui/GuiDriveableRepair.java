@@ -10,7 +10,6 @@ import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.network.PacketDriveableGUI;
 import com.flansmod.common.util.Ticker;
 
 import net.minecraft.client.gui.GuiButton;
@@ -208,7 +207,7 @@ public class GuiDriveableRepair extends GuiScreen
 		if(m > 185 && m < 195 && n > 5 && n < 15)
 			if(driving instanceof EntityMecha)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
+				//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				(driver).openGui(FlansMod.INSTANCE, 10, driver.world, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
 			}
 			else

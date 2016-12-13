@@ -60,10 +60,6 @@ import com.flansmod.common.guns.EntityGrenade;
 import com.flansmod.common.guns.EntityMG;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.network.PacketBuyArmour;
-import com.flansmod.common.network.PacketBuyWeapon;
-import com.flansmod.common.network.PacketCraftDriveable;
-import com.flansmod.common.network.PacketRepairDriveable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.teams.ArmourBoxType;
 import com.flansmod.common.teams.BlockArmourBox;
@@ -388,7 +384,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void buyGun(GunBoxType type, InfoType gun)
 	{
-		FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, gun));
+		//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, gun));
 		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
 		data.shootTimeLeft = data.shootTimeRight = 10;
 	}
@@ -396,7 +392,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void buyArmour(String shortName, int piece, ArmourBoxType box)
 	{
-		FlansMod.getPacketHandler().sendToServer(new PacketBuyArmour(box.shortName, shortName, piece));
+		//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyArmour(box.shortName, shortName, piece));
 		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
 		data.shootTimeLeft = data.shootTimeRight = 10;
 	}
@@ -406,8 +402,9 @@ public class ClientProxy extends CommonProxy
 	{
 		//Craft it this side (so the inventory updates immediately) and then send a packet to the server so that it is crafted that side too
 		super.craftDriveable(player, type);
-		if(player.world.isRemote)
-			FlansMod.getPacketHandler().sendToServer(new PacketCraftDriveable(type.shortName));
+		if(player.world.isRemote){
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketCraftDriveable(type.shortName));
+		}
 	}
 	
 	@Override
@@ -415,8 +412,9 @@ public class ClientProxy extends CommonProxy
 	{
 		//Repair it this side (so the inventory updates immediately) and then send a packet to the server so that it is repaired that side too
 		super.repairDriveable(driver, driving, part);
-		if(driver.world.isRemote)
-			FlansMod.getPacketHandler().sendToServer(new PacketRepairDriveable(part.type));
+		if(driver.world.isRemote){
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketRepairDriveable(part.type));
+		}
 	}
 	
 	/** Helper method that returns whether there is a GUI open */

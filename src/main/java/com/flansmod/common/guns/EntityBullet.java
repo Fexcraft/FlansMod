@@ -19,7 +19,6 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.EntityHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
-import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Config;
@@ -563,7 +562,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 		// Send flak packet
 		if (bulletType.flak > 0 && owner != null)
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(detonatePos.x, detonatePos.y, detonatePos.z, bulletType.flak, bulletType.flakParticles), detonatePos.x, detonatePos.y, detonatePos.z, 200, owner.dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(detonatePos.x, detonatePos.y, detonatePos.z, bulletType.flak, bulletType.flakParticles), detonatePos.x, detonatePos.y, detonatePos.z, 200, owner.dimension);
 		}
 		// Drop item on hitting if bullet requires it
 		if (bulletType.dropItemOnHit != null) 

@@ -15,11 +15,9 @@ import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.client.model.ModelAttachment;
 import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.client.model.RenderGun;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.guns.Paintjob;
-import com.flansmod.common.network.PacketGunPaint;
 import com.flansmod.common.paintjob.ContainerPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.types.EnumType;
@@ -687,7 +685,7 @@ public class GuiPaintjobTable extends GuiContainer
 		if(hoveringOver == null)
 			return;
 		
-		FlansMod.getPacketHandler().sendToServer(new PacketGunPaint(hoveringOver.ID));
+		//TODO FlansMod.getPacketHandler().sendToServer(new PacketGunPaint(hoveringOver.ID));
 		((ContainerPaintjobTable)inventorySlots).clickPaintjob(hoveringOver.ID);
 	}
 }

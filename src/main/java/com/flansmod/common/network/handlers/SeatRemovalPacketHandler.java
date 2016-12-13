@@ -2,6 +2,8 @@ package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.packets.PacketSeatRemoval;
+
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,8 +31,15 @@ public class SeatRemovalPacketHandler {
 						}
 					}
 					if(driveable != null){
-						driveable.seats[packet.seatId].exists = false;
-						driveable.seats[packet.seatId].setDead();
+						try{
+							Print.spam(1, "SEAT REMOVAL PACKET [CLIENT]");
+							driveable.seats[packet.seatId].exists = false;
+							driveable.seats[packet.seatId].setDead();
+							Print.spam(1, "SEAT REMOVAL PACKET END [CLIENT]");
+						}
+						catch(Exception e){
+							Print.spam(1, "SEAT REMOVAL PACKET FAILED [CLIENT]");
+						}
 					}
 				}
 			});

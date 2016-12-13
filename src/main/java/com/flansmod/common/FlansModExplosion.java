@@ -29,6 +29,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class FlansModExplosion extends Explosion 
 {
@@ -75,8 +76,11 @@ public class FlansModExplosion extends Explosion
         {
 	        this.doExplosionA();
 	        this.doExplosionB(true);
-	        for(Object obj : world.playerEntities)
-	        	FlansMod.getPacketHandler().sendTo(new SPacketExplosion(x, y, z, radius, getAffectedBlockPositions(), (Vec3d)getPlayerKnockbackMap().get((EntityPlayer)obj)), (EntityPlayerMP)obj);
+	        for(EntityPlayerMP obj : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()){//world.playerEntities){
+	        	//TODO check
+	        	obj.connection.sendPacket(new SPacketExplosion(x, y, z, radius, getAffectedBlockPositions(), (Vec3d)getPlayerKnockbackMap().get((EntityPlayer)obj)));
+	        	//FlansMod.getPacketHandler().sendTo(new SPacketExplosion(x, y, z, radius, getAffectedBlockPositions(), (Vec3d)getPlayerKnockbackMap().get((EntityPlayer)obj)), (EntityPlayerMP)obj);
+	        }
         }
 	}
 

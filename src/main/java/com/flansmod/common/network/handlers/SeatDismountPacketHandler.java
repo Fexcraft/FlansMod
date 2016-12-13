@@ -2,6 +2,8 @@ package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.packets.PacketSeatDismount;
+
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,8 +31,15 @@ public class SeatDismountPacketHandler {
 						}
 					}
 					if(driveable != null){
-						driveable.seats[packet.seatId].dismount = true;
-						driveable.seats[packet.seatId].removePassengers();
+						try{
+							Print.spam(1, "DISMOUNT PACKET [CLIENT]");
+							driveable.seats[packet.seatId].dismount = true;
+							driveable.seats[packet.seatId].getControllingPassenger().dismountRidingEntity();
+							Print.spam(1, "DISMOUNT PACKET END [CLIENT]");
+						}
+						catch(Exception e){
+							Print.spam(1, "DISMOUNT PACKET FAILED [CLIENT]");
+						}
 					}
 				}
 			});

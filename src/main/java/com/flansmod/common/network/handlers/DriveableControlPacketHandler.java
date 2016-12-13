@@ -74,6 +74,9 @@ public class DriveableControlPacketHandler {
 	}
 	
 	protected static void updateDriveable(EntityDriveable driveable, PacketDriveableControl pkt){
+		if(pkt.errored){
+			return;
+		}
 		driveable.setPositionRotationAndMotion(pkt.posX, pkt.posY, pkt.posZ, pkt.yaw, pkt.pitch, pkt.roll, pkt.motX, pkt.motY, pkt.motZ, pkt.avelx, pkt.avely, pkt.avelz, pkt.throttle, pkt.steeringYaw);
 		driveable.driveableData.fuelInTank = pkt.fuelInTank;
 	}

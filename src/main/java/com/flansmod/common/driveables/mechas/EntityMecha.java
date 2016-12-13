@@ -20,9 +20,6 @@ import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.ItemShootable;
 import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.network.PacketDriveableDamage;
-import com.flansmod.common.network.PacketDriveableGUI;
-import com.flansmod.common.network.PacketMechaControl;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.tools.ItemTool;
@@ -248,13 +245,12 @@ public class EntityMecha extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				seats[0].getControllingPassenger().dismountRidingEntity();
-				//TODO seats[0].passenger = null;
+				seats[0].removeSeatPassenger();
 		  		return true;
 			}
 			case 7 : //Inventory
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
+				//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				((EntityPlayer)seats[0].getControllingPassenger()).openGui(FlansMod.INSTANCE, 10, world, chunkCoordX, chunkCoordY, chunkCoordZ);
 				return true;
 			}
@@ -493,7 +489,7 @@ public class EntityMecha extends EntityDriveable
 
 			driveableData.parts.get(EnumDriveablePart.hips).attack(damageToInflict, false);
 			checkParts();
-			FlansMod.getPacketHandler().sendToAllAround(new PacketDriveableDamage(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+			//TODO FlansMod.getPacketHandler().sendToAllAround(new PacketDriveableDamage(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 			if(blockDamageFromFalling > 1)
 			{
 				world.createExplosion(this, posX, posY, posZ, blockDamageFromFalling, Config.explosions);
@@ -968,7 +964,7 @@ public class EntityMecha extends EntityDriveable
 		//Calculate movement on the client and then send position, rotation etc to the server
 		if(thePlayerIsDrivingThis)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketMechaControl(this));
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketMechaControl(this));
 			serverPosX = posX;
 			serverPosY = posY;
 			serverPosZ = posZ;
@@ -978,7 +974,7 @@ public class EntityMecha extends EntityDriveable
 		//If this is the server, send position updates to everyone, having received them from the driver
 		if(!world.isRemote && ticksExisted % 5 == 0)
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketMechaControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+			//TODO FlansMod.getPacketHandler().sendToAllAround(new PacketMechaControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 		}
 		
 		for(EntitySeat seat : seats)

@@ -1,6 +1,5 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
@@ -51,7 +50,7 @@ public class PacketSelectOffHandGun extends PacketBase
 		//PlayerData data = PlayerHandler.getPlayerData(playerEntity, Side.SERVER);
 		//data.offHandGunSlot = slot;
 		
-		FlansMod.getPacketHandler().sendToAllAround(new PacketOffHandGunInfo(playerEntity, slot), playerEntity.posX, playerEntity.posY, playerEntity.posZ, 50F, playerEntity.dimension);
+		//FlansMod.getPacketHandler().sendToAllAround(new PacketOffHandGunInfo(playerEntity, slot), playerEntity.posX, playerEntity.posY, playerEntity.posZ, 50F, playerEntity.dimension);
 	}
 
 

@@ -2,13 +2,11 @@ package com.flansmod.client.gui;
 
 import java.io.IOException;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.boxes.ContainerGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntryTopLevel;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxPage;
-import com.flansmod.common.network.PacketBuyWeapon;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
 
@@ -130,10 +128,10 @@ public class GuiGunBox extends GuiContainer
 		switch(button.id)
 		{
 		case 0: //Left
-			FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentEntry.type));
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentEntry.type));
 			break;
 		case 1: //Right
-			FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentSubEntry.type));
+			//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentSubEntry.type));
 			break;
 		case 2: //Left
 			if(pageScroller > 0)

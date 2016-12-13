@@ -8,8 +8,6 @@ import org.lwjgl.input.Mouse;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.network.PacketMGFire;
-import com.flansmod.common.network.PacketMGMount;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.teams.EntityGunItem;
 import com.flansmod.common.util.Config;
@@ -210,12 +208,12 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	{
 		if(Mouse.isButtonDown(0) && !wasShooting && !FlansMod.proxy.isScreenOpen())
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketMGFire(true));
+			//FlansMod.getPacketHandler().sendToServer(new PacketMGFire(true));
 			wasShooting = true;
 		}
 		else if(!Mouse.isButtonDown(0) && wasShooting)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketMGFire(false));
+			//FlansMod.getPacketHandler().sendToServer(new PacketMGFire(false));
 			wasShooting = false;
 		}
 	}
@@ -291,7 +289,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			if(gunner == player)
 			{
 				mountGun(player, false);
-				FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, false), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+				//FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, false), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 				return true;
 			}
 			
@@ -308,7 +306,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 
 			//None of the above applied, so mount the gun
 			mountGun(player, true);
-			FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, true), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, true), posX, posY, posZ, Config.driveableUpdateRange, dimension);
 			if (ammo == null)
 			{
 				int slot = findAmmo(player);

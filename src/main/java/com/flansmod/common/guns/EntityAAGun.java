@@ -3,8 +3,6 @@ package com.flansmod.common.guns;
 import org.lwjgl.input.Mouse;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.network.PacketAAGunAngles;
-import com.flansmod.common.network.PacketMGFire;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
@@ -401,7 +399,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		}
 		if(!world.isRemote)
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketAAGunAngles(this), posX, posY, posZ, 50F, dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketAAGunAngles(this), posX, posY, posZ, 50F, dimension);
 		}
 	}
 	
@@ -439,12 +437,12 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		//Send a packet!
 		if(Mouse.isButtonDown(0) && !wasShooting && !FlansMod.proxy.isScreenOpen())
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketMGFire(true));
+			//FlansMod.getPacketHandler().sendToServer(new PacketMGFire(true));
 			wasShooting = true;
 		}
 		else if(!Mouse.isButtonDown(0) && wasShooting)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketMGFire(false));
+			//FlansMod.getPacketHandler().sendToServer(new PacketMGFire(false));
 			wasShooting = false;
 		}
 	}

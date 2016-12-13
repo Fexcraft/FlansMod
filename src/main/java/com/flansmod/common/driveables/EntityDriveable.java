@@ -28,9 +28,8 @@ import com.flansmod.common.guns.ShotData.SpawnEntityShotData;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
-import com.flansmod.common.network.PacketDriveableDamage;
-import com.flansmod.common.network.PacketDriveableKeyHeld;
 import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
@@ -452,7 +451,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	{
 		if(world.isRemote)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketDriveableKeyHeld(key, held));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKeyHeld(key, held));
 		}
 		switch(key)
 		{
@@ -1264,7 +1263,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		{
 			checkParts();
 			//If it hit, send a damage update packet
-			FlansMod.getPacketHandler().sendToAllAround(new PacketDriveableDamage(this), posX, posY, posZ, 100, dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketDriveableDamage(this), posX, posY, posZ, 100, dimension);
 		}
 		
 		return penetratingPower - 5F;

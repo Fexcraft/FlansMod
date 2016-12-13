@@ -9,8 +9,6 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.ContainerDriveableInventory;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.network.PacketDriveableGUI;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -176,7 +174,7 @@ public class GuiDriveableInventory extends GuiContainer
 		{
 			if(driveable instanceof EntityMecha)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
+				//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				(inventory.player).openGui(FlansMod.INSTANCE, 10, world, driveable.chunkCoordX, driveable.chunkCoordY, driveable.chunkCoordZ);
 			}
 			else

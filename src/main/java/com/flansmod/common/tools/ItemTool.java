@@ -9,7 +9,6 @@ import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.vector.Vector3f;
@@ -28,7 +27,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -204,7 +202,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType>, IItem
 						return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 
 					hitLiving.heal(type.healAmount);
-					FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(hitLiving.posX, hitLiving.posY, hitLiving.posZ, 5, "heart"), new NetworkRegistry.TargetPoint(hitLiving.dimension, hitLiving.posX, hitLiving.posY, hitLiving.posZ, 50F));
+					//TODO FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(hitLiving.posX, hitLiving.posY, hitLiving.posZ, 5, "heart"), new NetworkRegistry.TargetPoint(hitLiving.dimension, hitLiving.posX, hitLiving.posY, hitLiving.posZ, 50F));
 
 					//If not in creative and the tool should decay, damage it
 					if(!entityplayer.capabilities.isCreativeMode && type.toolLife > 0)

@@ -18,6 +18,7 @@ public class PacketDriveableControl implements IPacket, IMessage{
 	public float throttle;
 	public float fuelInTank;
 	public float steeringYaw;
+	public boolean errored = false;
 	
 	public PacketDriveableControl(){}
 	
@@ -37,13 +38,11 @@ public class PacketDriveableControl implements IPacket, IMessage{
 		avelz = driveable.angularVelocity.z;
 		throttle = driveable.throttle;
 		fuelInTank = driveable.driveableData.fuelInTank;
-		if(driveable instanceof EntityVehicle)
-		{
+		if(driveable instanceof EntityVehicle){
 			EntityVehicle veh = (EntityVehicle)driveable;
 			steeringYaw = veh.wheelsYaw;
 		}
-		else if(driveable instanceof EntityPlane)
-		{
+		else if(driveable instanceof EntityPlane){
 			EntityPlane plane = (EntityPlane)driveable;
 			steeringYaw = plane.flapsYaw;
 		}
@@ -71,22 +70,29 @@ public class PacketDriveableControl implements IPacket, IMessage{
 
 	@Override
 	public void fromBytes(ByteBuf buf){
-		entityId = buf.readInt();
-		posX = buf.readDouble();
-		posY = buf.readDouble();
-		posZ = buf.readDouble();
-		yaw = buf.readFloat();
-		pitch = buf.readFloat();
-		roll = buf.readFloat();
-		motX = buf.readDouble();
-		motY = buf.readDouble();
-		motZ = buf.readDouble();
-		avelx = buf.readFloat();
-		avely = buf.readFloat();
-		avelz = buf.readFloat();
-		throttle = buf.readFloat();
-		fuelInTank = buf.readFloat();
-		steeringYaw = buf.readFloat();
+		try{
+			entityId = buf.readInt();
+			posX = buf.readDouble();
+			posY = buf.readDouble();
+			posZ = buf.readDouble();
+			yaw = buf.readFloat();
+			pitch = buf.readFloat();
+			roll = buf.readFloat();
+			motX = buf.readDouble();
+			motY = buf.readDouble();
+			motZ = buf.readDouble();
+			avelx = buf.readFloat();
+			avely = buf.readFloat();
+			avelz = buf.readFloat();
+			throttle = buf.readFloat();
+			fuelInTank = buf.readFloat();
+			steeringYaw = buf.readFloat();
+		}
+		catch(Exception e){
+			//e.printStackTrace();
+			//Print.spam(1, "PACKET DRIVEABLE DECODE ERROR");
+			errored = true;
+		}
 	}
 	
 }

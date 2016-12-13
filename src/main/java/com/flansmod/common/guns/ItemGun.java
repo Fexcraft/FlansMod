@@ -31,8 +31,6 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.EntityHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.network.PacketPlaySound;
-import com.flansmod.common.network.PacketReload;
-import com.flansmod.common.network.PacketShotData;
 import com.flansmod.common.teams.EntityGunItem;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.types.InfoType;
@@ -425,7 +423,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 						data.burstRoundsRemainingRight = 0;
 					}
 					//Send reload packet to server
-					FlansMod.getPacketHandler().sendToServer(new PacketReload(handSide, false));
+					//FlansMod.getPacketHandler().sendToServer(new PacketReload(handSide, false));
 				}
 			}
 			// Fire!
@@ -523,7 +521,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			// Now send shooting data to the server
 			if(!shotsFiredClient.isEmpty() && player.ticksExisted % CLIENT_TO_SERVER_UPDATE_INTERVAL == 0)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketShotData(shotsFiredClient));
+				//FlansMod.getPacketHandler().sendToServer(new PacketShotData(shotsFiredClient));
 				shotsFiredClient.clear();
 			}
 			
@@ -776,7 +774,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		
 		if(!shotsFiredServer.isEmpty())// && entity.ticksExisted % SERVER_TO_CLIENT_UPDATE_INTERVAL == 0)
 		{
-			FlansMod.getPacketHandler().sendToDimension(new PacketShotData(shotsFiredServer), player.dimension );
+			//FlansMod.getPacketHandler().sendToDimension(new PacketShotData(shotsFiredServer), player.dimension );
 			shotsFiredServer.clear();
 		}
 	}

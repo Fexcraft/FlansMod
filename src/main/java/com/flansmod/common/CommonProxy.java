@@ -19,7 +19,6 @@ import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.ContainerGunModTable;
 import com.flansmod.common.guns.boxes.ContainerGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.network.PacketBreakSound;
 import com.flansmod.common.paintjob.ContainerPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.EnumPartCategory;
@@ -143,7 +142,7 @@ public class CommonProxy {
 	/** Play a block break sound here */
 	public void playBlockBreakSound(int x, int y, int z, Block blockHit)
 	{
-		FlansMod.packetHandler.sendToAll(new PacketBreakSound(x, y, z, blockHit));
+		//TODO FlansMod.packetHandler.sendToAll(new PacketBreakSound(x, y, z, blockHit));
 	}
 		
 	public void craftDriveable(EntityPlayer player, DriveableType type)

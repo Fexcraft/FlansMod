@@ -6,7 +6,6 @@ import java.util.Arrays;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.PacketBaseEdit;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -165,7 +164,7 @@ public class GuiBaseEditor extends GuiScreen
 		super.onGuiClosed();
 		packet.baseName = nameEntryField.getText();
 		Keyboard.enableRepeatEvents(false);
-		FlansMod.getPacketHandler().sendToServer(packet);
+		//TODO FlansMod.getPacketHandler().sendToServer(packet);
 	}
 	
 	@Override

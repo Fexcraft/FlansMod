@@ -45,7 +45,6 @@ import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.FPacketHandler;
-import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.ItemPart;
@@ -109,7 +108,7 @@ public class FlansMod
 	public static File flanDir;
 
 	//Handlers
-	public static final PacketHandler packetHandler = new PacketHandler();
+	//public static final PacketHandler packetHandler = new PacketHandler();
 	public static final FPacketHandler packet_handler = new FPacketHandler();
 	public static final PlayerHandler playerHandler = new PlayerHandler();
 	public static final Ticker tick_handler = new Ticker();
@@ -186,7 +185,7 @@ public class FlansMod
 		//proxy.registerRenderers();
 
 		//Initialising handlers
-		packetHandler.initialise();
+		//packetHandler.initialise();
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CommonGuiHandler());		
 		
 		// Recipes
@@ -244,7 +243,7 @@ public class FlansMod
 	/** The mod post-initialisation method */
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event){
-		packetHandler.postInitialise();
+		//packetHandler.postInitialise();
 		packet_handler.initialise();
 		
 		hooks.hook();
@@ -449,10 +448,10 @@ public class FlansMod
 		//proxy.addMissingJSONs(InfoType.infoTypes);
 	}
 	
-	public static PacketHandler getPacketHandler()
+	/*public static PacketHandler getPacketHandler()
 	{
 		return INSTANCE.packetHandler;
-	}
+	}*/
 	
 	public static SimpleNetworkWrapper getNewPacketHandler(){
 		return packet_handler.getInstance();

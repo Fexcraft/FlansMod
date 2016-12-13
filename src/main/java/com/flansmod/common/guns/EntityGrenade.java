@@ -3,11 +3,9 @@ package com.flansmod.common.guns;
 import java.util.List;
 
 import com.flansmod.client.FlansModClient;
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.FlansModExplosion;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.network.PacketFlak;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.types.InfoType;
@@ -33,7 +31,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 public class EntityGrenade extends EntityShootable implements IEntityAdditionalSpawnData
@@ -129,7 +126,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 		if(smoking)
 		{
 			//Send flak packet to spawn particles
-			FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(posX, posY, posZ, 50, type.smokeParticleType), posX, posY, posZ, 30, dimension);
+			//FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(posX, posY, posZ, 50, type.smokeParticleType), posX, posY, posZ, 30, dimension);
 			//
 			List list = world.getEntitiesWithinAABB(EntityLivingBase.class, getEntityBoundingBox().expand(type.smokeRadius, type.smokeRadius, type.smokeRadius));
 			for(Object obj : list)
@@ -550,7 +547,7 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 			if(type.healAmount > 0 && player.getHealth() < player.getMaxHealth())
 			{
 				player.heal(type.healAmount);
-				FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(player.posX, player.posY, player.posZ, 5, "heart"), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 50F));
+				//FlansMod.getPacketHandler().sendToAllAround(new PacketFlak(player.posX, player.posY, player.posZ, 5, "heart"), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 50F));
 				used = true;
 			}
 			//Handle potion effects
