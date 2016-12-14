@@ -9,6 +9,8 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.driveables.VehicleType;
 import com.flansmod.common.vector.Vector3f;
 
+import net.fexcraft.mod.lib.util.render.RGB;
+
 //Extensible ModelVehicle class for rendering vehicle models
 public class ModelVehicle extends ModelDriveable
 {
@@ -36,6 +38,12 @@ public class ModelVehicle extends ModelDriveable
 	
 	public ModelRendererTurbo drillHeadModel[] = new ModelRendererTurbo[0]; 		//Drill head. Rotates around
 	public Vector3f drillHeadOrigin = new Vector3f();								//this point
+	
+	
+	/*public ModelRendererTurbo primaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo secondaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorOpenModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorCloseModel[] = new ModelRendererTurbo[0];*/
 	
 	public int animFrame = 0;
 
@@ -74,17 +82,17 @@ public class ModelVehicle extends ModelDriveable
 		renderPart(steeringWheelModel);
 	}
 	
-	public void render(float f5, EntityVehicle vehicle, float f)
-	{
+	public void render(float f5, EntityVehicle vehicle, float f){
+		
 		boolean rotateWheels = vehicle.getVehicleType().rotateWheels;
 		animFrame = vehicle.animFrame;
 
 		//Rendering the body
-		if(vehicle.isPartIntact(EnumDriveablePart.core))
-		{
-			for (ModelRendererTurbo aBodyModel : bodyModel) {
+		if(vehicle.isPartIntact(EnumDriveablePart.core)){
+			
+			for (ModelRendererTurbo aBodyModel : bodyModel){
 				aBodyModel.render(f5, oldRotateOrder);
-			}
+			};
 			for (ModelRendererTurbo aBodyDoorOpenModel : bodyDoorOpenModel) {
 				if (vehicle.varDoor)
 					aBodyDoorOpenModel.render(f5, oldRotateOrder);
@@ -93,6 +101,30 @@ public class ModelVehicle extends ModelDriveable
 				if (!vehicle.varDoor)
 					aBodyDoorCloseModel.render(f5, oldRotateOrder);
 			}
+			
+			//PAINT START
+			vehicle.primary_color.glColorApply();
+			for(ModelRendererTurbo model : primaryPaintBodyModel) {
+				model.render(f5, oldRotateOrder);
+			};
+			for(ModelRendererTurbo model : primaryPaintBodyDoorOpenModel) {
+				if(vehicle.varDoor){
+					model.render(f5, oldRotateOrder);
+				}
+			};
+			for(ModelRendererTurbo model : primaryPaintBodyDoorCloseModel) {
+				if(!vehicle.varDoor){
+					model.render(f5, oldRotateOrder);
+				}
+			};
+			RGB.glColorReset();
+			vehicle.secondary_color.glColorApply();
+			for (ModelRendererTurbo model : secondaryPaintBodyModel) {
+				model.render(f5, oldRotateOrder);
+			};
+			RGB.glColorReset();
+			//PAINT END
+			
 			for (ModelRendererTurbo aSteeringWheelModel : steeringWheelModel) {
 				aSteeringWheelModel.rotateAngleX = vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aSteeringWheelModel.render(f5, oldRotateOrder);
@@ -242,7 +274,7 @@ public class ModelVehicle extends ModelDriveable
 		
 		//Render main turret barrel
 		{
-			float yaw = vehicle.seats[0].looking.getYaw();
+			//float yaw = vehicle.seats[0].looking.getYaw();
 			float pitch = vehicle.seats[0].looking.getPitch();
 
 			for (ModelRendererTurbo aTurretModel : turretModel) {

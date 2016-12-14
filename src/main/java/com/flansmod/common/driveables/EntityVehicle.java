@@ -3,6 +3,7 @@ package com.flansmod.common.driveables;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.tools.ItemTool;
@@ -16,6 +17,8 @@ import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -116,24 +119,34 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	@Override
 	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand)
 	{
-		if(isDead)
+		if(isDead){
 			return false;
-		if(world.isRemote)
+		}
+		if(world.isRemote){
 			return false;
+		}
 		
 		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
 			return true;
+		}
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && !entityplayer.isSneaking()){
+			primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			return true;
+		}
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && entityplayer.isSneaking()){
+			secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			return true;
+		}
 		
 		VehicleType type = getVehicleType();
 		//Check each seat in order to see if the player can sit in it
-		for(int i = 0; i <= type.numPassengers; i++)
-		{
-			if(seats[i].processInitialInteract(entityplayer, hand))//.interactFirst(entityplayer))
-			{
-				if(i == 0)
-				{
+		for(int i = 0; i <= type.numPassengers; i++){
+			if(seats[i].processInitialInteract(entityplayer, hand)){
+				if(i == 0){
 					shellDelay = type.vehicleShellDelay;
 					FlansMod.proxy.doTutorialStuff(entityplayer, this);
 				}

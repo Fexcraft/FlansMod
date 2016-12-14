@@ -30,6 +30,7 @@ import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
+import com.flansmod.common.network.packets.PacketDriveableSync;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
@@ -38,6 +39,7 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -120,6 +122,12 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public int animCount = 0;
 	public int animFrame = 0;
 	
+	//MINUS START
+	public RGB primary_color = RGB.BLUE;
+	public RGB secondary_color = RGB.GREEN;
+	public boolean sync = false;
+	//MINUS END
+	
 	public EntityDriveable(World world)
 	{
 		super(world);
@@ -178,11 +186,20 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound tag)
 	{
-		driveableData.writeToNBT(tag);
+		tag = driveableData.writeToNBT(tag);
 		tag.setString("Type", driveableType);
 		tag.setFloat("RotationYaw", axes.getYaw());
 		tag.setFloat("RotationPitch", axes.getPitch());
 		tag.setFloat("RotationRoll", axes.getRoll());
+		
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setFloat("PrimaryColorRed", primary_color.red);
+		nbt.setFloat("PrimaryColorGreen", primary_color.green);
+		nbt.setFloat("PrimaryColorBlue", primary_color.blue);
+		nbt.setFloat("SecondaryColorRed", secondary_color.red);
+		nbt.setFloat("SecondaryColorGreen", secondary_color.green);
+		nbt.setFloat("SecondaryColorBlue", secondary_color.blue);
+		tag.setTag("Minus", nbt);
 	}
 
 	@Override
@@ -196,6 +213,18 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		prevRotationPitch = tag.getFloat("RotationPitch");
 		prevRotationRoll = tag.getFloat("RotationRoll");
 		axes = new RotatedAxes(prevRotationYaw, prevRotationPitch, prevRotationRoll);
+		
+		if(tag.hasKey("Minus")){
+			NBTTagCompound nbt = tag.getCompoundTag("Minus");
+			float pr = nbt.getFloat("PrimaryColorRed");
+			float pg = nbt.getFloat("PrimaryColorGreen");
+			float pb = nbt.getFloat("PrimaryColorBlue");
+			primary_color = new RGB(pr, pg, pb);
+			float sr = nbt.getFloat("SecondaryColorRed");
+			float sg = nbt.getFloat("SecondaryColorGreen");
+			float sb = nbt.getFloat("SecondaryColorBlue");
+			secondary_color = new RGB(sr, sg, sb);
+		}
 	}
 	
 	@Override
@@ -709,26 +738,24 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	}
 		
 	@Override
-    public void onUpdate()
-    {
+    public void onUpdate(){
         super.onUpdate();
+        
+        if(world.isRemote && !sync){
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableSync(this));
+		}
         
         DriveableType type = getDriveableType();
         
-        if(!world.isRemote)
-        {
-        	for(int i = 0; i < getDriveableType().numPassengers + 1; i++)
-        	{
-        		if(seats[i] == null || !seats[i].addedToChunk)
-        		{
+        if(!world.isRemote){
+        	for(int i = 0; i < getDriveableType().numPassengers + 1; i++){
+        		if(seats[i] == null || !seats[i].addedToChunk){
         			seats[i] = new EntitySeat(world, this, i);
     				world.spawnEntity(seats[i]);
         		}
         	}
-        	for(int i = 0; i < type.wheelPositions.length; i++)
-        	{
-        		if(wheels[i] == null || !wheels[i].addedToChunk)
-        		{
+        	for(int i = 0; i < type.wheelPositions.length; i++){
+        		if(wheels[i] == null || !wheels[i].addedToChunk){
         			wheels[i] = new EntityWheel(world, this, i);
     				world.spawnEntity(wheels[i]);
         		}
@@ -737,8 +764,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
         
         //Harvest stuff
   		//Aesthetics
-  		if(hasEnoughFuel())
-  		{
+  		if(hasEnoughFuel()){
   			harvesterAngle += throttle / 5F;	
   		}
   		//Actual harvesting

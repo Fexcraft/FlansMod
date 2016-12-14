@@ -6,6 +6,7 @@ import com.flansmod.common.driveables.EntityVehicle;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
+import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class PacketDriveableControl implements IPacket, IMessage{
@@ -19,6 +20,8 @@ public class PacketDriveableControl implements IPacket, IMessage{
 	public float fuelInTank;
 	public float steeringYaw;
 	public boolean errored = false;
+	public RGB primary;
+	public RGB secondary;
 	
 	public PacketDriveableControl(){}
 	
@@ -46,6 +49,8 @@ public class PacketDriveableControl implements IPacket, IMessage{
 			EntityPlane plane = (EntityPlane)driveable;
 			steeringYaw = plane.flapsYaw;
 		}
+		//this.primary = driveable.driveableData.primary_color;
+		//this.secondary = driveable.driveableData.secondary_color;
 	}
 
 	@Override
@@ -66,6 +71,12 @@ public class PacketDriveableControl implements IPacket, IMessage{
 		buf.writeFloat(throttle);
 		buf.writeFloat(fuelInTank);
 		buf.writeFloat(steeringYaw);
+		/*buf.writeFloat(primary.red);
+		buf.writeFloat(primary.green);
+		buf.writeFloat(primary.blue);
+		buf.writeFloat(secondary.red);
+		buf.writeFloat(secondary.green);
+		buf.writeFloat(secondary.blue);*/
 	}
 
 	@Override
@@ -87,6 +98,8 @@ public class PacketDriveableControl implements IPacket, IMessage{
 			throttle = buf.readFloat();
 			fuelInTank = buf.readFloat();
 			steeringYaw = buf.readFloat();
+			//primary = new RGB(buf.readFloat(), buf.readFloat(), buf.readFloat());
+			//secondary = new RGB(buf.readFloat(), buf.readFloat(), buf.readFloat());
 		}
 		catch(Exception e){
 			//e.printStackTrace();

@@ -1,15 +1,19 @@
 package com.flansmod.common.network;
 
+import com.flansmod.common.network.handlers.DriveableColorPacketHandler;
 import com.flansmod.common.network.handlers.DriveableControlPacketHandler;
 import com.flansmod.common.network.handlers.DriveableKeyPacketHandler;
+import com.flansmod.common.network.handlers.DriveableSyncPacketHandler;
 import com.flansmod.common.network.handlers.EmptyPacketHandler;
 import com.flansmod.common.network.handlers.JsonPacketHandler;
 import com.flansmod.common.network.handlers.SeatDismountPacketHandler;
 import com.flansmod.common.network.handlers.SeatRemovalPacketHandler;
 import com.flansmod.common.network.handlers.SeatUpdatePacketHandler;
 import com.flansmod.common.network.handlers.VehicleControlPacketHandler;
+import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketDriveableSync;
 import com.flansmod.common.network.packets.PacketEmpty;
 import com.flansmod.common.network.packets.PacketSeatDismount;
 import com.flansmod.common.network.packets.PacketSeatRemoval;
@@ -47,6 +51,9 @@ public class FPacketHandler {
 		instance.registerMessage(SeatUpdatePacketHandler.Client.class,            PacketSeatUpdate.class,          id++, Side.CLIENT);
 		instance.registerMessage(SeatRemovalPacketHandler.Client.class,           PacketSeatRemoval.class,         id++, Side.CLIENT);
 		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
+		instance.registerMessage(DriveableColorPacketHandler.Client.class,        PacketDriveableColor.class,      id++, Side.CLIENT);
+		instance.registerMessage(DriveableSyncPacketHandler.Server.class,         PacketDriveableSync.class,       id++, Side.SERVER);
+		instance.registerMessage(DriveableSyncPacketHandler.Client.class,         PacketDriveableSync.class,       id++, Side.CLIENT);
 		
 		PacketHandler.registerListener(PacketHandlerType.JSON, Side.CLIENT, new JsonPacketHandler.Client());
 		PacketHandler.registerListener(PacketHandlerType.JSON, Side.SERVER, new JsonPacketHandler.Server());

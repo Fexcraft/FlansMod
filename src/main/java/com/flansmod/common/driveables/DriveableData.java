@@ -12,8 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 
-public class DriveableData implements IInventory
-{
+public class DriveableData implements IInventory {
+	
 	/** The name of this driveable's type */
 	public String type;
 	/** The sizes of each inventory (guns, bombs / mines, missiles / shells, cargo) */
@@ -29,27 +29,27 @@ public class DriveableData implements IInventory
 	/** Each driveable part has a small class that holds its current status */
 	public HashMap<EnumDriveablePart, DriveablePart> parts;
 	/** Paintjob index */
-	public int paintjobID;	
+	public int paintjobID;
 	
-	public DriveableData(NBTTagCompound tags, int paintjobID)
-	{
+
+	
+	public DriveableData(NBTTagCompound tags, int paintjobID){
 		this(tags);
 		this.paintjobID = paintjobID;
 	}
 	
-	public DriveableData(NBTTagCompound tags)
-	{
+	public DriveableData(NBTTagCompound tags){
 		parts = new HashMap<EnumDriveablePart, DriveablePart>();
 		readFromNBT(tags);
 	}
 
-	public void readFromNBT(NBTTagCompound tag)
-	{
-		if(tag == null)
+	public void readFromNBT(NBTTagCompound tag){
+		if(tag == null){
 			return;
-		if(!tag.hasKey("Type"))
+		}
+		if(!tag.hasKey("Type")){
 			return;
-
+		}
 		type = tag.getString("Type");
 		DriveableType dType = DriveableType.getDriveable(type);
 		numBombs = dType.numBombSlots;
@@ -62,64 +62,63 @@ public class DriveableData implements IInventory
 		bombs = new ItemStack[numBombs];
 		missiles = new ItemStack[numMissiles];
 		cargo = new ItemStack[numCargo];
-		for(int i = 0; i < numGuns; i++)
+		for(int i = 0; i < numGuns; i++){
 			ammo[i] = new ItemStack(tag.getCompoundTag("Ammo " + i));
-		
-		for(int i = 0; i < numBombs; i++)
+		}
+		for(int i = 0; i < numBombs; i++){
 			bombs[i] = new ItemStack(tag.getCompoundTag("Bombs " + i));
-
-		for(int i = 0; i < numMissiles; i++)
+		}
+		for(int i = 0; i < numMissiles; i++){
 			missiles[i] = new ItemStack(tag.getCompoundTag("Missiles " + i));
-
- 		for(int i = 0; i < numCargo; i++)
-			cargo[i] = new ItemStack(tag.getCompoundTag("Cargo " + i));
-
+		}
+ 		for(int i = 0; i < numCargo; i++){
+ 			cargo[i] = new ItemStack(tag.getCompoundTag("Cargo " + i));
+ 		}
 		fuel = new ItemStack(tag.getCompoundTag("Fuel"));
 		fuelInTank = tag.getInteger("FuelInTank");
-		for(EnumDriveablePart part : EnumDriveablePart.values())
-		{
+		for(EnumDriveablePart part : EnumDriveablePart.values()){
 			parts.put(part, new DriveablePart(part, dType.health.get(part)));
 		}
-		for(DriveablePart part : parts.values())
-		{
+		for(DriveablePart part : parts.values()){
 			part.readFromNBT(tag);
 		}
 	}
 
-	public void writeToNBT(NBTTagCompound tag)
-	{
+	public NBTTagCompound writeToNBT(NBTTagCompound tag){
 		tag.setString("Type", type);
 		if(engine != null){
 			tag.setString("Engine", engine.shortName);
 		}
 		tag.setInteger("Paint", paintjobID);
-		for(int i = 0; i < ammo.length; i++)
-		{
-			if(ammo[i] != null)
+		for(int i = 0; i < ammo.length; i++){
+			if(ammo[i] != null){
 				tag.setTag("Ammo " + i, ammo[i].writeToNBT(new NBTTagCompound()));
+			}
 		}
-		for(int i = 0; i < bombs.length; i++)
-		{
-			if(bombs[i] != null)
+		for(int i = 0; i < bombs.length; i++){
+			if(bombs[i] != null){
 				tag.setTag("Bombs " + i, bombs[i].writeToNBT(new NBTTagCompound()));
+			}
 		}
-		for(int i = 0; i < missiles.length; i++)
-		{
-			if(missiles[i] != null)
+		for(int i = 0; i < missiles.length; i++){
+			if(missiles[i] != null){
 				tag.setTag("Missiles " + i, missiles[i].writeToNBT(new NBTTagCompound()));
+			}
 		}
-		for(int i = 0; i < cargo.length; i++)
-		{
-			if(cargo[i] != null)
+		for(int i = 0; i < cargo.length; i++){
+			if(cargo[i] != null){
 				tag.setTag("Cargo " + i, cargo[i].writeToNBT(new NBTTagCompound()));
+			}
 		}
-		if(fuel != null)
+		if(fuel != null){
 			tag.setTag("Fuel", fuel.writeToNBT(new NBTTagCompound()));
+		}
 		tag.setInteger("FuelInTank", (int)fuelInTank);
-		for(DriveablePart part : parts.values())
-		{
+		for(DriveablePart part : parts.values()){
 			part.writeToNBT(tag);
 		}
+		
+		return tag;
 	}
 	
 	@Override

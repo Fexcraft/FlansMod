@@ -15,6 +15,7 @@ import com.flansmod.common.types.TypeFile;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
+import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.init.Items;
@@ -140,7 +141,10 @@ public abstract class DriveableType extends PaintableType
 	
 	/**Track animation frames */
 	public int animFrames = 0;
-
+	
+	public boolean isMinus;
+	public RGB default_primary_color = RGB.BLUE;
+	public RGB default_secondary_color = RGB.RED;
 	
 	public static ArrayList<DriveableType> types = new ArrayList<DriveableType>();
 	
@@ -565,6 +569,17 @@ public abstract class DriveableType extends PaintableType
 				emitter.velocity.scale(1.0f / 16.0f);
 				emitters.add(emitter);
 			}
+			
+			else if(split[0].equals("SetMinus")){
+				isMinus = Boolean.parseBoolean(split[1]);
+			}
+			else if(split[0].equals("DefaultPrimaryRGB")){
+				default_primary_color = new RGB(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
+			}
+			else if(split[0].equals("DefaultSecondaryRGB")){
+				default_secondary_color = new RGB(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
+			}
+			
 		}
 		catch (Exception e)
 		{
