@@ -39,4 +39,14 @@ public class Util {
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
         return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
+    
+    public static boolean isNull(String s){
+    	if(s == null){
+    		return true;
+    	}
+    	else if(s.equals("")){
+    		return true;
+    	}
+    	else return false;
+    }
 }

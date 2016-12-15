@@ -14,6 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
@@ -86,22 +87,22 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = FlansMod.MODID, name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl", acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+@Mod(modid = "ffmm", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod
 {
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F0.1";
+	public static final String VERSION = "5.F0.3";
 	public static final String NAME = "Flan's Mod Minus";
-	@Mod.Instance(MODID)
+	@Mod.Instance("ffmm")
 	public static FlansMod INSTANCE;
 	@SidedProxy(clientSide = "com.flansmod.client.ClientProxy", serverSide = "com.flansmod.common.CommonProxy")
 	public static CommonProxy proxy;
@@ -131,6 +132,7 @@ public class FlansMod
 	public void preInit(FMLPreInitializationEvent event){
 		Util.log("Preinitialising Flan's mod.");
 		Config.initalize(new Configuration(event.getSuggestedConfigurationFile()), event.getSuggestedConfigurationFile().getParentFile());
+		com.flansmod.common.data.player.PlayerHandler.initialize();
 		
 		flanDir = new File(event.getModConfigurationDirectory().getParentFile(), "/Flan/");
 		if(!flanDir.exists()){
@@ -267,9 +269,10 @@ public class FlansMod
 	}
 	
 	@Mod.EventHandler
-	public void registerCommand(FMLServerStartedEvent e){
+	public void registerCommand(FMLServerStartingEvent event){
 		//CommandHandler handler = ((CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().getCommandManager());
 		//handler.registerCommand(new CommandTeams());
+		event.registerServerCommand(new TextureCommand());
 	}
 	
 	@SubscribeEvent

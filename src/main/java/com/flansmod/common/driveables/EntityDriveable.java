@@ -39,7 +39,6 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -123,8 +122,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public int animFrame = 0;
 	
 	//MINUS START
-	public RGB primary_color = RGB.BLUE;
-	public RGB secondary_color = RGB.GREEN;
 	public boolean sync = false;
 	//MINUS END
 	
@@ -191,15 +188,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		tag.setFloat("RotationYaw", axes.getYaw());
 		tag.setFloat("RotationPitch", axes.getPitch());
 		tag.setFloat("RotationRoll", axes.getRoll());
-		
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setFloat("PrimaryColorRed", primary_color.red);
-		nbt.setFloat("PrimaryColorGreen", primary_color.green);
-		nbt.setFloat("PrimaryColorBlue", primary_color.blue);
-		nbt.setFloat("SecondaryColorRed", secondary_color.red);
-		nbt.setFloat("SecondaryColorGreen", secondary_color.green);
-		nbt.setFloat("SecondaryColorBlue", secondary_color.blue);
-		tag.setTag("Minus", nbt);
 	}
 
 	@Override
@@ -214,17 +202,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		prevRotationRoll = tag.getFloat("RotationRoll");
 		axes = new RotatedAxes(prevRotationYaw, prevRotationPitch, prevRotationRoll);
 		
-		if(tag.hasKey("Minus")){
-			NBTTagCompound nbt = tag.getCompoundTag("Minus");
-			float pr = nbt.getFloat("PrimaryColorRed");
-			float pg = nbt.getFloat("PrimaryColorGreen");
-			float pb = nbt.getFloat("PrimaryColorBlue");
-			primary_color = new RGB(pr, pg, pb);
-			float sr = nbt.getFloat("SecondaryColorRed");
-			float sg = nbt.getFloat("SecondaryColorGreen");
-			float sb = nbt.getFloat("SecondaryColorBlue");
-			secondary_color = new RGB(sr, sg, sb);
-		}
 	}
 	
 	@Override

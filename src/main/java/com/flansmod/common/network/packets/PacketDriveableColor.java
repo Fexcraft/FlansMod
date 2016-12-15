@@ -17,8 +17,8 @@ public class PacketDriveableColor implements IPacket, IMessage{
 	
 	public PacketDriveableColor(EntityDriveable ent){
 		this.entityId = ent.getEntityId();
-		this.primary = ent.primary_color;
-		this.secondary = ent.secondary_color;
+		this.primary = ent.driveableData.primary_color;
+		this.secondary = ent.driveableData.secondary_color;
 	}
 
 	@Override

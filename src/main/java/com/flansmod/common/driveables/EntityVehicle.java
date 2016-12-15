@@ -2,9 +2,13 @@ package com.flansmod.common.driveables;
 
 import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.cmds.TextureCommand;
+import com.flansmod.common.data.player.IPlayerData;
+import com.flansmod.common.data.player.PlayerHandler;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketDriveableTexture;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
@@ -17,6 +21,7 @@ import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
@@ -132,14 +137,35 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			return true;
 		}
 		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && !entityplayer.isSneaking()){
-			primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
-			FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			if(driveableData.hasColor){
+				driveableData.primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			}
 			return true;
 		}
 		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && entityplayer.isSneaking()){
-			secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
-			FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			if(driveableData.hasColor){
+				driveableData.secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+			}
 			return true;
+		}
+		if(!currentItem.isEmpty() && currentItem.getItem() == Items.IRON_INGOT){
+			if(!driveableData.allowURL){
+				Print.chat(entityplayer, "This vehicle doesn't allow custom remote Textures.");
+			}
+			else{
+				IPlayerData data = PlayerHandler.getData(entityplayer);
+				if(Util.isNull(data.getTextureURL())){
+					Print.chat(entityplayer, "No Texture URL in clipboard.");
+					Print.chat(entityplayer, "try: /" + TextureCommand.NAME);
+				}
+				else{
+					driveableData.texture_url = data.getTextureURL();
+					Print.chat(entityplayer, "Texture applied.");
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableTexture(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+				}
+			}
 		}
 		
 		VehicleType type = getVehicleType();

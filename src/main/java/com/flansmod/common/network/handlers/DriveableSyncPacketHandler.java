@@ -51,8 +51,9 @@ public class DriveableSyncPacketHandler {
 					for(Object obj : Minecraft.getMinecraft().world.loadedEntityList){
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
 							driveable = (EntityDriveable)obj;
-							driveable.primary_color = packet.primary;
-							driveable.secondary_color = packet.secondary;
+							driveable.driveableData.primary_color = packet.primary;
+							driveable.driveableData.secondary_color = packet.secondary;
+							driveable.driveableData.texture_url = packet.texture_url;
 							driveable.sync = true;
 							break;
 						}

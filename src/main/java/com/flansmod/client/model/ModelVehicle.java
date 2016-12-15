@@ -103,26 +103,28 @@ public class ModelVehicle extends ModelDriveable
 			}
 			
 			//PAINT START
-			vehicle.primary_color.glColorApply();
-			for(ModelRendererTurbo model : primaryPaintBodyModel) {
-				model.render(f5, oldRotateOrder);
-			};
-			for(ModelRendererTurbo model : primaryPaintBodyDoorOpenModel) {
-				if(vehicle.varDoor){
+			if(vehicle.driveableData.hasColor){
+				vehicle.driveableData.primary_color.glColorApply();
+				for(ModelRendererTurbo model : primaryPaintBodyModel) {
 					model.render(f5, oldRotateOrder);
-				}
-			};
-			for(ModelRendererTurbo model : primaryPaintBodyDoorCloseModel) {
-				if(!vehicle.varDoor){
+				};
+				for(ModelRendererTurbo model : primaryPaintBodyDoorOpenModel) {
+					if(vehicle.varDoor){
+						model.render(f5, oldRotateOrder);
+					}
+				};
+				for(ModelRendererTurbo model : primaryPaintBodyDoorCloseModel) {
+					if(!vehicle.varDoor){
+						model.render(f5, oldRotateOrder);
+					}
+				};
+				RGB.glColorReset();
+				vehicle.driveableData.secondary_color.glColorApply();
+				for (ModelRendererTurbo model : secondaryPaintBodyModel) {
 					model.render(f5, oldRotateOrder);
-				}
-			};
-			RGB.glColorReset();
-			vehicle.secondary_color.glColorApply();
-			for (ModelRendererTurbo model : secondaryPaintBodyModel) {
-				model.render(f5, oldRotateOrder);
-			};
-			RGB.glColorReset();
+				};
+				RGB.glColorReset();
+			}
 			//PAINT END
 			
 			for (ModelRendererTurbo aSteeringWheelModel : steeringWheelModel) {

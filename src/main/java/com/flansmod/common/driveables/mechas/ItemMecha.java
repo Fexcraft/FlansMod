@@ -118,7 +118,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	
 	public DriveableData getData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage());
+		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
 	}
    
 	//TODO @Override

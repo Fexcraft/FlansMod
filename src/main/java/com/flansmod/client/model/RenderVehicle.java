@@ -13,6 +13,7 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.driveables.VehicleType;
 import com.flansmod.common.guns.Paintjob;
 
+import net.fexcraft.mod.lib.util.render.RemoteTextureRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -160,11 +161,23 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity) 
-	{
-		DriveableType type = ((EntityDriveable)entity).getDriveableType();
-		Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-		return FlansModResourceHandler.getPaintjobTexture(paintjob);
+	protected ResourceLocation getEntityTexture(Entity entity){
+		EntityVehicle vehicle = (EntityVehicle)entity;
+		if(!vehicle.driveableData.allowURL){
+			DriveableType type = ((EntityDriveable)entity).getDriveableType();
+			Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
+			return FlansModResourceHandler.getPaintjobTexture(paintjob);
+    	}
+    	else{
+    		if(vehicle.driveableData.texture_url == null || vehicle.driveableData.texture_url.length() < 4){
+    			DriveableType type = ((EntityDriveable)entity).getDriveableType();
+    			Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
+    			return FlansModResourceHandler.getPaintjobTexture(paintjob);
+    		}
+    		else{
+    			return RemoteTextureRenderHelper.get(vehicle.driveableData.texture_url);
+    		}
+    	}
 	}
 	
 	/*@Override

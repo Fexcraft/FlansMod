@@ -169,7 +169,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	
 	public DriveableData getPlaneData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage());
+		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
 	}
 		
 	//TODO @Override

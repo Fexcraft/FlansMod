@@ -71,12 +71,15 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 				tags.setString("Type", type.shortName);
 				tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);
 				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setFloat("PrimaryColorRed", type.default_primary_color.red);
-				nbt.setFloat("PrimaryColorGreen", type.default_primary_color.green);
-				nbt.setFloat("PrimaryColorBlue", type.default_primary_color.blue);
-				nbt.setFloat("SecondaryColorRed", type.default_secondary_color.red);
-				nbt.setFloat("SecondaryColorGreen", type.default_secondary_color.green);
-				nbt.setFloat("SecondaryColorBlue", type.default_secondary_color.red);
+				nbt.setBoolean("HasColor", type.hasColor);
+				if(type.hasColor){
+					nbt.setFloat("PrimaryColorRed", type.default_primary_color.red);
+					nbt.setFloat("PrimaryColorGreen", type.default_primary_color.green);
+					nbt.setFloat("PrimaryColorBlue", type.default_primary_color.blue);
+					nbt.setFloat("SecondaryColorRed", type.default_secondary_color.red);
+					nbt.setFloat("SecondaryColorGreen", type.default_secondary_color.green);
+					nbt.setFloat("SecondaryColorBlue", type.default_secondary_color.red);
+				}
 				tags.setTag("Minus", nbt);
 				
 				
@@ -172,7 +175,7 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 	
 	public DriveableData getData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage());
+		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
 	}
 	
 	//TODO @Override

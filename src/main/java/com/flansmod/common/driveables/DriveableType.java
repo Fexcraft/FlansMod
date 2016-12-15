@@ -142,9 +142,10 @@ public abstract class DriveableType extends PaintableType
 	/**Track animation frames */
 	public int animFrames = 0;
 	
-	public boolean isMinus;
 	public RGB default_primary_color = RGB.BLUE;
 	public RGB default_secondary_color = RGB.RED;
+	public boolean hasColor;
+	public boolean allowURL;
 	
 	public static ArrayList<DriveableType> types = new ArrayList<DriveableType>();
 	
@@ -570,14 +571,22 @@ public abstract class DriveableType extends PaintableType
 				emitters.add(emitter);
 			}
 			
-			else if(split[0].equals("SetMinus")){
+			/*else if(split[0].equals("SetMinus")){
 				isMinus = Boolean.parseBoolean(split[1]);
+			}*/
+			else if(split[0].equals("EnableRGB")){
+				hasColor = Boolean.parseBoolean(split[1]);
 			}
 			else if(split[0].equals("DefaultPrimaryRGB")){
 				default_primary_color = new RGB(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
+				hasColor = true;
 			}
 			else if(split[0].equals("DefaultSecondaryRGB")){
 				default_secondary_color = new RGB(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
+				hasColor = true;
+			}
+			else if(split[0].equals("AllowRemoteTextures") || split[0].equals("AllowURLTextures") || split[0].equals("AllowTexturesFromURL")){
+				allowURL = Boolean.parseBoolean(split[1]);
 			}
 			
 		}

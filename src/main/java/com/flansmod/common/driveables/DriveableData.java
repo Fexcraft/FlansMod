@@ -6,6 +6,8 @@ import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
+
+import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -31,11 +33,24 @@ public class DriveableData implements IInventory {
 	/** Paintjob index */
 	public int paintjobID;
 	
-
+	//MINUS START
+	public RGB primary_color = RGB.BLUE;
+	public RGB secondary_color = RGB.GREEN;
+	public boolean hasColor = false;
+	public boolean allowURL = false;
+	public String texture_url;
+	//MINUS END
 	
-	public DriveableData(NBTTagCompound tags, int paintjobID){
+	public DriveableData(NBTTagCompound tags, int paintjobID, DriveableType type){
 		this(tags);
 		this.paintjobID = paintjobID;
+		if(type.hasColor){
+			hasColor = type.hasColor;
+			primary_color = type.default_primary_color;
+			secondary_color = type.default_secondary_color;
+		}
+		allowURL = type.allowURL;
+		texture_url = new String();
 	}
 	
 	public DriveableData(NBTTagCompound tags){
@@ -82,6 +97,25 @@ public class DriveableData implements IInventory {
 		for(DriveablePart part : parts.values()){
 			part.readFromNBT(tag);
 		}
+		
+		if(tag.hasKey("Minus")){
+			NBTTagCompound nbt = tag.getCompoundTag("Minus");
+			if(nbt.hasKey("HasColor") && nbt.getBoolean("HasColor")){
+				hasColor = true;
+				float pr = nbt.getFloat("PrimaryColorRed");
+				float pg = nbt.getFloat("PrimaryColorGreen");
+				float pb = nbt.getFloat("PrimaryColorBlue");
+				primary_color = new RGB(pr, pg, pb);
+				float sr = nbt.getFloat("SecondaryColorRed");
+				float sg = nbt.getFloat("SecondaryColorGreen");
+				float sb = nbt.getFloat("SecondaryColorBlue");
+				secondary_color = new RGB(sr, sg, sb);
+			}
+			if(nbt.hasKey("AllowRemoteTextures") && nbt.getBoolean("AllowRemoteTextures")){
+				allowURL = true;
+				texture_url = nbt.getString("RemoteTexture");
+			}
+		}
 	}
 
 	public NBTTagCompound writeToNBT(NBTTagCompound tag){
@@ -117,6 +151,23 @@ public class DriveableData implements IInventory {
 		for(DriveablePart part : parts.values()){
 			part.writeToNBT(tag);
 		}
+		
+
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setBoolean("HasColor", hasColor);
+		if(hasColor){
+			nbt.setFloat("PrimaryColorRed", primary_color.red);
+			nbt.setFloat("PrimaryColorGreen", primary_color.green);
+			nbt.setFloat("PrimaryColorBlue", primary_color.blue);
+			nbt.setFloat("SecondaryColorRed", secondary_color.red);
+			nbt.setFloat("SecondaryColorGreen", secondary_color.green);
+			nbt.setFloat("SecondaryColorBlue", secondary_color.blue);
+		}
+		nbt.setBoolean("AllowRemoteTextures", allowURL);
+		if(allowURL){
+			nbt.setString("RemoteTexture", texture_url);
+		}
+		tag.setTag("Minus", nbt);
 		
 		return tag;
 	}
