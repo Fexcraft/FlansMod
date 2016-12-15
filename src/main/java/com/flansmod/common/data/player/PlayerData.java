@@ -13,8 +13,12 @@ public class PlayerData implements IPlayerData {
 
 	@Override
 	public NBTTagCompound write(){
-		//
-		return null;
+		NBTTagCompound nbt = new NBTTagCompound();
+		if(texture_url == null){
+			texture_url = "";
+		}
+		nbt.setString("texture_url", texture_url);
+		return nbt;
 	}
 
 	@Override

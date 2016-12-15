@@ -37,6 +37,7 @@ import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
 import com.flansmod.common.network.packets.PacketSeatRemoval;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
+import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
@@ -633,20 +634,23 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand) //interact : change back when Forge updates
-	{
-		if(isDead)
+	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand){
+		if(isDead || world.isRemote){
 			return false;
-		if(world.isRemote)
+		}
+		if(hand == EnumHand.OFF_HAND){
 			return false;
+		}
 		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItem(hand);
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
+		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
 			return true;
-		if(currentItem != null && currentItem.getItem() instanceof ItemLead)
-		{
-			if(this.getControllingPassenger() != null && this.getControllingPassenger() instanceof EntityLiving && !(this.getControllingPassenger() instanceof EntityPlayer))
-			{
+		}
+		if(currentItem != null && currentItem.getItem() instanceof ItemKey){
+			return true;
+		}
+		if(currentItem != null && currentItem.getItem() instanceof ItemLead){
+			if(this.getControllingPassenger() != null && this.getControllingPassenger() instanceof EntityLiving && !(this.getControllingPassenger() instanceof EntityPlayer)){
 				EntityLiving mob = (EntityLiving)this.getControllingPassenger();
 				this.getControllingPassenger().dismountRidingEntity();
 				Print.spam(1, "PASSENGER != ENTITYPLAYER >>> DISMOUNTING");
@@ -655,11 +659,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 			double checkRange = 10;
 			List nearbyMobs = world.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(posX - checkRange, posY - checkRange, posZ - checkRange, posX + checkRange, posY + checkRange, posZ + checkRange));
-			for(Object obj : nearbyMobs)
-			{
+			for(Object obj : nearbyMobs){
 				EntityLiving entity = (EntityLiving)obj;
-				if(entity.getLeashed() && entity.getLeashedToEntity() == entityplayer)
-				{
+				if(entity.getLeashed() && entity.getLeashedToEntity() == entityplayer){
 					entity.startRiding(this);
 					looking.setAngles(-entity.rotationYaw, entity.rotationPitch, 0F);
 					entity.clearLeashed(true, !entityplayer.capabilities.isCreativeMode);
@@ -667,9 +669,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 			return true;
 		}
-		//Put them in the seat
-		if(this.getControllingPassenger() == null && !driveable.getDriveableData().engine.isAIChip)
-		{
+		if(this.getControllingPassenger() == null && !driveable.getDriveableData().engine.isAIChip){
 			entityplayer.startRiding(this);
 			return true;
 		}
@@ -697,6 +697,11 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	
 	@Override
 	public void addPassenger(Entity passenger){
+		if(driveable.driveableData.isLocked && this.driver){
+			Print.chat(passenger, "Vehicle is locked. Unlock to drive it.");
+			passenger.dismountRidingEntity();
+			return;
+		}
 		if(passenger.getRidingEntity() != this){
             throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
         }

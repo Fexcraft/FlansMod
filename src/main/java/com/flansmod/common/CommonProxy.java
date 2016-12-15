@@ -7,20 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.flansmod.common.driveables.ContainerDriveableInventory;
-import com.flansmod.common.driveables.ContainerDriveableMenu;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.mechas.ContainerMechaInventory;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.ContainerGunModTable;
-import com.flansmod.common.guns.boxes.ContainerGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.paintjob.ContainerPaintjobTable;
-import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
@@ -32,10 +23,8 @@ import com.flansmod.common.util.Util;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CommonProxy {
@@ -56,87 +45,53 @@ public class CommonProxy {
 		return contentPacks;
 	}
 	
-	public void addMissingJSONs(HashMap<Integer, InfoType> types)
-	{
+	public void addMissingJSONs(HashMap<Integer, InfoType> types){
 		
 	}
 	
 	/** A ton of client only methods follow */
-	public void load()
-	{
+	public void load(){
+		
 	}
 	
-	public void forceReload()
-	{
+	public void forceReload(){
+		
 	}
 		
-	public void registerRenderers()
-	{
+	public void registerRenderers(){
+		
 	}
 		
-	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType)
-	{
+	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType){
+		
 	}
 	
-	public void changeControlMode(EntityPlayer player)
-	{
+	public void changeControlMode(EntityPlayer player){
+		
 	}
 
-	public boolean mouseControlEnabled()
-	{
+	public boolean mouseControlEnabled(){
 		return false;
 	}
 	
-	public void openDriveableMenu(EntityPlayer player, World world, EntityDriveable driveable)
-	{
+	public void openDriveableMenu(EntityPlayer player, World world, EntityDriveable driveable){
+		
 	}
 	
-	public <T> T loadModel(String s, String shortName, Class<T> typeClass)
-	{
+	public <T> T loadModel(String s, String shortName, Class<T> typeClass){
 		return null;
 	}
 	
-	public void loadSound(String contentPack, String type, String sound)
-	{
+	public void loadSound(String contentPack, String type, String sound){
+		
 	}
 	
-	public boolean isThePlayer(EntityPlayer player)
-	{
+	public boolean isThePlayer(EntityPlayer player){
 		return false;
 	}
 	
-	public void buyGun(GunBoxType type, InfoType gun)
-	{
-	}
-	
-	/** Gets the client GUI element from ClientProxy */
-	public Object getClientGui(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		return null;
-	}
-
-	/** Gets the container for the specified GUI */
-	public Container getServerGui(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		switch(ID) 
-		{	
-		case 0 : return null; //Driveable crafting. No server side
-		case 1 : return null; //Driveable repair. No server side
-		case 2: return new ContainerGunModTable(player.inventory, world);
-		case 3: return new ContainerDriveableMenu(player.inventory, world);
-		case 4: return new ContainerDriveableMenu(player.inventory, world, true, ((EntitySeat)player.getRidingEntity()).driveable);
-		case 5: return new ContainerGunBox(player.inventory);
-		//Plane inventory screens
-		case 6: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 0);
-		case 7: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 1);
-		case 8: return new ContainerDriveableMenu(player.inventory, world, true, ((EntitySeat)player.getRidingEntity()).driveable);
-		case 9: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 2);
-		case 10: return new ContainerMechaInventory(player.inventory, world, (EntityMecha)((EntitySeat)player.getRidingEntity()).driveable);
-		case 11 : return null; //Armour box. No server side
-		case 12 : return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 3);
-		case 13: return new ContainerPaintjobTable(player.inventory, world, (TileEntityPaintjobTable)world.getTileEntity(new BlockPos(x, y, z)));
-		}
-		return null;
+	public void buyGun(GunBoxType type, InfoType gun){
+		
 	}
 	
 	/** Play a block break sound here */

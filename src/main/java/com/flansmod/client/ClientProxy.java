@@ -15,16 +15,7 @@ import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.client.debug.RenderDebugAABB;
 import com.flansmod.client.debug.RenderDebugDot;
 import com.flansmod.client.debug.RenderDebugVector;
-import com.flansmod.client.gui.GuiArmourBox;
-import com.flansmod.client.gui.GuiDriveableCrafting;
-import com.flansmod.client.gui.GuiDriveableFuel;
-import com.flansmod.client.gui.GuiDriveableInventory;
 import com.flansmod.client.gui.GuiDriveableMenu;
-import com.flansmod.client.gui.GuiDriveableRepair;
-import com.flansmod.client.gui.GuiGunBox;
-import com.flansmod.client.gui.GuiGunModTable;
-import com.flansmod.client.gui.GuiMechaInventory;
-import com.flansmod.client.gui.GuiPaintjobTable;
 import com.flansmod.client.model.OverrideVanillaModelLoader;
 import com.flansmod.client.model.RenderAAGun;
 import com.flansmod.client.model.RenderBullet;
@@ -58,11 +49,8 @@ import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.EntityGrenade;
 import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.BlockArmourBox;
 import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.types.IFlanItem;
@@ -73,7 +61,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -290,31 +277,6 @@ public class ClientProxy extends CommonProxy
 	public boolean mouseControlEnabled()
 	{
 		return FlansModClient.controlModeMouse;
-	}
-
-	/** Client GUI object getter */
-	@Override
-	public Object getClientGui(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		//Null riding entity, don't open GUI in this case
-		if(((ID >= 6 && ID <= 10) || ID == 12) && player.getRidingEntity() == null) return null;
-		
-		switch(ID) 
-		{
-		case 0: return new GuiDriveableCrafting(player.inventory, world, x, y, z);
-		case 1: return new GuiDriveableRepair(player);
-		case 2: return new GuiGunModTable(player.inventory, world);
-		case 5: return new GuiGunBox(player.inventory, ((BlockGunBox)world.getBlockState(new BlockPos(x, y, z)).getBlock()).type);
-		case 6: return new GuiDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 0);
-		case 7: return new GuiDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 1);
-		case 8: return new GuiDriveableFuel		(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable);
-		case 9: return new GuiDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 2);
-		case 10: return new GuiMechaInventory	(player.inventory, world, (EntityMecha)((EntitySeat)player.getRidingEntity()).driveable);
-		case 11: return new GuiArmourBox(player.inventory, ((BlockArmourBox)world.getBlockState(new BlockPos(x, y, z)).getBlock()).type);
-		case 12: return new GuiDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 3);
-		case 13: return new GuiPaintjobTable(player.inventory, world, (TileEntityPaintjobTable)world.getTileEntity(new BlockPos(x, y, z)));
-		}
-		return null;
 	}
 	
 	/** Called when the player presses the plane inventory key. Opens menu client side */

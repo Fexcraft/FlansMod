@@ -36,13 +36,10 @@ public class PacketDriveableGUI extends PacketBase
 	}
 
 	@Override
-	public void handleServerSide(EntityPlayerMP playerEntity) 
-	{
-		if(playerEntity.getRidingEntity() != null && playerEntity.getRidingEntity() instanceof EntitySeat)
-		{
+	public void handleServerSide(EntityPlayerMP playerEntity) {
+		if(playerEntity.getRidingEntity() != null && playerEntity.getRidingEntity() instanceof EntitySeat) {
 			EntityDriveable d = ((EntitySeat)playerEntity.getRidingEntity()).driveable;
-			switch(guiID)
-			{
+			switch(guiID) {
 			case 0 : //Guns
 				playerEntity.openGui(FlansMod.INSTANCE, 6, playerEntity.world, d.chunkCoordX, d.chunkCoordY, d.chunkCoordZ); break;
 			case 1 : //Bombs / Mines

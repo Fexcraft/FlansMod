@@ -10,6 +10,7 @@ import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableTexture;
 import com.flansmod.common.network.packets.PacketVehicleControl;
+import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
@@ -120,19 +121,71 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		super.setPositionRotationAndMotion(x, y, z, yaw, pitch, roll, motX, motY, motZ, velYaw, velPitch, velRoll, throt, steeringYaw);
 		wheelsYaw = steeringYaw;
 	}
+	
+	/*public boolean isLocked(EntityPlayer player){
+		if(driveableData.hasLock && driveableData.isLocked){
+			ItemStack stack = player.getHeldItemMainhand();
+			if(stack.getItem() instanceof ItemKey){
+				if(stack.getTagCompound() == null){
+					return true;
+				}
+				if(stack.getTagCompound().hasKey("code") && stack.getTagCompound().getInteger("code") == driveableData.lock_code){
+					driveableData.isLocked = !driveableData.isLocked;
+					sendLockState(player);
+					return false;
+				}
+				if(stack.getTagCompound().hasKey("universal") && stack.getTagCompound().getBoolean("universal")){
+					driveableData.isLocked = !driveableData.isLocked;
+					sendLockState(player);
+					return false;
+				}
+				return true;
+			}
+			else return true;
+		}
+		else return false;
+	}*/
 			
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand)
-	{
-		if(isDead){
+	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand){
+		if(isDead || world.isRemote){
 			return false;
 		}
-		if(world.isRemote){
+		if(hand == EnumHand.OFF_HAND){
 			return false;
+		}
+		/*if(isLocked(entityplayer)){
+			Print.chat(entityplayer, "Vehicle is locked.");
+			return false;
+		}*/
+		
+		ItemStack currentItem = entityplayer.getHeldItemMainhand();
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemKey){
+			if(!driveableData.hasLock){
+				Print.chat(entityplayer, "This vehicle doesn't allow locking.");
+			}
+			else{
+				if(currentItem.getTagCompound() != null){
+					if(currentItem.getTagCompound().getString("code").equals(driveableData.lock_code) || currentItem.getTagCompound().getBoolean("universal")){
+						driveableData.isLocked = !driveableData.isLocked;
+						Print.chat(entityplayer, "The Vehicle is now " + (driveableData.isLocked ? "locked" : "unlocked") + ".");
+					}
+					else{
+						Print.chat(entityplayer, "Wrong key.\n[" + driveableData.lock_code.toUpperCase() + "] != [" + currentItem.getTagCompound().getString("code").toUpperCase() + "]");
+					}
+				}
+				else{
+					Print.chat(entityplayer, "Error, this key is empty!");
+				}
+			}
+			return true;
+		}
+		if(driveableData.isLocked){
+			Print.chat(entityplayer, "Vehicle is locked.");
+			return true;
 		}
 		
-		//If they are using a repair tool, don't put them in
-		ItemStack currentItem = entityplayer.getHeldItemMainhand();
+		
 		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
 			return true;
 		}
@@ -140,6 +193,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			if(driveableData.hasColor){
 				driveableData.primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
 				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+				currentItem.shrink(1);
 			}
 			return true;
 		}
@@ -147,6 +201,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			if(driveableData.hasColor){
 				driveableData.secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
 				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+				currentItem.shrink(1);
 			}
 			return true;
 		}
@@ -166,6 +221,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableTexture(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 				}
 			}
+			return true;
 		}
 		
 		VehicleType type = getVehicleType();
@@ -315,8 +371,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Get vehicle type
 		VehicleType type = this.getVehicleType();
 		DriveableData data = getDriveableData();
-		if(type == null)
-		{
+		if(type == null){
 			Util.log("Vehicle type null. Not ticking vehicle");
 			return;
 		}

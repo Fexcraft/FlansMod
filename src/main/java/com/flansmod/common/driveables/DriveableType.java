@@ -146,6 +146,7 @@ public abstract class DriveableType extends PaintableType
 	public RGB default_secondary_color = RGB.RED;
 	public boolean hasColor;
 	public boolean allowURL;
+	public boolean hasLock = true;
 	
 	public static ArrayList<DriveableType> types = new ArrayList<DriveableType>();
 	
@@ -570,10 +571,6 @@ public abstract class DriveableType extends PaintableType
 				emitter.velocity.scale(1.0f / 16.0f);
 				emitters.add(emitter);
 			}
-			
-			/*else if(split[0].equals("SetMinus")){
-				isMinus = Boolean.parseBoolean(split[1]);
-			}*/
 			else if(split[0].equals("EnableRGB")){
 				hasColor = Boolean.parseBoolean(split[1]);
 			}
@@ -587,6 +584,9 @@ public abstract class DriveableType extends PaintableType
 			}
 			else if(split[0].equals("AllowRemoteTextures") || split[0].equals("AllowURLTextures") || split[0].equals("AllowTexturesFromURL")){
 				allowURL = Boolean.parseBoolean(split[1]);
+			}
+			else if(split[0].equals("HasLock")){
+				hasColor = Boolean.parseBoolean(split[1]);
 			}
 			
 		}

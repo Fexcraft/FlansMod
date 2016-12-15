@@ -14,6 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import com.flansmod.common.cmds.KeyCommand;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
@@ -48,6 +49,7 @@ import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.FPacketHandler;
 import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.paintjob.TileEntityPaintjobTable;
+import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.ArmourBoxType;
@@ -126,6 +128,8 @@ public class FlansMod
 	/** Custom paintjob item */
 	public static Item rainbowPaintcan;
 	public static BlockPaintjobTable paintjobTable;
+	
+	public static ItemKey key;
 
 	/** The mod pre-initialiser method */
 	@Mod.EventHandler
@@ -142,6 +146,7 @@ public class FlansMod
 		}
 		
 		//Set up mod blocks and items
+		key = new ItemKey();
 		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench());
 		workbench.setRegistryName(MODID, "flansWorkbench");
 		workbench.setUnlocalizedName(workbench.getRegistryName().toString());
@@ -273,6 +278,7 @@ public class FlansMod
 		//CommandHandler handler = ((CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().getCommandManager());
 		//handler.registerCommand(new CommandTeams());
 		event.registerServerCommand(new TextureCommand());
+		event.registerServerCommand(new KeyCommand());
 	}
 	
 	@SubscribeEvent

@@ -7,6 +7,7 @@ import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 
+import net.fexcraft.mod.fsu.server.modules.nrr.util.Util;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -39,6 +40,10 @@ public class DriveableData implements IInventory {
 	public boolean hasColor = false;
 	public boolean allowURL = false;
 	public String texture_url;
+	public String lock_code;
+	public boolean isLocked;
+	public boolean hasLock;
+	public int spawnedKeys;
 	//MINUS END
 	
 	public DriveableData(NBTTagCompound tags, int paintjobID, DriveableType type){
@@ -51,6 +56,10 @@ public class DriveableData implements IInventory {
 		}
 		allowURL = type.allowURL;
 		texture_url = new String();
+		hasLock = type.hasLock;
+		isLocked = false;
+		lock_code = Util.randomKeyCode();
+		spawnedKeys = 0;
 	}
 	
 	public DriveableData(NBTTagCompound tags){
@@ -115,6 +124,12 @@ public class DriveableData implements IInventory {
 				allowURL = true;
 				texture_url = nbt.getString("RemoteTexture");
 			}
+			if(nbt.hasKey("HasLock") && nbt.getBoolean("HasLock")){
+				hasLock = true;
+				isLocked = nbt.getBoolean("Locked");
+				lock_code = nbt.getString("LockCode");
+				spawnedKeys = nbt.getInteger("SpawnedKeys");
+			}
 		}
 	}
 
@@ -166,6 +181,12 @@ public class DriveableData implements IInventory {
 		nbt.setBoolean("AllowRemoteTextures", allowURL);
 		if(allowURL){
 			nbt.setString("RemoteTexture", texture_url);
+		}
+		nbt.setBoolean("HasLock", hasLock);
+		if(hasLock){
+			nbt.setBoolean("Locked", isLocked);
+			nbt.setString("LockCode", lock_code);
+			nbt.setInteger("SpawnedKeys", spawnedKeys);
 		}
 		tag.setTag("Minus", nbt);
 		

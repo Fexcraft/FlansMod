@@ -59,12 +59,11 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 		return true;
 	}
 	
-	private NBTTagCompound getTagCompound(ItemStack stack, World world)
-	{
-		if(stack.getTagCompound() == null)
-		{
-			if(!world.isRemote && stack.getItemDamage() != 0)
+	private NBTTagCompound getTagCompound(ItemStack stack, World world){
+		if(stack.getTagCompound() == null){
+			if(!world.isRemote && stack.getItemDamage() != 0){
 				stack.setTagCompound(getOldTagCompound(stack, world));
+			}
 			if(stack.getTagCompound() == null)
 			{
 				NBTTagCompound tags = new NBTTagCompound();

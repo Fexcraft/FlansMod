@@ -70,22 +70,22 @@ public class GuiDriveableMenu extends GuiContainer
 		if(button.id == 0) //Cargo
 		{
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(3));
-			//inventory.player.openGui(FlansMod.INSTANCE, 9, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
+			inventory.player.openGui(FlansMod.INSTANCE, 9, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
 		}
 		if(button.id == 1) //Guns
 		{
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(0));
-			//inventory.player.openGui(FlansMod.INSTANCE, 6, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
+			inventory.player.openGui(FlansMod.INSTANCE, 6, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
 		}
 		if(button.id == 2) //Fuel
 		{
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(2));
-			//inventory.player.openGui(FlansMod.INSTANCE, 8, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
+			inventory.player.openGui(FlansMod.INSTANCE, 8, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
 		}
 		if(button.id == 3) //Missiles
 		{
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(5));
-			//inventory.player.openGui(FlansMod.INSTANCE, 12, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
+			inventory.player.openGui(FlansMod.INSTANCE, 12, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
 		}
 		if(button.id == 4) //Repair
 		{
@@ -95,7 +95,7 @@ public class GuiDriveableMenu extends GuiContainer
 		if(button.id == 5) //Bombs
 		{
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(1));
-			//inventory.player.openGui(FlansMod.INSTANCE, 7, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
+			inventory.player.openGui(FlansMod.INSTANCE, 7, world, entity.chunkCoordX, entity.chunkCoordY, entity.chunkCoordZ);
 		}
 
 	}
@@ -103,7 +103,7 @@ public class GuiDriveableMenu extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j)
 	{
-		fontRendererObj.drawString(entity.getDriveableType().name, 6, 6, 0x404040);
+		fontRendererObj.drawString(entity.getDriveableType().name + " [CODE: " + entity.driveableData.lock_code.toUpperCase() + "]", 6, 6, 0x404040);
 		fontRendererObj.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
 	}
 
