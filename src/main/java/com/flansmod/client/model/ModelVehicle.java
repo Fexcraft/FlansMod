@@ -288,7 +288,7 @@ public class ModelVehicle extends ModelDriveable
 			}
 			for(int i = 0; i < ammoModel.length; i++)
 			{
-				if(i >= type.numMissileSlots || vehicle.getDriveableData().missiles[i] != null)
+				if(i >= type.numMissileSlots || !vehicle.getDriveableData().missiles.get(i).isEmpty())
 				{
 					for(int j = 0; j < ammoModel[i].length; j++)
 					{

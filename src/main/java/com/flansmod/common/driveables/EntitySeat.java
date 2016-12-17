@@ -582,7 +582,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 				if(gunDelay <= 0 && Config.bulletsEnabled)
 				{
 	
-					ItemStack bulletItemStack = driveable.getDriveableData().ammo[seatInfo.gunnerID];
+					ItemStack bulletItemStack = driveable.getDriveableData().ammo.get(seatInfo.gunnerID);
 					//Check that neither is null and that the bullet item is actually a bullet
 					if(gun != null && bulletItemStack != null && bulletItemStack.getItem() instanceof ItemShootable)
 					{

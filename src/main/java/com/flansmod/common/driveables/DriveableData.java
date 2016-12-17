@@ -13,7 +13,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 public class DriveableData implements IInventory {
 	
@@ -22,7 +24,7 @@ public class DriveableData implements IInventory {
 	/** The sizes of each inventory (guns, bombs / mines, missiles / shells, cargo) */
 	public int numGuns, numBombs, numMissiles, numCargo;
 	/** The inventory stacks */
-	public ItemStack[] ammo, bombs, missiles, cargo;
+	public NonNullList<ItemStack> ammo, bombs, missiles, cargo;
 	/** The engine in this driveable */
 	public PartType engine;
 	/** The stack in the fuel slot */
@@ -82,21 +84,29 @@ public class DriveableData implements IInventory {
 		numGuns = dType.ammoSlots();
 		engine = PartType.getPart(tag.getString("Engine"));
 		paintjobID = tag.getInteger("Paint");
-		ammo = new ItemStack[numGuns];
-		bombs = new ItemStack[numBombs];
-		missiles = new ItemStack[numMissiles];
-		cargo = new ItemStack[numCargo];
+		ammo = NonNullList.<ItemStack>withSize(numGuns, ItemStack.EMPTY);
+		bombs = NonNullList.<ItemStack>withSize(numBombs, ItemStack.EMPTY);
+		missiles = NonNullList.<ItemStack>withSize(numMissiles, ItemStack.EMPTY);
+		cargo = NonNullList.<ItemStack>withSize(numCargo, ItemStack.EMPTY);
 		for(int i = 0; i < numGuns; i++){
-			ammo[i] = new ItemStack(tag.getCompoundTag("Ammo " + i));
+			if(tag.hasKey("Ammo " + i)){
+				ammo.set(i, new ItemStack(tag.getCompoundTag("Ammo " + i)));
+			}
 		}
 		for(int i = 0; i < numBombs; i++){
-			bombs[i] = new ItemStack(tag.getCompoundTag("Bombs " + i));
+			if(tag.hasKey("Bombs " + i)){
+				bombs.set(i, new ItemStack(tag.getCompoundTag("Bombs " + i)));
+			}
 		}
 		for(int i = 0; i < numMissiles; i++){
-			missiles[i] = new ItemStack(tag.getCompoundTag("Missiles " + i));
+			if(tag.hasKey("Missiles " + i)){
+				missiles.set(i, new ItemStack(tag.getCompoundTag("Missiles " + i)));
+			}
 		}
  		for(int i = 0; i < numCargo; i++){
- 			cargo[i] = new ItemStack(tag.getCompoundTag("Cargo " + i));
+			if(tag.hasKey("Cargo " + i)){
+	 			cargo.set(i, new ItemStack(tag.getCompoundTag("Cargo " + i)));
+			}
  		}
 		fuel = new ItemStack(tag.getCompoundTag("Fuel"));
 		fuelInTank = tag.getInteger("FuelInTank");
@@ -139,34 +149,33 @@ public class DriveableData implements IInventory {
 			tag.setString("Engine", engine.shortName);
 		}
 		tag.setInteger("Paint", paintjobID);
-		for(int i = 0; i < ammo.length; i++){
-			if(ammo[i] != null){
-				tag.setTag("Ammo " + i, ammo[i].writeToNBT(new NBTTagCompound()));
+		for(int i = 0; i < ammo.size(); i++){
+			if(!ammo.get(i).isEmpty()){
+				tag.setTag("Ammo " + i, ammo.get(i).writeToNBT(new NBTTagCompound()));
 			}
 		}
-		for(int i = 0; i < bombs.length; i++){
-			if(bombs[i] != null){
-				tag.setTag("Bombs " + i, bombs[i].writeToNBT(new NBTTagCompound()));
+		for(int i = 0; i < bombs.size(); i++){
+			if(!bombs.get(i).isEmpty()){
+				tag.setTag("Bombs " + i, bombs.get(i).writeToNBT(new NBTTagCompound()));
 			}
 		}
-		for(int i = 0; i < missiles.length; i++){
-			if(missiles[i] != null){
-				tag.setTag("Missiles " + i, missiles[i].writeToNBT(new NBTTagCompound()));
+		for(int i = 0; i < missiles.size(); i++){
+			if(!missiles.get(i).isEmpty()){
+				tag.setTag("Missiles " + i, missiles.get(i).writeToNBT(new NBTTagCompound()));
 			}
 		}
-		for(int i = 0; i < cargo.length; i++){
-			if(cargo[i] != null){
-				tag.setTag("Cargo " + i, cargo[i].writeToNBT(new NBTTagCompound()));
+		for(int i = 0; i < cargo.size(); i++){
+			if(!cargo.get(i).isEmpty()){
+				tag.setTag("Cargo " + i, cargo.get(i).writeToNBT(new NBTTagCompound()));
 			}
 		}
-		if(fuel != null){
+		if(!fuel.isEmpty()){
 			tag.setTag("Fuel", fuel.writeToNBT(new NBTTagCompound()));
 		}
 		tag.setInteger("FuelInTank", (int)fuelInTank);
 		for(DriveablePart part : parts.values()){
 			part.writeToNBT(tag);
 		}
-		
 
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setBoolean("HasColor", hasColor);
@@ -203,20 +212,20 @@ public class DriveableData implements IInventory {
 	public ItemStack getStackInSlot(int i) 
 	{ 
 		//Find the correct inventory
-		ItemStack[] inv = ammo;
-		if(i >= ammo.length)
+		NonNullList<ItemStack> inv = ammo;
+		if(i >= ammo.size())
 		{
-			i -= ammo.length;
+			i -= ammo.size();
 			inv = bombs;
-			if(i >= bombs.length)
+			if(i >= bombs.size())
 			{
-				i -= bombs.length;
+				i -= bombs.size();
 				inv = missiles;
-				if(i >= missiles.length)
+				if(i >= missiles.size())
 				{
-					i -= missiles.length;
+					i -= missiles.size();
 					inv = cargo;
-					if(i >= cargo.length)
+					if(i >= cargo.size())
 					{
 						return fuel;
 					}
@@ -224,85 +233,70 @@ public class DriveableData implements IInventory {
 			}	
 		}
 		//Return the stack in the slot
-		return inv[i];
+		return inv.get(i);
 	}
 
 	@Override
-	public ItemStack decrStackSize(int i, int j) 
-	{
+	public ItemStack decrStackSize(int i, int j) {
 		//Find the correct inventory
-		ItemStack[] inv = ammo;
-		if(i >= ammo.length)
-		{
-			i -= ammo.length;
+		NonNullList<ItemStack> inv = ammo;
+		if(i >= ammo.size()){
+			i -= ammo.size();
 			inv = bombs;
-			if(i >= bombs.length)
-			{
-				i -= bombs.length;
+			if(i >= bombs.size()){
+				i -= bombs.size();
 				inv = missiles;
-				if(i >= missiles.length)
-				{
-					i -= missiles.length;
+				if(i >= missiles.size()){
+					i -= missiles.size();
 					inv = cargo;
-					if(i >= cargo.length)
-					{
+					if(i >= cargo.size()){
 						//Put the fuel stack in a stack array just to simplify the code
-						i -= cargo.length;
-						inv = new ItemStack[1];
-						inv[0] = fuel;		
-	
+						i -= cargo.size();
+						inv = NonNullList.<ItemStack>withSize(1, ItemStack.EMPTY);
+						inv.set(0, fuel);	
 						setInventorySlotContents(getFuelSlot(), null);
 					}
 				}
 			}	
 		}
 		//Decrease the stack size
-		if(inv[i] != null)
-		{
-			if(inv[i].getCount() <= j)
-			{
-				ItemStack itemstack = inv[i];
-				inv[i] = null;
+		if(!inv.get(i).isEmpty()){
+			if(inv.get(i).getCount() <= j){
+				ItemStack itemstack = inv.get(i);
+				inv.get(i).shrink(64);
 				return itemstack;
 			}
-			ItemStack itemstack1 = inv[i].splitStack(j);
-			if(inv[i].getCount() <= 0)
-			{
-				inv[i] = null;
+			ItemStack itemstack1 = inv.get(i).splitStack(j);
+			if(inv.get(i).getCount() <= 0){
+				inv.get(i).shrink(64);
 			}
 			return itemstack1;
-		} else
-		{
-			return null;
+		}
+		else{
+			return ItemStack.EMPTY;
 		}
 		
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int i) 
-	{ 
+	public ItemStack removeStackFromSlot(int i){ 
 		return getStackInSlot(i);	
 	}
 
 	@Override
-	public void setInventorySlotContents(int i, ItemStack stack) 
-	{ 
+	public void setInventorySlotContents(int i, ItemStack stack) { 
 		//Find the correct inventory
-		ItemStack[] inv = ammo;
-		if(i >= ammo.length)
-		{
-			i -= ammo.length;
+		NonNullList<ItemStack> inv = ammo;
+		if(i >= ammo.size()){
+			i -= ammo.size();
 			inv = bombs;
-			if(i >= bombs.length)
-			{
-				i -= bombs.length;
+			if(i >= bombs.size()){
+				i -= bombs.size();
 				inv = missiles;
-				if(i >= missiles.length)
-				{
-					i -= missiles.length;
+				if(i >= missiles.size()){
+					i -= missiles.size();
 					inv = cargo;
-					if(i >= cargo.length)
-					{
+					if(i >= cargo.size()){
 						fuel = stack;
 						return;
 					}
@@ -310,52 +304,44 @@ public class DriveableData implements IInventory {
 			}	
 		}
 		//Set the stack
-		inv[i] = stack;
+		inv.set(i, stack);
 	}
 
     @Override
-	public int getInventoryStackLimit() 
-	{ 
+	public int getInventoryStackLimit() { 
 		return 64; 
 	}
 
 	@Override
-	public void markDirty() {}
+	public void markDirty(){}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) 
-	{ 
+	public boolean isUsableByPlayer(EntityPlayer player) { 
 		return true; 
 	}
 	
-	public int getAmmoInventoryStart()
-	{
+	public int getAmmoInventoryStart(){
 		return 0;
 	}
 	
-	public int getBombInventoryStart()
-	{
-		return ammo.length;
+	public int getBombInventoryStart(){
+		return ammo.size();
 	}	
 	
-	public int getMissileInventoryStart()
-	{
-		return ammo.length + bombs.length;
+	public int getMissileInventoryStart(){
+		return ammo.size() + bombs.size();
 	}	
 	
-	public int getCargoInventoryStart()
-	{
-		return ammo.length + bombs.length + missiles.length; 
+	public int getCargoInventoryStart(){
+		return ammo.size() + bombs.size() + missiles.size(); 
 	}
 	
-	public int getFuelSlot()
-	{
-		return ammo.length + bombs.length + missiles.length + cargo.length;
+	public int getFuelSlot(){
+		return ammo.size() + bombs.size() + missiles.size() + cargo.size();
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack) 
-	{
+	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		if(i < getBombInventoryStart() && itemstack != null && itemstack.getItem() instanceof ItemBullet) //Ammo
 		{
 			return true;
@@ -381,31 +367,28 @@ public class DriveableData implements IInventory {
 	}
 
 	@Override
-	public String getName() 
-	{
+	public String getName(){
 		return "Flan's Secret Data"; 
 	}
 
 	@Override
-	public boolean hasCustomName() 
-	{
+	public boolean hasCustomName(){
 		return false;
 	}
 
 	@Override
-	public ITextComponent getDisplayName() 
-	{
-		return null;
+	public ITextComponent getDisplayName(){
+		return new TextComponentString("driveable.inventory");
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) 
-	{
+	public void openInventory(EntityPlayer player){
+		
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) 
-	{
+	public void closeInventory(EntityPlayer player){
+		
 	}
 
 	@Override
@@ -428,13 +411,11 @@ public class DriveableData implements IInventory {
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		cargo.clear();
 	}
 
 	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isEmpty(){
+		return cargo.isEmpty();
 	}
 }

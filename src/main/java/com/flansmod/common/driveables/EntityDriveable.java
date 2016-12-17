@@ -518,7 +518,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 			PilotGun pilotGun = (PilotGun)shootPoint;
 			//Get the gun from the plane type and the ammo from the data
 			GunType gunType = pilotGun.type;
-			ItemStack shootableStack = driveableData.ammo[getDriveableType().numPassengerGunners + currentGun];
+			ItemStack shootableStack = driveableData.ammo.get(getDriveableType().numPassengerGunners + currentGun);
 			EntityPlayer driver = getDriver();
 			
 			// For each 
