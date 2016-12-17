@@ -102,7 +102,7 @@ public class FlansMod
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F0.3-EX";
+	public static final String VERSION = "5.F0.4-EX";
 	public static final String NAME = "Flan's Mod Minus";
 	@Mod.Instance("ffmm")
 	public static FlansMod INSTANCE;

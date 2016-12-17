@@ -3,7 +3,6 @@ package com.flansmod.common.driveables;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.fsu.server.modules.nrr.util.Util;
 import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -40,6 +39,7 @@ import com.flansmod.common.network.packets.PacketSeatUpdate;
 import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Lists;
 

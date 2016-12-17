@@ -1,6 +1,8 @@
 package com.flansmod.common.util;
 
+import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,4 +51,15 @@ public class Util {
     	}
     	else return false;
     }
+
+	public static long getTime(){
+		return new Date().getTime();
+	}
+
+	public static String randomKeyCode(){
+		UUID uuid = UUID.randomUUID();
+		String s = uuid.toString();
+		s = s.replace("-", "");
+		return s.substring(0, 7);
+	}
 }

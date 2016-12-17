@@ -1,9 +1,9 @@
 package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.frsm.util.java.BoolUtil;
-import net.fexcraft.mod.fsu.server.modules.nrr.util.Util;
 import net.fexcraft.mod.lib.api.network.IPacketListener;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketJsonObject;

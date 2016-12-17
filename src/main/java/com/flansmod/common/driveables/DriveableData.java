@@ -6,8 +6,8 @@ import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
+import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.fsu.server.modules.nrr.util.Util;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
