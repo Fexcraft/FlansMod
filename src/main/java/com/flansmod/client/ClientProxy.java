@@ -190,8 +190,8 @@ public class ClientProxy extends CommonProxy
 					method.invoke(classloader, file.toURI().toURL());
 					
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put("modid", "FlansMod");
-					map.put("name", "Flan's Mod : " + file.getName());
+					map.put("modid", "ffmm");
+					map.put("name", "Flan's Mod Minus : " + file.getName());
 					map.put("version", "1");
 					FMLModContainer container = new FMLModContainer("com.flansmod.common.FlansMod", new ModCandidate(file, file, file.isDirectory() ? ContainerType.DIR : ContainerType.JAR), map);
 					container.bindMetadata(MetadataCollection.from(null, ""));
