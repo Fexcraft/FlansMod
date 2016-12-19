@@ -1,6 +1,28 @@
 package com.flansmod.common.driveables;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
+
+import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.lib.util.cls.Print;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemLead;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
@@ -10,38 +32,24 @@ import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemShootable;
 import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.network.PacketDriveableKeyHeld;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
 import com.flansmod.common.network.packets.PacketSeatRemoval;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
+import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
-
-import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.cls.Print;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.google.common.collect.Lists;
 
 public class EntitySeat extends Entity implements IControllable, IEntityAdditionalSpawnData
 {
 	/** Set this to true when the client has found the parent driveable and connected them */
 	@SideOnly(Side.CLIENT)
 	public boolean foundDriveable;
+	public boolean dismount, exists;
 	private int driveableID;
 	private int seatID;
 	public EntityDriveable driveable;
@@ -78,22 +86,25 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	private double prevPlayerPosX, prevPlayerPosY, prevPlayerPosZ;
 	private float prevPlayerYaw, prevPlayerPitch;
 	private boolean shooting;
+    private Entity passenger;
+	
 	
 	/** Default constructor for spawning client side 
 	 * Should not be called server side EVER */
-	public EntitySeat(World world) 
-	{
+	public EntitySeat(World world) {
 		super(world);
 		setSize(1F, 1F);
 		prevLooking = new RotatedAxes();
 		looking = new RotatedAxes();
 		playerLooking = new RotatedAxes();
 		prevPlayerLooking = new RotatedAxes();
+		dismount = false;
+		exists = true;
+        this.passenger = null;
 	}
 		
 	/** Server side seat constructor */
-	public EntitySeat(World world, EntityDriveable d, int id) 
-	{
+	public EntitySeat(World world, EntityDriveable d, int id) {
 		this(world);
 		driveable = d;
 		driveableID = d.getEntityId();
@@ -105,30 +116,27 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		playerPosZ = prevPlayerPosZ = posZ;
 		looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 		prevLooking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
+        this.passenger = null;
 		//updatePosition();
 	}
 	
 	@Override
-	public void setPositionAndRotationDirect(double d, double d1, double d2, float f, float f1, int i, boolean b){
-		//setPosition(x, y, z);
-		super.setPositionAndRotationDirect(d1, d1, d2, f1, f1, i, b);//TODO check
+	public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int partialticks, boolean b){
+		super.setPositionAndRotationDirect(x, y, z, yaw, pitch, partialticks, b);//TODO check
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		super.onUpdate();
-		prevPosX = posX;
-		prevPosY = posY;
-		prevPosZ = posZ;
+		//prevPosX = posX;
+		//prevPosY = posY;
+		//prevPosZ = posZ;
 		
-	    if(driver && getControllingPassenger() == null){//tt
-	        prevLooking = looking.clone();
-	        prevPlayerLooking = playerLooking.clone();
-	    }
 		
 		//If on the client and the driveable parent has yet to be found, search for it
-		if(worldObj.isRemote && !foundDriveable){
+		if(worldObj.isRemote && !foundDriveable)
+		{
 			driveable = (EntityDriveable)worldObj.getEntityByID(driveableID);
 			if(driveable == null)
 				return;
@@ -137,51 +145,43 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			seatInfo = driveable.getDriveableType().seats[seatID];
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			prevLooking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
-			prevLooking = looking.clone();//tt
-			
 			playerPosX = prevPlayerPosX = posX = driveable.posX;
 			playerPosY = prevPlayerPosY = posY = driveable.posY;
 			playerPosZ = prevPlayerPosZ = posZ = driveable.posZ;
-			
-			lastTickPosX = driveable.lastTickPosX; // synchronization with driveable
-			lastTickPosY = driveable.lastTickPosY; // synchronization with driveable
-			lastTickPosZ = driveable.lastTickPosZ; // synchronization with driveable
-			
 			setPosition(posX, posY, posZ);
-		}
-		
-		
+		}		
 		//Update gun delay ticker
-		if(gunDelay > 0)
+		if(gunDelay > 0){
 			gunDelay--;
+		}
 		//Update sound delay ticker
-		if(soundDelay > 0)
+		if(soundDelay > 0){
 			soundDelay--;
-		if(yawSoundDelay > 0)
+		}
+		if(yawSoundDelay > 0){
 			yawSoundDelay--;
-		if(pitchSoundDelay > 0)
+		}
+		if(pitchSoundDelay > 0){
 			pitchSoundDelay--;
+		}
 		
 		//updatePosition();
 		
-		if (playYawSound == true && yawSoundDelay == 0 && seatInfo.traverseSounds == true)
-		{
+		if (playYawSound == true && yawSoundDelay == 0 && seatInfo.traverseSounds == true){
 			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.yawSound, false);
 			yawSoundDelay = seatInfo.yawSoundLength;
 		}
 		
-		if (playPitchSound == true && pitchSoundDelay == 0 && seatInfo.traverseSounds == true)
-		{
+		if (playPitchSound == true && pitchSoundDelay == 0 && seatInfo.traverseSounds == true){
 			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.pitchSound, false);
 			pitchSoundDelay = seatInfo.pitchSoundLength;
 		}
 		
-		boolean isThePlayer = getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)getControllingPassenger());
+		boolean isThePlayer = this.getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)this.getControllingPassenger());
 		
 		//Reset traverse sounds if player exits the vehicle
 		
-		if(isThePlayer)
-		{
+		if(isThePlayer){
 			playYawSound = false;
 			playPitchSound = false;
 			yawSoundDelay = 0;
@@ -189,17 +189,16 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		
 		//If on the client
-		if(worldObj.isRemote)
-		{
-			if(driver && isThePlayer && FlansMod.proxy.mouseControlEnabled() && driveable.hasMouseControlMode())
-			{
+		if(worldObj.isRemote){
+			if(driver && isThePlayer && FlansMod.proxy.mouseControlEnabled() && driveable.hasMouseControlMode()){
 				looking = new RotatedAxes();
 				playerLooking = new RotatedAxes();
 			}
 		}
 
-		if(getControllingPassenger() instanceof EntityPlayer && shooting)
-			pressKey(9, (EntityPlayer)getControllingPassenger());
+		if(this.getControllingPassenger() instanceof EntityPlayer && shooting){
+			pressKey(9, (EntityPlayer)this.getControllingPassenger());
+		}
 		
 		minigunSpeed *= 0.95F;
 		minigunAngle += minigunSpeed;
@@ -209,8 +208,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	/** Set the position to be that of the driveable plus the local position, rotated */
 	public void updatePosition()
 	{
-		Entity passenger = getControllingPassenger();
-		
 		//If we haven't found our driveable, give up
 		if(worldObj.isRemote && !foundDriveable)
 			return;
@@ -242,20 +239,20 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//Set the absol
 		setPosition(driveable.posX + relativePosition.x, driveable.posY + relativePosition.y, driveable.posZ + relativePosition.z);
 		
-		if(passenger != null)
+		if(this.getControllingPassenger() != null)
 		{
 	    	//DriveableType type = driveable.getDriveableType();
-			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, getControllingPassenger().getEyeHeight(), 0);
-			//driveable.rotate(0, passenger.getYOffset(), 0).toVec3();
+			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, this.getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, this.getControllingPassenger().getEyeHeight(), 0);
+			//driveable.rotate(0, this.getControllingPassenger().getYOffset(), 0).toVec3();
 			
 			playerPosX = posX + yOffset.xCoord;
 			playerPosY = posY + yOffset.yCoord;
 			playerPosZ = posZ + yOffset.zCoord;
 			
-			passenger.lastTickPosX = passenger.prevPosX = prevPlayerPosX;
-			passenger.lastTickPosY = passenger.prevPosY = prevPlayerPosY;
-			passenger.lastTickPosZ = passenger.prevPosZ = prevPlayerPosZ;
-			passenger.setPosition(playerPosX, playerPosY, playerPosZ);
+			this.getControllingPassenger().lastTickPosX = this.getControllingPassenger().prevPosX = prevPlayerPosX;
+			this.getControllingPassenger().lastTickPosY = this.getControllingPassenger().prevPosY = prevPlayerPosY;
+			this.getControllingPassenger().lastTickPosZ = this.getControllingPassenger().prevPosZ = prevPlayerPosZ;
+			this.getControllingPassenger().setPosition(playerPosX, playerPosY, playerPosZ);
 
 			//Calculate the local look axes globally
 			RotatedAxes globalLookAxes = driveable.axes.findLocalAxesGlobally(playerLooking);
@@ -269,13 +266,13 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			if(dYaw < -180)
 				prevPlayerYaw -= 360F;
 			
-			if(getControllingPassenger() instanceof EntityPlayer)
+			if(this.getControllingPassenger() instanceof EntityPlayer)
 			{
-				passenger.prevRotationYaw = prevPlayerYaw;
-				passenger.prevRotationPitch = prevPlayerPitch;
+				this.getControllingPassenger().prevRotationYaw = prevPlayerYaw;
+				this.getControllingPassenger().prevRotationPitch = prevPlayerPitch;
 				
-				passenger.rotationYaw = playerYaw;
-				passenger.rotationPitch = playerPitch;
+				this.getControllingPassenger().rotationYaw = playerYaw;
+				this.getControllingPassenger().rotationPitch = playerPitch;
 			}
 			
 			//If the entity is a player, roll its view accordingly
@@ -322,7 +319,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		return false;
 	}
 	
-	//TODO didn't find a replace //@Override
+	//@Override
 	public boolean writeMountToNBT(NBTTagCompound tags)
 	{
 		return false;
@@ -332,8 +329,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	public void onMouseMoved(int deltaX, int deltaY) 
 	{
 		if(!foundDriveable)
-			return;
-		
+			return;		
 		
 		prevLooking = looking.clone();
 		prevPlayerLooking = playerLooking.clone();
@@ -536,7 +532,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	{
 		if(worldObj.isRemote && foundDriveable)
 		{
-			FlansMod.getPacketHandler().sendToServer(new PacketDriveableKeyHeld(key, held));
+			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKeyHeld(key, held));
 
 		}
 		if(driver)
@@ -570,9 +566,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		
 		//Exit key pressed
-		if(key == 6 && getControllingPassenger() != null){
-			getControllingPassenger().dismountRidingEntity();
-			//TODO passenger = null;
+		if(key == 6 && this.getControllingPassenger() != null){
+			//this.getControllingPassenger().startRiding(null);
+			this.removeSeatPassenger();
 		}
 				
 		if(key == 9) //Shoot
@@ -605,7 +601,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 							worldObj.spawnEntityInWorld(((ItemShootable)bulletItemStack.getItem()).getEntity(worldObj, 
 									Vector3f.add(yOffset, new Vector3f(gunOrigin.x, gunOrigin.y, gunOrigin.z), null), 
 									shootVec, 
-									(EntityLivingBase)getControllingPassenger(), 
+									(EntityLivingBase)this.getControllingPassenger(), 
 									bullet.bulletSpread * gun.bulletSpread, 
 									gun.damage, 
 									gun.bulletSpeed <= 0.0f ? 5.0f : gun.bulletSpeed, // TODO : Fix nasty hack 
@@ -625,7 +621,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 							{
 								//Set the damage to 0 and consume one ammo item (unless in creative)
 								bulletItemStack.setItemDamage(0);
-								if(!((EntityPlayer)getControllingPassenger()).capabilities.isCreativeMode)
+								if(!((EntityPlayer)this.getControllingPassenger()).capabilities.isCreativeMode)
 									driveable.getDriveableData().decrStackSize(3 + seatID, 1);
 							}
 							//Reset the shoot delay
@@ -639,61 +635,80 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand) //interact : change back when Forge updates
-	{
-		if(isDead)
+	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand){
+		if(isDead || worldObj.isRemote){
 			return false;
-		if(worldObj.isRemote)
+		}
+		if(hand == EnumHand.OFF_HAND){
 			return false;
+		}
 		//If they are using a repair tool, don't put them in
-		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
+		ItemStack currentItem = entityplayer.getHeldItem(hand);
+		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
 			return true;
-		/*if(currentItem != null && currentItem.getItem() instanceof ItemLead)
-		{
-			if(getControllingPassenger() != null && getControllingPassenger() instanceof EntityLiving && !(getControllingPassenger() instanceof EntityPlayer))
-			{
-				EntityLiving mob = (EntityLiving)getControllingPassenger();
-				getControllingPassenger().dismountRidingEntity();
-				passenger = null;
+		}
+		if(currentItem != null && currentItem.getItem() instanceof ItemLead){
+			if(this.getControllingPassenger() != null && this.getControllingPassenger() instanceof EntityLiving && !(this.getControllingPassenger() instanceof EntityPlayer)){
+				EntityLiving mob = (EntityLiving)this.getControllingPassenger();
+				this.getControllingPassenger().dismountRidingEntity();
+				Print.spam(1, "PASSENGER != ENTITYPLAYER >>> DISMOUNTING");
 				mob.setLeashedToEntity(entityplayer, true);
 				return true;
 			}
 			double checkRange = 10;
 			List nearbyMobs = worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(posX - checkRange, posY - checkRange, posZ - checkRange, posX + checkRange, posY + checkRange, posZ + checkRange));
-			for(Object obj : nearbyMobs)
-			{
+			for(Object obj : nearbyMobs){
 				EntityLiving entity = (EntityLiving)obj;
-				if(entity.getLeashed() && entity.getLeashedToEntity() == entityplayer)
-				{
+				if(entity.getLeashed() && entity.getLeashedToEntity() == entityplayer){
 					entity.startRiding(this);
-					
 					looking.setAngles(-entity.rotationYaw, entity.rotationPitch, 0F);
 					entity.clearLeashed(true, !entityplayer.capabilities.isCreativeMode);
 				}
 			}
 			return true;
-		}*/
-		//Put them in the seat
-		if(getControllingPassenger() == null && !driveable.getDriveableData().engine.isAIChip)
-		{
+		}
+		if(this.getControllingPassenger() == null && !driveable.getDriveableData().engine.isAIChip){
 			entityplayer.startRiding(this);
-			//TODO this.passenger = entityplayer;
 			return true;
 		}
 		return false;
 	}
 	
 	@Override
-	public Entity getControllingEntity() 
-	{
-		return getControllingPassenger();
+	public Entity getControllingEntity() {
+		return passenger;
 	}
 	
 	@Override
-	public void addPassenger(Entity entity){
-		super.addPassenger(entity);
-		//Print.spam(1, "AP => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
+	public Entity getControllingPassenger(){
+		return passenger;
+	}
+	
+	@Override
+	public List<Entity> getPassengers(){
+		List list = Lists.<Entity>newArrayList();
+		if(passenger != null){
+			list.add(passenger);
+		}
+		return list;
+	}
+	
+	@Override
+	public void addPassenger(Entity passenger){
+		if(passenger.getRidingEntity() != this){
+            throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
+        }
+        else{
+            /*if(!this.worldObj.isRemote && passenger instanceof EntityPlayer && !(this.getControllingPassenger() instanceof EntityPlayer)){
+                this.passengers.add(0, passenger);
+            }
+            else{
+                this.passengers.add(passenger);
+            }*/
+        	this.passenger = passenger;
+        }
+		dismount = false;
+		Print.spam(1, "AP => " + Util.getTime() + " " + (worldObj.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 	
 	public void removeSeatPassenger(){
@@ -703,23 +718,35 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 	}
 	
-	public boolean dismount = false;
-	
 	@Override
 	public void removePassenger(Entity entity){
 		if(worldObj.isRemote){
 			if(!dismount){
-				//Print.spam(1, "Received 'removePassenger(<ENT>)' call, but ignoring it since it wasn't sent from the server.");
+				if(!passenger.isRiding()){
+					//super.removePassenger(entity);
+					//passenger.startRiding(this);
+					passenger = null;
+					Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] RIDER -> RIDING == NULL;");
+				}
+				else{
+					Print.spam(1, "Received 'removePassenger(<ENT>)' call, but ignoring it since it wasn't sent from the server.");
+					dismount = true;
+					passenger.startRiding(this);
+					Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] ERR;");
+				}
 			}
 			else{
-				super.removePassenger(entity);
+				//super.removePassenger(entity);
+				passenger = null;
+				Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] OK");
 			}
 		}
 		else{
-			super.removePassenger(entity);
+			//super.removePassenger(entity);
+			passenger = null;
 			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatDismount(this));//TODO ranged packet maybe?
+			Print.spam(1, "RM => " + Util.getTime() + " [SERVER]");
 		}
-		//Print.spam(1, "RM => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 
 	@Override
@@ -731,34 +758,30 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		this.exists = false;
 		this.setDead();
 	}
-
-	public boolean exists = true;
 	
 	@Override
 	public void setDead(){
 		if(worldObj.isRemote){
 			if(exists){
-				//Print.spam(1, "Received 'setDead()' call, but ignoring it since it wasn't sent from the server.");
+				this.isDead = false;
+				//
+				Print.spam(1, "Received 'setDead()' call, but ignoring it since it wasn't sent from the server.");
+				Print.spam(1, "DD => " + Util.getTime() + " [CLIENT] ERR;");
 			}
 			else{
-				super.setDead();
+				this.isDead = true;
+				Print.spam(1, "DD => " + Util.getTime() + " [CLIENT] OK;");
 			}
 		}
 		else{
-			super.setDead();
+			this.isDead = true;
 			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatRemoval(this));//TODO ranged packet maybe?
+			Print.spam(1, "DD => " + Util.getTime() + " [SERVER]");
 		}
-		//Print.spam(1, "DD => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 	
 	@Override
-	public Entity getControllingPassenger(){
-		return this.getPassengers().isEmpty() ? null : (Entity)this.getPassengers().get(0);
-	}
-	
-	
-	@Override
-    public void updatePassenger(Entity passenger){
+    public void updatePassenger(Entity passengerr){
 		if(passenger instanceof EntityPlayer){
 			passenger.rotationYaw = playerYaw;
 			passenger.rotationPitch = playerPitch;
@@ -769,7 +792,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		passenger.lastTickPosY = passenger.prevPosY = prevPlayerPosY;
 		passenger.lastTickPosZ = passenger.prevPosZ = prevPlayerPosZ;
 		
-		passenger.setPosition(playerPosX, playerPosY, playerPosZ);
+		//passenger.setPosition(playerPosX, playerPosY, playerPosZ);
     }
 	
 	@Override

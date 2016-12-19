@@ -1,5 +1,6 @@
 package com.flansmod.common.util;
 
+import java.util.Date;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,5 +29,9 @@ public class Util {
 	
 	public static int nextInt(int i){
 		return random.nextInt(i);
+	}
+
+	public static long getTime(){
+		return new Date().getTime();
 	}
 }
