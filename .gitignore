@@ -40,3 +40,5 @@ run/Flan/WW2 Pack/.DS_Store
 
 run/Flan/WW2 Pack/boxes/.DS_Store
 *.launch
+
+src/main/java/com/flansmod.*/
