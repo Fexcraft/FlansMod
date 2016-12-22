@@ -7,6 +7,7 @@ import java.util.List;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.parts.PartType;
@@ -143,7 +144,7 @@ public abstract class DriveableType extends PaintableType
 	public int animFrames = 0;
 	
 	public RGB default_primary_color = RGB.BLUE;
-	public RGB default_secondary_color = RGB.RED;
+	public RGB default_secondary_color = RGB.GREEN;
 	public boolean hasColor;
 	public boolean allowURL;
 	public boolean hasLock = true;

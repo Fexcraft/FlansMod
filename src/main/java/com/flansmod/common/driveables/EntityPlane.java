@@ -1,6 +1,7 @@
 package com.flansmod.common.driveables;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
@@ -774,9 +775,7 @@ public class EntityPlane extends EntityDriveable
 		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
-			NBTTagCompound tags = new NBTTagCompound();
-			planeStack.setTagCompound(tags);
-			driveableData.writeToNBT(tags);
+			planeStack.setTagCompound(driveableData.writeToNBT(new NBTTagCompound()));
 			entityDropItem(planeStack, 0.5F);
 	 		setDead();
 		}

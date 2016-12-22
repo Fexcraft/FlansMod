@@ -799,7 +799,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		passenger.lastTickPosY = passenger.prevPosY = prevPlayerPosY;
 		passenger.lastTickPosZ = passenger.prevPosZ = prevPlayerPosZ;
 		
-		//passenger.setPosition(playerPosX, playerPosY, playerPosZ);
+		passenger.setPosition(playerPosX, playerPosY, playerPosZ);
     }
 	
 	@Override

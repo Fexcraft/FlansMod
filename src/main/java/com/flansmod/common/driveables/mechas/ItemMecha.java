@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.DriveableData;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
@@ -118,7 +118,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	
 	public DriveableData getData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
+		return new DriveableData(getTagCompound(itemstack, world));
 	}
    
 	//TODO @Override

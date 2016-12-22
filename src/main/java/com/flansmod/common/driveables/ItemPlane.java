@@ -3,9 +3,11 @@ package com.flansmod.common.driveables;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
@@ -102,13 +104,38 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 
 
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips)
-	{
+	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips){
+		if(type.description != null){
+			Collections.addAll(lines, type.description.split("_"));
+		}
 		NBTTagCompound tags = getTagCompound(stack, player.world);
-		String engineName = tags.getString("Engine");
-		PartType part = PartType.getPart(engineName);
-		if(part != null)
+		PartType part = PartType.getPart(tags.getString("Engine"));
+		if(part != null){
 			lines.add(part.name);
+		}
+		if(type.hasColor){
+			if(tags.hasKey("PrimaryColorRed")){
+				lines.add("Primary Color: R" + tags.getFloat("PrimaryColorRed") + " G" + tags.getFloat("PrimaryColorGreen") + " B" + tags.getFloat("PrimaryColorBlue"));
+				lines.add("Secondary Color: R" + tags.getFloat("SecondaryColorRed") + " G" + tags.getFloat("SecondaryColorGreen") + " B" + tags.getFloat("SecondaryColorBlue"));
+			}
+			else{
+				lines.add("Primary Color: R" + type.default_primary_color.red + " G" + type.default_primary_color.green + " B" + type.default_primary_color.blue);
+				lines.add("Secondary Color: R" + type.default_secondary_color.red + " G" + type.default_secondary_color.green + " B" + type.default_secondary_color.blue);
+			}
+		}
+		if(type.allowURL){
+			if(tags.hasKey("RemoteTexture")){
+				lines.add("Remote Texture: " + tags.getString("RemoteTexture"));
+			}
+		}
+		if(type.hasLock){
+			if(tags.hasKey("LockCode")){
+				lines.add("Lock Code: " + tags.getString("LockCode"));
+			}
+			else{
+				lines.add("Lock Code: none");
+			}
+		}
 	}
 	
 	@Override
@@ -169,7 +196,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	
 	public DriveableData getPlaneData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
+		return new DriveableData(getTagCompound(itemstack, world));
 	}
 		
 	//TODO @Override

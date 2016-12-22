@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
@@ -54,8 +55,7 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 
 	@Override
 	/** Make sure client and server side NBTtags update */
-	public boolean getShareTag()
-	{
+	public boolean getShareTag(){
 		return true;
 	}
 	
@@ -64,24 +64,10 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 			if(!world.isRemote && stack.getItemDamage() != 0){
 				stack.setTagCompound(getOldTagCompound(stack, world));
 			}
-			if(stack.getTagCompound() == null)
-			{
+			if(stack.getTagCompound() == null){
 				NBTTagCompound tags = new NBTTagCompound();
 				tags.setString("Type", type.shortName);
-				tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);
-				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setBoolean("HasColor", type.hasColor);
-				if(type.hasColor){
-					nbt.setFloat("PrimaryColorRed", type.default_primary_color.red);
-					nbt.setFloat("PrimaryColorGreen", type.default_primary_color.green);
-					nbt.setFloat("PrimaryColorBlue", type.default_primary_color.blue);
-					nbt.setFloat("SecondaryColorRed", type.default_secondary_color.red);
-					nbt.setFloat("SecondaryColorGreen", type.default_secondary_color.green);
-					nbt.setFloat("SecondaryColorBlue", type.default_secondary_color.red);
-				}
-				tags.setTag("Minus", nbt);
-				
-				
+				tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);				
 				stack.setTagCompound(tags);
 			}
 		}
@@ -112,17 +98,49 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips)
-	{
-		if(type.description != null)
-		{
+	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips){
+		if(type.description != null){
 			Collections.addAll(lines, type.description.split("_"));
 		}
 		NBTTagCompound tags = getTagCompound(stack, player.world);
-		String engineName = tags.getString("Engine");
-		PartType part = PartType.getPart(engineName);
-		if(part != null)
+		PartType part = PartType.getPart(tags.getString("Engine"));
+		if(part != null){
 			lines.add(part.name);
+		}
+		if(!tags.hasKey("Minus")){
+			return;
+		}
+		NBTTagCompound nbt = tags.getCompoundTag("Minus");
+		if(type.hasColor){
+			if(nbt.hasKey("PrimaryColorRed")){
+				lines.add("Primary Color R:" + nbt.getFloat("PrimaryColorRed") + " G:" + nbt.getFloat("PrimaryColorGreen") + " B:" + nbt.getFloat("PrimaryColorBlue"));
+				lines.add("Secondary Color R:" + nbt.getFloat("SecondaryColorRed") + " G:" + nbt.getFloat("SecondaryColorGreen") + " B:" + nbt.getFloat("SecondaryColorBlue"));
+			}
+			else{
+				lines.add("Primary Color R:" + type.default_primary_color.red + " G:" + type.default_primary_color.green + " B:" + type.default_primary_color.blue);
+				lines.add("Secondary Color R:" + type.default_secondary_color.red + " G:" + type.default_secondary_color.green + " B:" + type.default_secondary_color.blue);
+			}
+		}
+		if(type.allowURL){
+			if(nbt.hasKey("RemoteTexture")){
+				lines.add("Remote Texture: " + nbt.getString("RemoteTexture"));
+			}
+			else{
+				lines.add("Remote Texture: none");
+			}
+		}
+		if(type.hasLock){
+			if(nbt.hasKey("LockCode")){
+				lines.add("Lock Code: " + nbt.getString("LockCode").toUpperCase());
+			}
+			else{
+				lines.add("Lock Code: none");
+			}
+			if(nbt.hasKey("SpawnedKeys")){
+				lines.add("Spawned Keys: " + nbt.getInteger("SpawnedKeys"));
+			}
+		}
+		lines.add(nbt.toString());
 	}
 	
 	@Override
@@ -174,7 +192,7 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 	
 	public DriveableData getData(ItemStack itemstack, World world)
 	{
-		return new DriveableData(getTagCompound(itemstack, world), itemstack.getItemDamage(), type);
+		return new DriveableData(getTagCompound(itemstack, world));
 	}
 	
 	//TODO @Override

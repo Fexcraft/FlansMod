@@ -7,7 +7,7 @@ import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
-import com.flansmod.common.driveables.DriveableData;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
@@ -500,9 +500,9 @@ public class EntityMecha extends EntityDriveable
 		{
 			ItemStack mechaStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();
+			tags = driveableData.writeToNBT(tags);
+			tags = inventory.writeToNBT(tags);
 			mechaStack.setTagCompound(tags); 
-			driveableData.writeToNBT(tags);
-			inventory.writeToNBT(tags);
 			entityDropItem(mechaStack, 0.5F);
 	 		setDead();
 		}

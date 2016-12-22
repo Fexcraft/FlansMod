@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.flansmod.client.model.ModelPlane;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.TypeFile;
 import com.flansmod.common.vector.Vector3f;

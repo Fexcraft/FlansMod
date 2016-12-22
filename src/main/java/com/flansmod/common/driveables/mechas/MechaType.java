@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.flansmod.client.model.ModelMecha;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.DriveableData;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;

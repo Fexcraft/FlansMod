@@ -3,6 +3,7 @@ package com.flansmod.common.driveables;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.cmds.TextureCommand;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.data.player.IPlayerData;
 import com.flansmod.common.data.player.PlayerHandler;
 import com.flansmod.common.network.PacketPlaySound;
@@ -154,14 +155,10 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		if(hand == EnumHand.OFF_HAND){
 			return false;
 		}
-		/*if(isLocked(entityplayer)){
-			Print.chat(entityplayer, "Vehicle is locked.");
-			return false;
-		}*/
 		
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
 		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemKey){
-			if(!driveableData.hasLock){
+			if(!getDriveableType().hasLock){
 				Print.chat(entityplayer, "This vehicle doesn't allow locking.");
 			}
 			else{
@@ -206,7 +203,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			return true;
 		}
 		if(!currentItem.isEmpty() && currentItem.getItem() == Items.IRON_INGOT){
-			if(!driveableData.allowURL){
+			if(!getDriveableType().allowURL){
 				Print.chat(entityplayer, "This vehicle doesn't allow custom remote Textures.");
 			}
 			else{
@@ -323,7 +320,6 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 					return true;
 				}
 				case 14 : // Door
-					Print.log("pass14");
 				{
 					if(toggleTimer <= 0)
 					{
@@ -702,9 +698,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack vehicleStack = new ItemStack(type.item, 1, driveableData.paintjobID);
-			NBTTagCompound tags = new NBTTagCompound();
-			vehicleStack.setTagCompound(tags);
-			driveableData.writeToNBT(tags);
+			vehicleStack.setTagCompound(driveableData.writeToNBT(new NBTTagCompound()));
 			entityDropItem(vehicleStack, 0.5F);
 	 		setDead();
 		}

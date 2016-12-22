@@ -12,6 +12,7 @@ import com.flansmod.client.debug.EntityDebugDot;
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
+import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.driveables.DriveableType.ParticleEmitter;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityShootable;
@@ -61,7 +62,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
@@ -134,7 +134,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		setSize(1F, 1F);
 		yOffset = 6F / 16F;
 		ignoreFrustumCheck = true;
-		if(FMLCommonHandler.instance().getSide().isClient()){
+		if(world.isRemote){
 			setRenderDistanceWeight(200D);
 		}
 	}
@@ -300,7 +300,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	@Override
     public boolean canBePushed()
     {
-        return true;//TODO just testing, false is original fm
+        return false;
     }
 
 	@Override
@@ -1181,9 +1181,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public ItemStack getPickedResult(RayTraceResult target)
 	{
 		ItemStack stack = new ItemStack(getDriveableType().item, 1, 0);
-		NBTTagCompound tags = new NBTTagCompound();
-		stack.setTagCompound(tags);
-		driveableData.writeToNBT(tags);
+		stack.setTagCompound(driveableData.writeToNBT(new NBTTagCompound()));
 		return stack;
 	}
 	

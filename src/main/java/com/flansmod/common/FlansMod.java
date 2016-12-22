@@ -71,6 +71,7 @@ import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 
+import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
 import net.fexcraft.mod.lib.util.block.BlockUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -78,6 +79,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -102,7 +104,7 @@ public class FlansMod
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F0.4-EX";
+	public static final String VERSION = "5.F0.6-EX";
 	public static final String NAME = "Flan's Mod Minus";
 	@Mod.Instance("ffmm")
 	public static FlansMod INSTANCE;
@@ -130,6 +132,7 @@ public class FlansMod
 	public static BlockPaintjobTable paintjobTable;
 	
 	public static ItemKey key;
+	private static final String prefix = TextFormatting.BLACK + " [" + TextFormatting.RED + "FM-" + TextFormatting.BLACK + "]" + TextFormatting.GRAY + "";
 
 	/** The mod pre-initialiser method */
 	@Mod.EventHandler
@@ -137,6 +140,9 @@ public class FlansMod
 		Util.log("Preinitialising Flan's mod.");
 		Config.initalize(new Configuration(event.getSuggestedConfigurationFile()), event.getSuggestedConfigurationFile().getParentFile());
 		com.flansmod.common.data.player.PlayerHandler.initialize();
+		
+		SimpleUpdateHandler.register("flansmod", 1, VERSION);
+		SimpleUpdateHandler.setUpdateMessage("flansmod", prefix + "New Version available! (" + SimpleUpdateHandler.getLatestVersionOf("flansmod") + ")");
 		
 		flanDir = new File(event.getModConfigurationDirectory().getParentFile(), "/Flan/");
 		if(!flanDir.exists()){

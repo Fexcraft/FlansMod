@@ -1,7 +1,10 @@
-package com.flansmod.common.driveables;
+package com.flansmod.common.data;
 
 import java.util.HashMap;
 
+import com.flansmod.common.driveables.DriveablePart;
+import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
@@ -48,20 +51,9 @@ public class DriveableData implements IInventory {
 	public int spawnedKeys;
 	//MINUS END
 	
-	public DriveableData(NBTTagCompound tags, int paintjobID, DriveableType type){
+	public DriveableData(NBTTagCompound tags, int paintjobID){
 		this(tags);
 		this.paintjobID = paintjobID;
-		if(type.hasColor){
-			hasColor = type.hasColor;
-			primary_color = type.default_primary_color;
-			secondary_color = type.default_secondary_color;
-		}
-		allowURL = type.allowURL;
-		texture_url = new String();
-		hasLock = type.hasLock;
-		isLocked = false;
-		lock_code = Util.randomKeyCode();
-		spawnedKeys = 0;
 	}
 	
 	public DriveableData(NBTTagCompound tags){
@@ -121,24 +113,51 @@ public class DriveableData implements IInventory {
 			NBTTagCompound nbt = tag.getCompoundTag("Minus");
 			if(nbt.hasKey("HasColor") && nbt.getBoolean("HasColor")){
 				hasColor = true;
-				float pr = nbt.getFloat("PrimaryColorRed");
-				float pg = nbt.getFloat("PrimaryColorGreen");
-				float pb = nbt.getFloat("PrimaryColorBlue");
-				primary_color = new RGB(pr, pg, pb);
-				float sr = nbt.getFloat("SecondaryColorRed");
-				float sg = nbt.getFloat("SecondaryColorGreen");
-				float sb = nbt.getFloat("SecondaryColorBlue");
-				secondary_color = new RGB(sr, sg, sb);
+				if(nbt.hasKey("PrimaryColorRed")){
+					float pr = nbt.getFloat("PrimaryColorRed");
+					float pg = nbt.getFloat("PrimaryColorGreen");
+					float pb = nbt.getFloat("PrimaryColorBlue");
+					primary_color = new RGB(pr, pg, pb);
+				}
+				else{
+					primary_color = dType.default_primary_color;
+				}
+				if(nbt.hasKey("SecondaryColorRed")){
+					float sr = nbt.getFloat("SecondaryColorRed");
+					float sg = nbt.getFloat("SecondaryColorGreen");
+					float sb = nbt.getFloat("SecondaryColorBlue");
+					secondary_color = new RGB(sr, sg, sb);
+				}
+				else{
+					secondary_color = dType.default_secondary_color;
+				}
+			}
+			else{
+				hasColor = dType.hasColor;
+				if(hasColor){
+					primary_color = dType.default_primary_color;
+					secondary_color = dType.default_secondary_color;
+				}
 			}
 			if(nbt.hasKey("AllowRemoteTextures") && nbt.getBoolean("AllowRemoteTextures")){
 				allowURL = true;
 				texture_url = nbt.getString("RemoteTexture");
+			}
+			else{
+				allowURL = dType.allowURL;
+				texture_url = new String();
 			}
 			if(nbt.hasKey("HasLock") && nbt.getBoolean("HasLock")){
 				hasLock = true;
 				isLocked = nbt.getBoolean("Locked");
 				lock_code = nbt.getString("LockCode");
 				spawnedKeys = nbt.getInteger("SpawnedKeys");
+			}
+			else{
+				hasLock = dType.hasLock;
+				isLocked = false;
+				lock_code = Util.randomKeyCode();
+				spawnedKeys = 0;
 			}
 		}
 	}
