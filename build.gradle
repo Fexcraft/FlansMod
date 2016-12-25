@@ -1,10 +1,7 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        maven { url = "http://files.minecraftforge.net/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
@@ -22,7 +19,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.10.2-12.18.1.2011"
+    version = "1.11-13.19.1.2188"
     runDir = "run"
 
     replace "@ALLOWED_VERSION@", "[5.2,5.3)"
@@ -33,7 +30,7 @@ minecraft {
     replace "@APOCALYPSEVERSION@", "1.0"
     replaceIn "FlansModApocalypse.java"
 	
-	mappings = "snapshot_20160518"
+	mappings = "snapshot_20161206"
 }
 
 processResources
