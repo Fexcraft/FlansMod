@@ -23,6 +23,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -148,11 +149,11 @@ public abstract class DriveableType extends PaintableType
 	public boolean hasColor;
 	public boolean allowURL;
 	public boolean hasLock = true;
+	public List<Vec3d> cargopos = new ArrayList<Vec3d>();
 	
 	public static ArrayList<DriveableType> types = new ArrayList<DriveableType>();
 	
-	public DriveableType(TypeFile file)
-	{
+	public DriveableType(TypeFile file){
 		super(file);
 	}
 
@@ -587,7 +588,10 @@ public abstract class DriveableType extends PaintableType
 				allowURL = Boolean.parseBoolean(split[1]);
 			}
 			else if(split[0].equals("HasLock")){
-				hasColor = Boolean.parseBoolean(split[1]);
+				hasLock = Boolean.parseBoolean(split[1]);
+			}
+			else if(split[0].equals("AddCargoRenderPos")){
+				cargopos.add(new Vec3d(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3])));
 			}
 			
 		}

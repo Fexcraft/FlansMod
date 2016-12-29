@@ -38,6 +38,10 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
+	public void bindTexture(Entity ent){
+		super.bindEntityTexture(ent);
+	}
+	
     public void render(EntityVehicle vehicle, double d, double d1, double d2, float f, float f1)
     {
     	bindEntityTexture(vehicle);
@@ -65,7 +69,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 				GL11.glScalef(modelScale, modelScale, modelScale);
 				ModelVehicle modVehicle = (ModelVehicle)type.model;
 				if(modVehicle != null)
-					modVehicle.render(vehicle, f1);
+					modVehicle.render(this, vehicle, f1);
 				
 				GL11.glPushMatrix();
 				if(type.turretOrigin != null && vehicle.isPartIntact(EnumDriveablePart.turret) && vehicle.seats != null && vehicle.seats[0] != null)

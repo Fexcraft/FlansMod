@@ -14,6 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.driveables.EntityPlane;
@@ -104,7 +105,7 @@ public class FlansMod
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F0.6-EX";
+	public static final String VERSION = "5.F0.7-EX";
 	public static final String NAME = "Flan's Mod Minus";
 	@Mod.Instance("ffmm")
 	public static FlansMod INSTANCE;
@@ -152,6 +153,9 @@ public class FlansMod
 		}
 		
 		//Set up mod blocks and items
+		if(event.getSide().isClient()){
+			CrateBlock.instance = new CrateBlock();
+		}
 		key = new ItemKey();
 		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench());
 		workbench.setRegistryName(MODID, "flansWorkbench");

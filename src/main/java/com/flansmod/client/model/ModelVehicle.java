@@ -1,6 +1,7 @@
 package com.flansmod.client.model;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
+import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
@@ -9,7 +10,16 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.driveables.VehicleType;
 import com.flansmod.common.vector.Vector3f;
 
+import net.fexcraft.mod.lib.api.item.IItem;
 import net.fexcraft.mod.lib.util.render.RGB;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumBlockRenderType;
 
 //Extensible ModelVehicle class for rendering vehicle models
 public class ModelVehicle extends ModelDriveable
@@ -48,10 +58,9 @@ public class ModelVehicle extends ModelDriveable
 	public int animFrame = 0;
 
 	
-	@Override
-	public void render(EntityDriveable driveable, float f1)
+	public void render(RenderVehicle render, EntityDriveable driveable, float f1)
 	{
-		render(0.0625F, (EntityVehicle)driveable, f1);
+		render(0.0625F, render, (EntityVehicle)driveable, f1);
 	}
 	
 	@Override
@@ -82,7 +91,7 @@ public class ModelVehicle extends ModelDriveable
 		renderPart(steeringWheelModel);
 	}
 	
-	public void render(float f5, EntityVehicle vehicle, float f){
+	public void render(float f5, RenderVehicle render, EntityVehicle vehicle, float f){
 		
 		boolean rotateWheels = vehicle.getVehicleType().rotateWheels;
 		animFrame = vehicle.animFrame;
@@ -265,6 +274,48 @@ public class ModelVehicle extends ModelDriveable
 					gunModelPart.render(f5);
 				}
 			}
+		}
+		
+		if(vehicle.driveableData.cargo.size() > 0){
+			DriveableType type = vehicle.getVehicleType();
+			for(int i = 0; i < vehicle.driveableData.cargo.size(); i++){
+				if(i >= type.cargopos.size()){
+					break;
+				}
+				IBlockState state = getBlockToRender(i, vehicle);
+				if(state.getRenderType() != EnumBlockRenderType.INVISIBLE){
+		            GlStateManager.pushMatrix();
+		            render.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		            //GlStateManager.scale(0.75F, 0.75F, 0.75F);
+		            GlStateManager.translate(pos(type.cargopos.get(i).xCoord) + 0.5, pos(type.cargopos.get(i).yCoord), pos(type.cargopos.get(i).zCoord) + 0.5);
+		            GlStateManager.pushMatrix();
+		            Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(state, vehicle.getBrightness(Minecraft.getMinecraft().getRenderPartialTicks()));
+		            GlStateManager.popMatrix();
+		            GlStateManager.popMatrix();
+		            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		            render.bindTexture(vehicle);
+		        }
+			}
+		}
+	}
+	
+	private static float pos(double d){
+		return (float)(d / 16f);
+	}
+	
+	private static IBlockState getBlockToRender(int index, EntityVehicle vehicle){
+		if(vehicle.driveableData.cargo.get(index).isEmpty()){
+			return Blocks.AIR.getDefaultState();
+		}
+		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof ItemBlock == false){
+			return CrateBlock.instance.getDefaultState();
+		}
+		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof IItem){
+			return Blocks.BEDROCK.getDefaultState();
+		}
+		else{
+			ItemStack stack = vehicle.driveableData.cargo.get(index);
+			return ((ItemBlock)stack.getItem()).block.getStateFromMeta(stack.getMetadata());
 		}
 	}
 		

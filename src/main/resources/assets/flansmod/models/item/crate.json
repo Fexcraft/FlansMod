@@ -1,5 +1,5 @@
 {
-    "parent": "flansmodapocalypse:block/labStone",
+    "parent": "flansmod:block/crate",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],
