@@ -9,11 +9,8 @@ import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.AttachmentType;
 import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.IScope;
-import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
@@ -23,15 +20,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -131,12 +125,10 @@ public class FlansModClient extends FlansMod
 			g.update();
 		}		
 		
-		for(Object obj : minecraft.world.playerEntities)
-		{
-			EntityPlayer player = (EntityPlayer)obj;
-			ItemStack currentItem = player.getHeldItemMainhand();
-			if(currentItem != null && currentItem.getItem() instanceof ItemGun)
-			{
+		//for(Object obj : minecraft.world.playerEntities){
+			//EntityPlayer player = (EntityPlayer)obj;
+			//ItemStack currentItem = player.getHeldItemMainhand();
+			//if(currentItem != null && currentItem.getItem() instanceof ItemGun){
 				/*if(player == minecraft.player && minecraft.gameSettings.thirdPersonView == 0)
 					player.clearItemInUse();
 				else
@@ -144,15 +136,15 @@ public class FlansModClient extends FlansMod
 					player.setItemInUse(currentItem, 100);
 				}*/
 				//TODO
-			}
-		}
+			//}
+		//}
 
 		//If the currently held item is not a gun or is the wrong gun, unscope
 		Item itemInHand = null;
 		ItemStack itemstackInHand = minecraft.player.inventory.getCurrentItem();
 		if (itemstackInHand != null)
 			itemInHand = itemstackInHand.getItem();
-		if (currentScope != null)
+		/*if (currentScope != null)
 		{
 			//GameSettings gameSettings = FMLClientHandler.instance().getClient().gameSettings;
 			
@@ -160,14 +152,13 @@ public class FlansModClient extends FlansMod
 			if(FMLClientHandler.instance().getClient().currentScreen != null 
 			|| itemInHand == null 
 			|| !(itemInHand instanceof ItemGun)
-			|| ((ItemGun)itemInHand).getInfoType().getCurrentScope(itemstackInHand) != currentScope)
-			{
+			|| ((ItemGun)itemInHand).getInfoType().getCurrentScope(itemstackInHand) != currentScope){
 				currentScope = null;
 				minecraft.gameSettings.fovSetting = originalFOV;
 				minecraft.gameSettings.mouseSensitivity = originalMouseSensitivity;
 				minecraft.gameSettings.thirdPersonView = originalThirdPerson;
 			}
-		}
+		}*/
 
 		//Calculate new zoom variables
 		lastZoomProgress = zoomProgress;
@@ -458,7 +449,7 @@ public class FlansModClient extends FlansMod
 			blockLightOverrides.clear();
 			
 			//Find all flashlights
-			for(Object obj : mc.world.playerEntities)
+			/*for(Object obj : mc.world.playerEntities)
 			{
 				EntityPlayer player = (EntityPlayer)obj;
 				ItemStack currentHeldItem = player.getHeldItemMainhand();
@@ -497,7 +488,7 @@ public class FlansModClient extends FlansMod
 							}
 						}
 					}
-				}
+				}*/
 				/*if(player.getRidingEntity() instanceof IControllable){
 					EntityDriveable icon = ((EntitySeat)player.getRidingEntity()).driveable;
 					for(int j = 0; j < 3; j++){
@@ -543,8 +534,8 @@ public class FlansModClient extends FlansMod
 							}
 						}
 					}
-				}*/
-			}
+				}
+			}*/
 			
 			for(Object obj : mc.world.loadedEntityList)
 			{

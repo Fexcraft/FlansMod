@@ -13,13 +13,7 @@ import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.EnumFireMode;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.InventoryHelper;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.guns.ItemShootable;
-import com.flansmod.common.guns.ShootableType;
 import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.tools.ItemTool;
@@ -47,7 +41,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -344,122 +337,9 @@ public class EntityMecha extends EntityDriveable {
 				}
 			}
 			
-			else if(heldItem instanceof ItemGun)
-			{
-				ItemGun gunItem = (ItemGun)heldItem;
-				GunType gunType = gunItem.getInfoType();
-				
-				//Get the correct shoot delay
-				float delay = left ? shootDelayLeft : shootDelayRight;
-				
-				//If we can shoot
-				if(delay <= 0)
-				{
-					//Go through the bullet stacks in the gun and see if any of them are not null
-					int bulletID = 0;
-					ItemStack bulletStack = null;
-					for(; bulletID < gunType.numAmmoItemsInGun; bulletID++)
-					{
-						ItemStack checkingStack = gunItem.getBulletItemStack(heldStack, bulletID);
-						if(checkingStack != null && checkingStack.getItem() != null && checkingStack.getItemDamage() < checkingStack.getMaxDamage())
-						{
-							bulletStack = checkingStack;
-							break;
-						}
-					}
-
-					//If no bullet stack was found, reload
-					if(bulletStack == null)
-					{
-						 gunItem.Reload(heldStack, world, this, driveableData, left ? EnumHandSide.LEFT : EnumHandSide.RIGHT, true, (infiniteAmmo() || creative()));
-					}
-					//A bullet stack was found, so try shooting with it
-					else if(bulletStack.getItem() instanceof ItemBullet)
-					{
-						//Shoot
-						shoot(heldStack, gunType, bulletStack, creative(), left);
-						
-						//Apply animations to 3D modelled guns
-						//TODO : Move to client side and sync
-						if(world.isRemote)
-						{							
-							int pumpDelay = gunType.model == null ? 0 : gunType.model.pumpDelay;
-							int pumpTime = gunType.model == null ? 1 : gunType.model.pumpTime;
-							if(left)
-							{
-								leftAnimations.doShoot(pumpDelay, pumpTime);
-							}
-							else
-							{
-								rightAnimations.doShoot(pumpDelay, pumpTime);
-							}
-						}
-						//Damage the bullet item
-						bulletStack.setItemDamage(bulletStack.getItemDamage() + 1);
-						
-						//Update the stack in the gun
-						gunItem.setBulletItemStack(heldStack, bulletStack, bulletID);
-					}
-				}
-			}
 		}
 		return true;
-	}
-
-	private void shoot(ItemStack stack, GunType gunType, ItemStack bulletStack, boolean creative, boolean left)
-	{
-		MechaType mechaType = getMechaType();
-		ShootableType bulletType = ((ItemShootable)bulletStack.getItem()).type;
-		RotatedAxes a = new RotatedAxes();
 		
-		Vector3f armVector = new Vector3f(mechaType.armLength, 0F, 0F);
-		Vector3f gunVector = new Vector3f(mechaType.armLength + 1.2F * mechaType.heldItemScale, 0.5F * mechaType.heldItemScale, 0F);
-		Vector3f armOrigin = left ?  mechaType.leftArmOrigin : mechaType.rightArmOrigin;
-		
-		a.rotateGlobalYaw(axes.getYaw());
-		armOrigin = a.findLocalVectorGlobally(armOrigin);
-		
-		a.rotateLocalPitch(-seats[0].looking.getPitch());
-		gunVector = a.findLocalVectorGlobally(gunVector);
-		armVector = a.findLocalVectorGlobally(armVector);
-		
-		Vector3f bulletOrigin = Vector3f.add(armOrigin, gunVector, null);
-		
-		bulletOrigin  = Vector3f.add(new Vector3f(posX, posY, posZ), bulletOrigin, null);
-				
-		if(!world.isRemote)
-			for (int k = 0; k < gunType.numBullets * bulletType.numBullets; k++)
-			{
-				
-				// TODO: Do mechas properly. No hacks
-				float speed = gunType.getBulletSpeed(stack);
-				if(speed <= 0.0f)
-					speed = 5.0f;
-				world.spawnEntity(((ItemShootable)bulletStack.getItem()).getEntity(world, 
-						bulletOrigin, 
-						armVector, 
-						(EntityLivingBase)(seats[0].getControllingPassenger()), 
-						gunType.getSpread(stack) / 2F, 
-						gunType.getDamage(stack), 
-						speed,
-						mechaType));
-			}
-		
-		if(left)
-			shootDelayLeft = gunType.mode == EnumFireMode.SEMIAUTO ? Math.max(gunType.shootDelay, 5) : gunType.shootDelay;
-		else shootDelayRight = gunType.mode == EnumFireMode.SEMIAUTO ? Math.max(gunType.shootDelay, 5) : gunType.shootDelay;
-		
-		if(bulletType.dropItemOnShoot != null && !creative)
-			ItemGun.dropItem(world, this, bulletType.dropItemOnShoot);
-		
-		// Play a sound if the previous sound has finished
-		if((left ? soundDelayLeft : soundDelayRight) <= 0 && gunType.shootSound != null)
-		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, gunType.shootSound, gunType.distortSound);
-			if(left)
-				soundDelayLeft = gunType.shootSoundLength;
-			else soundDelayRight = gunType.shootSoundLength;
-		}		
 	}
 	
 	@Override

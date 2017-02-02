@@ -31,7 +31,7 @@ public class ItemAAGun extends Item implements IFlanItem<AAGunType> {
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
-		setCreativeTab(CTabs.weapons);
+		setCreativeTab(CTabs.other);
 		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}
 

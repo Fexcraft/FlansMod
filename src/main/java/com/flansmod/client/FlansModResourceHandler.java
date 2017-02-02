@@ -16,7 +16,6 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.Paintjob;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.PaintableType;
@@ -64,17 +63,6 @@ public class FlansModResourceHandler
 			return resLoc;
 		}
 		else return null;
-	}
-	
-	public static ResourceLocation getDeployableTexture(GunType gunType)
-	{
-		if(textureMap.containsKey(gunType))
-		{
-			return textureMap.get(gunType);
-		}
-		ResourceLocation resLoc = new ResourceLocation("flansmod", "skins/" + gunType.deployableTexture + ".png");
-		textureMap.put(gunType, resLoc);
-		return resLoc;
 	}
 	
 	public static ResourceLocation getScope(String scopeTexture)

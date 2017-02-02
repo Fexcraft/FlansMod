@@ -15,8 +15,6 @@ import com.flansmod.common.driveables.mechas.EnumMechaSlotType;
 import com.flansmod.common.driveables.mechas.ItemMechaAddon;
 import com.flansmod.common.driveables.mechas.MechaItemType;
 import com.flansmod.common.driveables.mechas.MechaType;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.Paintjob;
 
 import net.minecraft.client.Minecraft;
@@ -387,7 +385,7 @@ public class RenderMecha extends Render implements IRenderFactory // implements 
 				toolType.model.renderSaw(mecha, dT, (leftHand && mecha.leftMouseHeld) || (!leftHand && mecha.rightMouseHeld));
 			}
 		}
-		else if(item instanceof ItemGun && ((ItemGun)item).getInfoType().model != null)
+		/*else if(item instanceof ItemGun && ((ItemGun)item).getInfoType().model != null)
 		{
 			GunType gunType = ((ItemGun)item).getInfoType();
 			ModelGun model = gunType.model;
@@ -395,7 +393,7 @@ public class RenderMecha extends Render implements IRenderFactory // implements 
 			GL11.glRotatef(-90F, 0F, 0F, 1F);
 			texturemanager.bindTexture(FlansModResourceHandler.getTexture(gunType));
 			//ClientProxy.gunRenderer.renderGun(stack, gunType, 1F / 16F, model, leftHand ? mecha.leftAnimations : mecha.rightAnimations, 0F);
-		}
+		}*/
 		else
 		{
 			GL11.glRotatef(-135F, 0F, 0F, 1F);
@@ -424,13 +422,11 @@ public class RenderMecha extends Render implements IRenderFactory // implements 
 		}
 		return false;
 	}
-
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) 
 	{
 		return false;
 	}
-
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data) 
 	{

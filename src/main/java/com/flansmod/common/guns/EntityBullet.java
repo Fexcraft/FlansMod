@@ -506,11 +506,6 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 			if (PlayerHandler.getPlayerData((EntityPlayer) owner,
 					world.isRemote ? Side.CLIENT : Side.SERVER) == null)
 				return false;
-			EntityMG mg = PlayerHandler.getPlayerData((EntityPlayer) owner,
-					world.isRemote ? Side.CLIENT : Side.SERVER).mountingGun;
-			if (mg != null && mg == entity) {
-				return true;
-			}
 		}
 		return owner.getRidingEntity() instanceof EntitySeat && (((EntitySeat) owner.getRidingEntity()).driveable == null
 				|| ((EntitySeat) owner.getRidingEntity()).driveable.isPartOfThis(entity));

@@ -16,15 +16,10 @@ import com.flansmod.client.debug.RenderDebugAABB;
 import com.flansmod.client.debug.RenderDebugDot;
 import com.flansmod.client.debug.RenderDebugVector;
 import com.flansmod.client.gui.GuiDriveableMenu;
-import com.flansmod.client.model.OverrideVanillaModelLoader;
 import com.flansmod.client.model.RenderAAGun;
 import com.flansmod.client.model.RenderBullet;
 import com.flansmod.client.model.RenderCustomEntityItem;
 import com.flansmod.client.model.RenderCustomItem;
-import com.flansmod.client.model.RenderGrenade;
-import com.flansmod.client.model.RenderGun;
-import com.flansmod.client.model.RenderItemHolder;
-import com.flansmod.client.model.RenderMG;
 import com.flansmod.client.model.RenderMecha;
 import com.flansmod.client.model.RenderNull;
 import com.flansmod.client.model.RenderParachute;
@@ -33,9 +28,6 @@ import com.flansmod.client.model.RenderVehicle;
 import com.flansmod.common.CommonProxy;
 import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.TileEntityItemHolder;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
@@ -47,26 +39,17 @@ import com.flansmod.common.driveables.PlaneType;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.types.IFlanItem;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.MetadataCollection;
@@ -78,11 +61,8 @@ public class ClientProxy extends CommonProxy
 	public static String modelDir = "com.flansmod.client.model.";
 	
 	/* These renderers handle rendering in hand items */
-	public static RenderGun gunRenderer;
-	public static RenderGrenade grenadeRenderer;
 	public static RenderPlane planeRenderer;
 	public static RenderVehicle vehicleRenderer;
-	public static RenderMecha mechaRenderer;
 
 
 
@@ -117,34 +97,11 @@ public class ClientProxy extends CommonProxy
 			}
 		}
 		*/
-
 		
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 0, new ModelResourceLocation("flansmod:flansWorkbench_guns", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 1, new ModelResourceLocation("flansmod:flansWorkbench_vehicles", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.workbench), 2, new ModelResourceLocation("flansmod:flansWorkbench_parts", "inventory"));
-		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.workbench), new String[] {"flansmod:flansWorkbench_guns", "flansmod:flansWorkbench_parts", "flansmod:flansWorkbench_vehicles"});
-
-		/*Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 0, new ModelResourceLocation("flansmod:opstick_Ownership", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 1, new ModelResourceLocation("flansmod:opstick_Connecting", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 2, new ModelResourceLocation("flansmod:opstick_Mapping", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.opStick, 3, new ModelResourceLocation("flansmod:opstick_Destruction", "inventory"));*/
-		//ModelBakery.addVariantName(FlansMod.opStick, new String[] {"flansmod:opstick_Ownership", "flansmod:opstick_Connecting", "flansmod:opstick_Mapping", "flansmod:opstick_Destruction"});
-		
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.spawner), 0, new ModelResourceLocation("flansmod:teamsSpawner_items", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.spawner), 1, new ModelResourceLocation("flansmod:teamsSpawner_players", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.spawner), 2, new ModelResourceLocation("flansmod:teamsSpawner_vehicles", "inventory"));
-		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.spawner), new String[] {"flansmod:teamsSpawner_items", "flansmod:teamsSpawner_players", "flansmod:teamsSpawner_vehicles"});
-
-		//Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.flag, 0, new ModelResourceLocation("flansmod:flagpole", "inventory"));
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(FlansMod.rainbowPaintcan, 0, new ModelResourceLocation("flansmod:rainbowPaintcan", "inventory"));
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(FlansMod.paintjobTable), 0, new ModelResourceLocation("flansmod:paintjobTable", "inventory"));
-		//ModelBakery.addVariantName(Item.getItemFromBlock(FlansMod.paintjobTable), new String[] {"flansmod:paintjobTable"});
 		
-		gunRenderer = new RenderGun(Minecraft.getMinecraft().getRenderManager());
-		grenadeRenderer = new RenderGrenade(Minecraft.getMinecraft().getRenderManager());
 		planeRenderer = new RenderPlane(Minecraft.getMinecraft().getRenderManager());
 		vehicleRenderer = new RenderVehicle(Minecraft.getMinecraft().getRenderManager());
-		mechaRenderer = new RenderMecha(Minecraft.getMinecraft().getRenderManager());
 		
 		//Register custom item renderers
 		/*for(GunType gunType : GunType.guns.values())
@@ -157,11 +114,6 @@ public class ClientProxy extends CommonProxy
 			MinecraftForgeClient.registerItemRenderer(vehicleType.item, vehicleRenderer);
 		for(MechaType mechaType : MechaType.types)
 			MinecraftForgeClient.registerItemRenderer(mechaType.item, mechaRenderer);*/
-
-
-		ModelLoaderRegistry.registerLoader(OverrideVanillaModelLoader.INSTANCE);
-
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemHolder.class, new RenderItemHolder());
 
         // Create one event handler for the client and register it with MC Forge and FML
 		ClientEventHandler eventHandler = new ClientEventHandler();
@@ -218,21 +170,18 @@ public class ClientProxy extends CommonProxy
 	{
 		
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, RenderBullet::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityGrenade.class, RenderGrenade::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, RenderPlane::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, RenderVehicle::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, RenderAAGun::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
 		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityMG.class, RenderMG::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityParachute.class, RenderParachute::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityMecha.class, RenderMecha::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityCustomItem.class, RenderCustomEntityItem::new);
-
-		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySpawner.class, new TileEntitySpawnerRenderer());
+		
 	}
 	
 	/** Old one time tutorial code that displays messages the first time you enter a plane / vehicle. Needs reworking */
@@ -340,23 +289,6 @@ public class ClientProxy extends CommonProxy
 	public boolean isThePlayer(EntityPlayer player)
 	{
 		return player == FMLClientHandler.instance().getClient().player;
-	}
-	
-	/* Gun and armour box crafting methods */
-	@Override
-	public void buyGun(GunBoxType type, InfoType gun)
-	{
-		//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, gun));
-		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
-		data.shootTimeLeft = data.shootTimeRight = 10;
-	}
-	
-	@Override
-	public void buyArmour(String shortName, int piece, ArmourBoxType box)
-	{
-		//TODO FlansMod.getPacketHandler().sendToServer(new PacketBuyArmour(box.shortName, shortName, piece));
-		PlayerData data = PlayerHandler.getPlayerData(Minecraft.getMinecraft().player);
-		data.shootTimeLeft = data.shootTimeRight = 10;
 	}
 	
 	@Override

@@ -9,8 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public class ItemBlockManyNames extends ItemBlock{
 	
-	public ItemBlockManyNames(Block b)
-	{
+	public ItemBlockManyNames(Block b){
 		super(b);
 		setHasSubtypes(true);
 		setRegistryName(b.getRegistryName());
@@ -18,20 +17,18 @@ public class ItemBlockManyNames extends ItemBlock{
 	}
 	
 	@Override
-	public String getUnlocalizedName(ItemStack stack)
-	{
+	public String getUnlocalizedName(ItemStack stack){
 		return super.getUnlocalizedName() + "." + stack.getItemDamage();
 	}
 	
 	@Override
-	public int getMetadata(int par1) 
-	{
+	public int getMetadata(int par1) {
 		return par1;
 	}
 	
 	@Override
-	public CreativeTabs[] getCreativeTabs()
-	{
-		return new CreativeTabs[]{ CTabs.vehicles, CTabs.weapons, CTabs.parts };
+	public CreativeTabs[] getCreativeTabs(){
+		return new CreativeTabs[]{ CTabs.vehicles, CTabs.other, CTabs.parts };
 	}
+	
 }

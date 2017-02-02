@@ -2,18 +2,12 @@ package com.flansmod.common.guns.raytracing;
 
 import java.util.ArrayList;
 
-import com.flansmod.common.FlansUtils;
 import com.flansmod.common.RotatedAxes;
-import com.flansmod.common.guns.AttachmentType;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -74,23 +68,6 @@ public class PlayerSnapshot
 		hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(leftArmAxes), new Vector3f(originXLeft, 1.3F, originZLeft), new Vector3f(-2F / 16F, -0.6F, -2F / 16F), new Vector3f(0.25F, 0.7F, 0.25F), EnumHitboxType.LEFTARM));	
 		hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(-2F / 16F, -0.6F, -2F / 16F), new Vector3f(0.25F, 0.7F, 0.25F), EnumHitboxType.RIGHTARM));
 
-
-		for (EnumHandSide handSide : EnumHandSide.values())
-		{
-			ItemStack stack = player.getHeldItem(FlansUtils.getHandForSide(handSide, p));
-			if (stack == null || !(stack.getItem() instanceof ItemGun))
-			{
-				continue;
-			}
-			GunType gunType = ((ItemGun) stack.getItem()).getInfoType();
-			if (gunType.shield)
-			{
-				EnumHitboxType hitboxType = handSide == EnumHandSide.LEFT ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM;
-				hitboxes.add(new PlayerHitbox(player, bodyAxes.findLocalAxesGlobally(rightArmAxes), new Vector3f(originXRight, 1.3F, originZRight), new Vector3f(gunType.shieldOrigin.y, -1.05F + gunType.shieldOrigin.x, -1F / 16F + gunType.shieldOrigin.z), new Vector3f(gunType.shieldDimensions.y, gunType.shieldDimensions.x, gunType.shieldDimensions.z), hitboxType));
-			}
-		}
-
-
 	}
 	
 	public ArrayList<BulletHit> raytrace(Vector3f origin, Vector3f motion)
@@ -134,25 +111,4 @@ public class PlayerSnapshot
 		return null;
 	}
 	
-	public Vector3f GetMuzzleLocation(GunType gunType, AttachmentType barrelAttachment, EnumHandSide handSide)
-	{
-		PlayerHitbox hitbox = GetHitbox(handSide == EnumHandSide.LEFT ? EnumHitboxType.LEFTARM : EnumHitboxType.RIGHTARM);
-		Vector3f muzzlePos = new Vector3f(hitbox.o.x, hitbox.o.y + hitbox.d.y * 0.5f, hitbox.o.z + hitbox.d.z * 0.5f);
-		
-		if(gunType != null && gunType.model != null)
-		{
-			/*Vector3f barrelAttach = new Vector3f(
-					gunType.model.barrelAttachPoint.z,
-					-gunType.model.barrelAttachPoint.x,
-					gunType.model.barrelAttachPoint.y);*/
-			//Vector3f.add(muzzlePos, barrelAttach, muzzlePos);
-		}
-		
-		muzzlePos = hitbox.axes.findLocalVectorGlobally(muzzlePos);
-		
-		
-		
-		Vector3f.add(muzzlePos, hitbox.rP, muzzlePos);
-		return muzzlePos;
-	}
 }

@@ -1,13 +1,8 @@
 package com.flansmod.common;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.raytracing.PlayerSnapshot;
-import com.flansmod.common.teams.PlayerClass;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 
@@ -35,14 +30,10 @@ public class PlayerData
 	/** The off hand gun stack. For viewing other player's off hand weapons only (since you don't know what is in their inventory and hence just the ID is insufficient) */
 	//@SideOnly(Side.CLIENT)
 	//public ItemStack offHandGunStack;
-	/** The MG this player is using */
-	public EntityMG mountingGun;
 	/** Stops player shooting immediately after swapping weapons */
 	public int shootClickDelay;
 	/** The speed of the minigun the player is using */
 	public float minigunSpeed = 0F;
-	/** When remote explosives are thrown they are added to this list. When the player uses a remote, the first one from this list detonates */
-	public ArrayList<EntityGrenade> remoteExplosives = new ArrayList<EntityGrenade>();
 	/** Sound delay parameters */
 	public int loopedSoundDelay;
 	/** Sound delay parameters */
@@ -106,10 +97,6 @@ public class PlayerData
 	public boolean out;
 	/** The player's vote for the next round from 1 ~ 5. 0 is not yet voted */
 	public int vote;
-	/** The class the player is currently using */
-	public PlayerClass playerClass;
-	/** The class the player will switch to upon respawning */
-	public PlayerClass newPlayerClass;
 	/** Keeps the player out of having to rechose their team each round */
 	public boolean builder;
 	/** Save the player's skin here, to replace after having done a swap for a certain class override */
@@ -165,85 +152,10 @@ public class PlayerData
 		}
 		*/
 	}
-
-	public PlayerClass getPlayerClass()
-	{
-		if(playerClass != newPlayerClass)
-			playerClass = newPlayerClass;
-		return playerClass;
-	}
-
-	public void resetScore() 
-	{
-		score = zombieScore = kills = deaths = 0;
-		playerClass = newPlayerClass = null;
-	}
 	
-	public void playerKilled()
-	{
-		mountingGun = null;
+	public void playerKilled(){
 		isShootingRight = isShootingLeft = false;
 		snapshots = new PlayerSnapshot[Config.numPlayerSnapshots];
-	}
-
-	/*
-	public void selectOffHandWeapon(EntityPlayer player, int slot)
-	{
-		if(isValidOffHandWeapon(player, slot))
-			offHandGunSlot = slot;
-	}
-	
-	public boolean isValidOffHandWeapon(EntityPlayer player, int slot)
-	{
-		if(slot == 0)
-			return true;
-		if(slot - 1 == player.inventory.currentItem)
-			return false;
-		ItemStack stackInSlot = player.inventory.getStackInSlot(slot - 1);
-		if(stackInSlot == null)
-			return false;
-		if(stackInSlot.getItem() instanceof ItemGun)
-		{
-			ItemGun item = ((ItemGun)stackInSlot.getItem());
-			if(item.GetType().oneHanded)
-				return true;
-		}
-		return false;
-	}
-
-	public void cycleOffHandItem(EntityPlayer player, int dWheel) 
-	{
-		if(dWheel < 0)
-			for(offHandGunSlot = ((offHandGunSlot + 1) % 10); !isValidOffHandWeapon(player, offHandGunSlot); offHandGunSlot = ((offHandGunSlot + 1) % 10)) ;
-		else if(dWheel > 0)
-			for(offHandGunSlot = ((offHandGunSlot + 9) % 10); !isValidOffHandWeapon(player, offHandGunSlot); offHandGunSlot = ((offHandGunSlot + 9) % 10)) ;
-		
-		FlansModClient.currentScope = null;
-		
-		FlansMod.getPacketHandler().sendToServer(new PacketSelectOffHandGun(offHandGunSlot));
-	}
-	*/
-	public void doMelee(EntityPlayer player, int meleeTime, GunType type)	
-	{
-		meleeLength = meleeTime;
-		lastMeleePositions = new Vector3f[type.meleePath.size()];
-		
-		for(int k = 0; k < type.meleeDamagePoints.size(); k++)
-		{
-			Vector3f meleeDamagePoint = type.meleeDamagePoints.get(k);
-			//Do a raytrace from the prev pos to the current pos and attack anything in the way
-			Vector3f nextPos = type.meleePath.get(0);
-			Vector3f nextAngles = type.meleePathAngles.get(0);
-			RotatedAxes nextAxes = new RotatedAxes(-nextAngles.y, -nextAngles.z, nextAngles.x);
-			
-			Vector3f nextPosInPlayerCoords = new RotatedAxes(player.rotationYaw + 90F, player.rotationPitch, 0F).findLocalVectorGlobally(nextAxes.findLocalVectorGlobally(meleeDamagePoint));
-			Vector3f.add(nextPos, nextPosInPlayerCoords, nextPosInPlayerCoords);
-			
-			if(!FlansMod.proxy.isThePlayer(player))
-				nextPosInPlayerCoords.y += 1.6F;
-			
-			lastMeleePositions[k] = new Vector3f(player.posX + nextPosInPlayerCoords.x, player.posY + nextPosInPlayerCoords.y, player.posZ + nextPosInPlayerCoords.z);
-		}
 	}
 	
 }

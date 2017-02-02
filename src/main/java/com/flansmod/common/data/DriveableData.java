@@ -73,7 +73,6 @@ public class DriveableData implements IInventory {
 		numBombs = dType.numBombSlots;
 		numCargo = dType.numCargoSlots;
 		numMissiles = dType.numMissileSlots;
-		numGuns = dType.ammoSlots();
 		engine = PartType.getPart(tag.getString("Engine"));
 		paintjobID = tag.getInteger("Paint");
 		ammo = NonNullList.<ItemStack>withSize(numGuns, ItemStack.EMPTY);

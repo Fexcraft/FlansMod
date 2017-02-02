@@ -40,9 +40,9 @@ public class GuiDriveableMenu extends GuiContainer
 		buttonList.add(cargoButton);
 		
 		//Gun button
-		GuiButton gunsButton = new GuiButton(1, width / 2 + 2, height / 2 - 71, 58, 20, "Guns");
+		/*GuiButton gunsButton = new GuiButton(1, width / 2 + 2, height / 2 - 71, 58, 20, "Guns");
 		gunsButton.enabled = type.ammoSlots() > 0;
-		buttonList.add(gunsButton);
+		buttonList.add(gunsButton);*/
 		
 		//Fuel button
 		GuiButton fuelButton = new GuiButton(2, width / 2 -60, height / 2 - 49, 58, 20, "Fuel");

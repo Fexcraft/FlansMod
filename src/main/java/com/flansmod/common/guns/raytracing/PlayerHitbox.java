@@ -1,22 +1,17 @@
 package com.flansmod.common.guns.raytracing;
 
 import com.flansmod.client.debug.EntityDebugDot;
-import com.flansmod.common.FlansUtils;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.PlayerBulletHit;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHandSide;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -160,54 +155,33 @@ public class PlayerHitbox
 		case RIGHTITEM : break;
 		default : break;
 		}
-		switch(type)
-		{
-		case BODY :  case HEAD :  case LEFTARM :  case RIGHTARM : 
-		{
-			//Calculate the hit damage
-			float hitDamage = damage * bulletType.damageVsLiving * damageModifier;
-			//Create a damage source object
-			DamageSource damagesource = damageOwner == null ? DamageSource.GENERIC 
-					: EntityBullet.GetBulletDamage(firedFrom, bulletType, damageOwner, type == EnumHitboxType.HEAD);
-
-			//When the damage is 0 (such as with Nerf guns) the entityHurt Forge hook is not called, so this hacky thing is here
-			/*if(!player.worldObj.isRemote && hitDamage == 0 && TeamsManager.getInstance().currentRound != null){
-				TeamsManager.getInstance().currentRound.gametype.playerAttacked((EntityPlayerMP)player, damagesource);
-			}*/
-			
-			//Attack the entity!
-			if(player.attackEntityFrom(damagesource, hitDamage))
+		switch(type){
+			case BODY :  case HEAD :  case LEFTARM :  case RIGHTARM : 
 			{
-				//If the attack was allowed, we should remove their immortality cooldown so we can shoot them again. Without this, any rapid fire gun become useless
-				player.arrowHitTimer++;
-				player.hurtResistantTime = player.maxHurtResistantTime / 2;
-				//Yuck.
-				//PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 50, dimension, PacketPlaySound.buildSoundPacket(posX, posY, posZ, type.hitSound, true));
+				//Calculate the hit damage
+				float hitDamage = damage * bulletType.damageVsLiving * damageModifier;
+				//Create a damage source object
+				DamageSource damagesource = damageOwner == null ? DamageSource.GENERIC 
+						: EntityBullet.GetBulletDamage(firedFrom, bulletType, damageOwner, type == EnumHitboxType.HEAD);
+	
+				//When the damage is 0 (such as with Nerf guns) the entityHurt Forge hook is not called, so this hacky thing is here
+				/*if(!player.worldObj.isRemote && hitDamage == 0 && TeamsManager.getInstance().currentRound != null){
+					TeamsManager.getInstance().currentRound.gametype.playerAttacked((EntityPlayerMP)player, damagesource);
+				}*/
+				
+				//Attack the entity!
+				if(player.attackEntityFrom(damagesource, hitDamage))
+				{
+					//If the attack was allowed, we should remove their immortality cooldown so we can shoot them again. Without this, any rapid fire gun become useless
+					player.arrowHitTimer++;
+					player.hurtResistantTime = player.maxHurtResistantTime / 2;
+					//Yuck.
+					//PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 50, dimension, PacketPlaySound.buildSoundPacket(posX, posY, posZ, type.hitSound, true));
+				}
+				return penetratingPower - 1;
 			}
-			return penetratingPower - 1;
-		}
-		case RIGHTITEM :
-		{
-			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.RIGHT, player);
-			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
-			{
-				GunType gunType = ((ItemGun)currentStack.getItem()).getInfoType();
-				//TODO : Shield damage
-				return penetratingPower - gunType.shieldDamageAbsorption;
-			}
-			else return penetratingPower;
-		}
-		case LEFTITEM : 
-		{
-			ItemStack currentStack = FlansUtils.getItemOnSide(EnumHandSide.LEFT, player);
-			if(currentStack != null && currentStack.getItem() instanceof ItemGun)
-			{
-				GunType gunType = ((ItemGun)currentStack.getItem()).getInfoType();
-				//TODO : Shield damage
-				return penetratingPower - gunType.shieldDamageAbsorption;
-			}
-		}
-		default : return penetratingPower;
+			default:
+				return penetratingPower;
 		}
 	}
 }

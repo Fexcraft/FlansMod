@@ -9,7 +9,6 @@ import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.PaintableType;
 import com.flansmod.common.types.TypeFile;
@@ -71,8 +70,6 @@ public abstract class DriveableType extends PaintableType
 	public String shootSoundPrimary, shootSoundSecondary;
 	/** Positions of primary and secondary weapons */
 	public ArrayList<DriveablePosition> shootPointsPrimary = new ArrayList<DriveablePosition>(), shootPointsSecondary = new ArrayList<DriveablePosition>();
-	/** Pilot guns also have their own seperate array so ammo handling can be done */
-	public ArrayList<PilotGun> pilotGuns = new ArrayList<PilotGun>();
 	
 	//Passengers
 	/** The number of passengers, not including the pilot */
@@ -340,31 +337,6 @@ public abstract class DriveableType extends PaintableType
 				modePrimary = EnumFireMode.valueOf(split[1].toUpperCase());
 			else if(split[0].equals("ModeSecondary"))
 				modeSecondary = EnumFireMode.valueOf(split[1].toUpperCase());
-			else if(split[0].equals("ShootPointPrimary"))
-			{
-				DriveablePosition shootPoint = getShootPoint(split);
-				shootPointsPrimary.add(shootPoint);
-				if(shootPoint instanceof PilotGun)
-					pilotGuns.add((PilotGun)shootPoint);
-			}
-			else if(split[0].equals("ShootPointSecondary"))
-			{
-				DriveablePosition shootPoint = getShootPoint(split);
-				shootPointsSecondary.add(shootPoint);
-				if(shootPoint instanceof PilotGun)
-					pilotGuns.add((PilotGun)shootPoint);
-			}
-			
-			
-			//Backwards compatibility stuff
-			else if(split[0].equals("AddGun"))
-			{
-				secondary = EnumWeaponType.GUN;
-				PilotGun pilotGun = (PilotGun)getShootPoint(split);
-				shootPointsSecondary.add(pilotGun);
-				pilotGuns.add(pilotGun);
-				driveableRecipe.add(new ItemStack(pilotGun.type.item));
-			}
 			else if(split[0].equals("BombPosition"))
 			{
 				primary = EnumWeaponType.BOMB;
@@ -479,11 +451,6 @@ public abstract class DriveableType extends PaintableType
 			{
 				Seat seat = new Seat(split);
 				seats[seat.id] = seat;
-				if(seat.gunType != null)
-				{
-					seat.gunnerID = numPassengerGunners++;
-					driveableRecipe.add(new ItemStack(seat.gunType.item));
-				}
 			}
 			else if(split[0].equals("GunOrigin"))
 				seats[Integer.parseInt(split[1])].gunOrigin = new Vector3f(Float.parseFloat(split[2]) / 16F, Float.parseFloat(split[3]) / 16F, Float.parseFloat(split[4]) / 16F);
@@ -603,20 +570,6 @@ public abstract class DriveableType extends PaintableType
 	}
 
 	public abstract EntityDriveable createDriveable(World world, double x, double y, double z, DriveableData data);
-	
-	private DriveablePosition getShootPoint(String[] split)
-	{
-		//Its a gun with a type
-		if(split.length == 6)
-		{
-			return new PilotGun(split);
-		}
-		else if(split.length == 5)
-		{
-			return new DriveablePosition(split);
-		}
-		return new DriveablePosition(new Vector3f(), EnumDriveablePart.core);
-	}
 
 	public ArrayList<DriveablePosition> shootPoints(boolean s)
 	{
@@ -648,11 +601,6 @@ public abstract class DriveableType extends PaintableType
 		return 1;
 	}
 
-	public int ammoSlots()
-	{
-		return numPassengerGunners + pilotGuns.size();
-	}
-
 	public boolean isValidAmmo(BulletType bulletType, EnumWeaponType weaponType)
 	{
 		return (acceptAllAmmo || ammo.contains(bulletType)) && bulletType.weaponType == weaponType;
@@ -668,25 +616,6 @@ public abstract class DriveableType extends PaintableType
 			for(ItemStack stack : partwiseRecipe.get(part.type))
 			{
 				stacks.add(stack.copy());
-			}
-		}
-		//Add the items required for the guns connected to this part
-		for(PilotGun gun : pilotGuns)
-		{
-			if(gun.part == part.type)
-			{
-				stacks.add(new ItemStack(gun.type.item));
-				//if(data.ammo[numPassengerGunners + pilotGuns.indexOf(gun)] != null)
-				//	stacks.add(data.ammo[numPassengerGunners + pilotGuns.indexOf(gun)]);
-			}
-		}
-		for(Seat seat : seats)
-		{
-			if(seat != null && seat.part == part.type && seat.gunType != null)
-			{
-				stacks.add(new ItemStack(seat.gunType.item));
-				//if(data.ammo[seat.id] != null)
-				//	stacks.add(data.ammo[seat.id]);
 			}
 		}
 		return stacks;

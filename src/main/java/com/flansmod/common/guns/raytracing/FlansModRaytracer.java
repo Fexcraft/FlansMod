@@ -4,16 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.flansmod.common.FlansUtils;
 import com.flansmod.common.PlayerData;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.AttachmentType;
 import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
@@ -22,9 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -106,7 +99,7 @@ public class FlansModRaytracer
 				Entity entity = (Entity)obj;
 				if(entity != entityToIgnore && entity != playerToIgnore 
 						&& !entity.isDead 
-						&& (entity instanceof EntityLivingBase || entity instanceof EntityAAGun || entity instanceof EntityGrenade) 
+						&& (entity instanceof EntityLivingBase || entity instanceof EntityAAGun) 
 						&& entity.getEntityBoundingBox() != null)
 				{
 					RayTraceResult mop = entity.getEntityBoundingBox().calculateIntercept(origin.toVec3(), new Vec3d(origin.x + motion.x, origin.y + motion.y, origin.z + motion.z));
@@ -162,34 +155,6 @@ public class FlansModRaytracer
 		}
 		
 		return hits;
-	}
-
-	public static Vector3f GetPlayerMuzzlePosition(EntityPlayer player, EnumHandSide hand)
-	{
-		PlayerSnapshot snapshot = new PlayerSnapshot(player);
-
-		ItemStack itemstack = FlansUtils.getItemOnSide(hand, player);
-
-		if (itemstack != null && itemstack.getItem() instanceof ItemGun)
-		{
-			GunType gunType = ((ItemGun) itemstack.getItem()).getInfoType();
-			AttachmentType barrelType = gunType.getBarrel(itemstack);
-
-			return Vector3f.add(
-					new Vector3f(
-							player.posX,
-							player.posY,
-							player.posZ
-					),
-					snapshot.GetMuzzleLocation(
-							gunType,
-							barrelType,
-							hand),
-					null
-			);
-		}
-
-		return new Vector3f(player.getPositionEyes(0.0f));
 	}
 
 	public static abstract class BulletHit implements Comparable<BulletHit>

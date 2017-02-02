@@ -1,7 +1,6 @@
 package com.flansmod.common.util;
 
 import com.flansmod.common.EntityCustomItem;
-import com.flansmod.common.guns.ItemGun;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -56,11 +55,12 @@ public class Ticker {
 	public void onEntitySpawn(EntityJoinWorldEvent event){
 		if(event.getEntity() instanceof EntityItem && !(event.getEntity() instanceof EntityCustomItem)){
 			ItemStack stack = ((EntityItem) event.getEntity()).getEntityItem();
-			if(stack.getItem() instanceof ItemGun && ((ItemGun)stack.getItem()).getInfoType().modelString != null){
+			/*if(stack.getItem() instanceof ItemGun && ((ItemGun)stack.getItem()).getInfoType().modelString != null){
 				EntityCustomItem replacementItem = new EntityCustomItem((EntityItem)event.getEntity());
 				event.getWorld().spawnEntity(replacementItem);
 				event.setCanceled(true);
-			}
+			}*/
 		}
 	}
+	
 }

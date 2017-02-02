@@ -1,11 +1,10 @@
-package com.flansmod.common.guns;
+package com.flansmod.common.driveables;
 
-public enum EnumFireMode 
-{
+public enum EnumFireMode {
+	
 	SEMIAUTO, FULLAUTO, MINIGUN, BURST;
 	
-	public static EnumFireMode getFireMode(String s)
-	{
+	public static EnumFireMode getFireMode(String s){
 		s = s.toLowerCase();
 		if(s.equals("fullauto"))
 			return FULLAUTO;
@@ -15,4 +14,5 @@ public enum EnumFireMode
 			return BURST;
 		return SEMIAUTO;
 	}
+	
 }

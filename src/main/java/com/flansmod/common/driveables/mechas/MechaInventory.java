@@ -3,8 +3,6 @@ package com.flansmod.common.driveables.mechas;
 import java.util.HashMap;
 
 import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGun;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -130,16 +128,18 @@ public class MechaInventory implements IInventory
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack) 
-	{
+	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		Item item = itemstack.getItem();
-		if(item == null)
+		if(item == null){
 			return true;
-		switch(EnumMechaSlotType.values()[i])
-		{
-		case leftTool : case rightTool : return item instanceof ItemGun || item instanceof ItemMechaAddon;
-		case leftArm : case rightArm : return item instanceof ItemBullet;
-		default : return false;
+		}
+		switch(EnumMechaSlotType.values()[i]){
+			case leftTool: case rightTool:
+				return item instanceof ItemMechaAddon;
+			case leftArm: case rightArm:
+				return item instanceof ItemBullet;
+			default:
+				return false;
 		}
 	}
 

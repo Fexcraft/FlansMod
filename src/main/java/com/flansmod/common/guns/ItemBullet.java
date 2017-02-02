@@ -30,8 +30,8 @@ public class ItemBullet extends ItemShootable implements IFlanItem<BulletType> {
 		setHasSubtypes(true);
 		type.item = this;
 		switch(type.weaponType){
-			case SHELL : case BOMB : case MINE : case MISSILE : setCreativeTab(CTabs.weapons); break;
-			default : setCreativeTab(CTabs.weapons);
+			case SHELL : case BOMB : case MINE : case MISSILE : setCreativeTab(CTabs.other); break;
+			default : setCreativeTab(CTabs.other);
 		}
 		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}

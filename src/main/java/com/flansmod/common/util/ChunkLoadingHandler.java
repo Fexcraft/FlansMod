@@ -1,4 +1,4 @@
-package com.flansmod.common.teams;
+package com.flansmod.common.util;
 
 import java.util.List;
 

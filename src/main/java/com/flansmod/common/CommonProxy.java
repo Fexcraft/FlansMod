@@ -11,11 +11,9 @@ import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.parts.EnumPartCategory;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
-import com.flansmod.common.teams.ArmourBoxType;
 import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
@@ -88,10 +86,6 @@ public class CommonProxy {
 	
 	public boolean isThePlayer(EntityPlayer player){
 		return false;
-	}
-	
-	public void buyGun(GunBoxType type, InfoType gun){
-		
 	}
 	
 	/** Play a block break sound here */
@@ -317,9 +311,5 @@ public class CommonProxy {
 	{
 		return false;
 	}
-
-	public void buyArmour(String shortName, int piece, ArmourBoxType type) 
-	{
-
-	}
+	
 }

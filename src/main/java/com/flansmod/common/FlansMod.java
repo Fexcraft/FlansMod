@@ -34,32 +34,15 @@ import com.flansmod.common.driveables.mechas.MechaItemType;
 import com.flansmod.common.driveables.mechas.MechaType;
 import com.flansmod.common.eventhandlers.PlayerDeathEventListener;
 import com.flansmod.common.guns.AAGunType;
-import com.flansmod.common.guns.AttachmentType;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityAAGun;
 import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.EntityGrenade;
-import com.flansmod.common.guns.EntityMG;
-import com.flansmod.common.guns.GrenadeType;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemAAGun;
-import com.flansmod.common.guns.ItemAttachment;
 import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.guns.ItemGrenade;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.guns.boxes.BlockGunBox;
-import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.FPacketHandler;
-import com.flansmod.common.paintjob.BlockPaintjobTable;
 import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
-import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.BlockArmourBox;
-import com.flansmod.common.teams.BlockSpawner;
-import com.flansmod.common.teams.ChunkLoadingHandler;
-import com.flansmod.common.teams.EntityGunItem;
-import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.tools.ToolType;
@@ -67,13 +50,13 @@ import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
 import com.flansmod.common.util.CTabs;
+import com.flansmod.common.util.ChunkLoadingHandler;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
 import net.fexcraft.mod.lib.util.registry.Registry;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -85,7 +68,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -120,15 +102,12 @@ public class FlansMod {
 	public static FlansHooks hooks = new FlansHooks();
 	
 	//Items and creative tabs
-	public static BlockFlansWorkbench workbench;
-	public static BlockSpawner spawner;
 	public static ArrayList<ItemPart> partItems = new ArrayList<ItemPart>();
 	public static ArrayList<ItemMecha> mechaItems = new ArrayList<ItemMecha>();
 	public static ArrayList<ItemTool> toolItems = new ArrayList<ItemTool>();
 	
 	/** Custom paintjob item */
 	public static Item rainbowPaintcan;
-	public static BlockPaintjobTable paintjobTable;
 	
 	public static ItemKey key;
 	private static final String prefix = TextFormatting.BLACK + "[" + TextFormatting.RED + "FM-" + TextFormatting.BLACK + "]" + TextFormatting.GRAY + "";
@@ -160,23 +139,11 @@ public class FlansMod {
 		Registry.registerAllEntities(MODID);
 		
 		key = new ItemKey();
-		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench());
-		workbench.setRegistryName(MODID, "flansWorkbench");
-		workbench.setUnlocalizedName(workbench.getRegistryName().toString());
-		GameRegistry.register(workbench);
-		GameRegistry.register(new ItemBlockManyNames(workbench));
-		GameRegistry.addRecipe(new ItemStack(workbench, 1, 0), "BBB", "III", "III", 'B', Items.BOWL, 'I', Items.IRON_INGOT );
-		GameRegistry.addRecipe(new ItemStack(workbench, 1, 1), "ICI", "III", 'C', Items.CAULDRON, 'I', Items.IRON_INGOT );
-		spawner = (BlockSpawner)(new BlockSpawner(Material.IRON).setBlockUnbreakable().setResistance(1000000F));
-		GameRegistry.register(spawner);
-		GameRegistry.register(new ItemBlockManyNames(spawner));
-		GameRegistry.registerTileEntity(TileEntitySpawner.class, "teamsSpawner");
 		
 		rainbowPaintcan = new Item().setCreativeTab(CTabs.parts);
 		rainbowPaintcan.setRegistryName(MODID, "rainbowPaintcan");
 		rainbowPaintcan.setUnlocalizedName(rainbowPaintcan.getRegistryName().toString());
 		GameRegistry.register(rainbowPaintcan);
-		paintjobTable = new BlockPaintjobTable();
 		GameRegistry.registerTileEntity(TileEntityItemHolder.class, "itemHolder");
 		
 		//Read content packs
@@ -215,8 +182,6 @@ public class FlansMod {
 		}
 		Util.log("Loaded recipes.");
 		
-		//EntityRegistry.registerGlobalEntityID(EntityGunItem.class, "GunItem", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "GunItem"), EntityGunItem.class, "GunItem", 98, this, 100, 20, true);
 		//EntityRegistry.registerGlobalEntityID(EntityItemCustomRender.class, "CustomItem", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "CustomItem"), EntityCustomItem.class, "CustomItem", 89, this, 100, 20, true);
 		
@@ -237,12 +202,7 @@ public class FlansMod {
 		//Register bullets and grenades
 		//EntityRegistry.registerGlobalEntityID(EntityBullet.class, "Bullet", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Bullet"), EntityBullet.class, "Bullet", 96, this, 40, 100, false);
-		//EntityRegistry.registerGlobalEntityID(EntityGrenade.class, "Grenade", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Grenade"), EntityGrenade.class, "Grenade", 100, this, 40, 100, true);
-
-		//Register MGs and AA guns
-		//EntityRegistry.registerGlobalEntityID(EntityMG.class, "MG", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "MG"), EntityMG.class, "MG", 91, this, 40, 5, true);
+		
 		//EntityRegistry.registerGlobalEntityID(EntityAAGun.class, "AAGun", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "AAGun"), EntityAAGun.class, "AAGun", 92, this, 40, 500, false);
 		
@@ -290,13 +250,6 @@ public class FlansMod {
 		event.registerServerCommand(new TextureCommand());
 		event.registerServerCommand(new KeyCommand());
 		event.registerServerCommand(new QuickFix());
-	}
-	
-	@SubscribeEvent
-	public void onBlockBreak(BlockEvent.BreakEvent event){
-		if(event.getPlayer() != null && event.getPlayer().getHeldItemMainhand() != null && event.getPlayer().getHeldItemMainhand().getItem() instanceof ItemGun){
-			event.setCanceled(true);
-		}
 	}
 	
 	/** Reads type files from all content packs */
@@ -402,18 +355,16 @@ public class FlansMod {
 	}
 	
 	/** Content pack reader method */
-	private void readContentPacks(FMLPreInitializationEvent event)
-	{
+	private void readContentPacks(FMLPreInitializationEvent event){
 		// Icons, Skins, Models
 		// Get the classloader in order to load the images
 		ClassLoader classloader = (net.minecraft.server.MinecraftServer.class).getClassLoader();
 		Method method = null;
-		try
-		{
+		try{
 			method = (java.net.URLClassLoader.class).getDeclaredMethod("addURL", java.net.URL.class);
 			method.setAccessible(true);
-		} catch (Exception e)
-		{
+		}
+		catch (Exception e){
 			Util.log("Failed to get class loader. All content loading will now fail.");
 			e.printStackTrace();
 		}
@@ -423,38 +374,27 @@ public class FlansMod {
 		//TODO : Add gametype loader
 		getTypeFiles(contentPacks);
 		
-		for(EnumType type : EnumType.values())
-		{
+		for(EnumType type : EnumType.values()){
 			Class<? extends InfoType> typeClass = type.getTypeClass();
-			for(TypeFile typeFile : TypeFile.files.get(type))
-			{
-				try
-				{
+			for(TypeFile typeFile : TypeFile.files.get(type)){
+				try{
 					InfoType infoType = (typeClass.getConstructor(TypeFile.class).newInstance(typeFile));
 					infoType.read(typeFile);
-					switch(type)
-					{
-					case bullet : 		new ItemBullet((BulletType)infoType); break;
-					case attachment : 	new ItemAttachment((AttachmentType)infoType); break;
-					case gun : 			new ItemGun((GunType)infoType); break;
-					case grenade : 		new ItemGrenade((GrenadeType)infoType); break;
-					case part : 		partItems.add((ItemPart)new ItemPart((PartType)infoType)); break;
-					case plane : 		new ItemPlane((PlaneType)infoType); break;
-					case vehicle : 		new ItemVehicle((VehicleType)infoType); break;
-					case aa : 			new ItemAAGun((AAGunType)infoType); break;
-					case mechaItem : 	new ItemMechaAddon((MechaItemType)infoType); break;
-					case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
-					case tool : 		toolItems.add((ItemTool)new ItemTool((ToolType)infoType)); break;
-					case box : 			new BlockGunBox((GunBoxType)infoType); break;
-					case armourBox : 	new BlockArmourBox((ArmourBoxType)infoType); break; 
-					case playerClass : 	break;
-					case team : 		break;
-					case itemHolder:	new BlockItemHolder((ItemHolderType)infoType); break;
-					default: Util.log("Unrecognised type for " + infoType.shortName); break;
+					switch(type){
+						case bullet : 		new ItemBullet((BulletType)infoType); break;
+						case part : 		partItems.add((ItemPart)new ItemPart((PartType)infoType)); break;
+						case plane : 		new ItemPlane((PlaneType)infoType); break;
+						case vehicle : 		new ItemVehicle((VehicleType)infoType); break;
+						case aa : 			new ItemAAGun((AAGunType)infoType); break;
+						case mechaItem : 	new ItemMechaAddon((MechaItemType)infoType); break;
+						case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
+						case tool : 		toolItems.add((ItemTool)new ItemTool((ToolType)infoType)); break;
+						case team : 		break;
+						case itemHolder:	new BlockItemHolder((ItemHolderType)infoType); break;
+						default: Util.log("Unrecognised type for " + infoType.shortName); break;
 					}
 				}
-				catch(Exception e)
-				{
+				catch(Exception e){
 					Util.log("Failed to add " + type.name() + " : " + typeFile.name);
 					e.printStackTrace();
 				}

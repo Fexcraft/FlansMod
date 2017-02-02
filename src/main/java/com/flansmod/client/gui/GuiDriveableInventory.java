@@ -62,29 +62,6 @@ public class GuiDriveableInventory extends GuiContainer
 			{
 				if(slotsDone >= 3 + scroll)
 					continue;
-				if(driveable.getDriveableType().seats[i].gunType != null)
-				{
-					if(slotsDone >= scroll)
-					{
-						fontRendererObj.drawString(driveable.getDriveableType().seats[i].gunName, 53, 29 + 19 * (slotsDone - scroll), 0x000000);
-						drawStack(new ItemStack(driveable.getDriveableType().seats[i].gunType.getItem()), 10, 25 + 19 * (slotsDone - scroll));
-					}
-					slotsDone++;
-				}
-			}
-			for(int i = 0; i < driveable.getDriveableType().pilotGuns.size(); i++)
-			{
-				if(slotsDone >= 3 + scroll)
-					continue;
-				if(driveable.getDriveableType().pilotGuns.get(i).type != null)
-				{
-					if(slotsDone >= scroll)
-					{
-						fontRendererObj.drawString("Driver's gun " + (i + 1), 53, 29 + 19 * (slotsDone - scroll), 0x000000);
-						drawStack(new ItemStack(driveable.getDriveableType().pilotGuns.get(i).type.getItem()), 10, 25 + 19 * (slotsDone - scroll));
-					}
-					slotsDone++;
-				}
 			}
 		}
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.types.IFlanItem;
@@ -44,7 +42,7 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType> {
 		{
 			setCreativeTab(CTabs.parts);
 			if(type.remote)
-				setCreativeTab(CTabs.weapons);
+				setCreativeTab(CTabs.other);
 			if(type.healDriveables)
 				setCreativeTab(CTabs.vehicles);
 		}
@@ -92,29 +90,6 @@ public class ItemTool extends ItemFood implements IFlanItem<ToolType> {
 				itemstack.shrink(1);;;
 			//Our work here is done. Let's be off
 			return new ActionResult(EnumActionResult.SUCCESS, itemstack);
-		}
-		
-		else if(type.remote)
-		{
-			PlayerData data = PlayerHandler.getPlayerData(entityplayer, world.isRemote ? Side.CLIENT : Side.SERVER);
-			//If we have some remote explosives out there
-			if(data.remoteExplosives.size() > 0)
-			{
-				//Detonate it
-				data.remoteExplosives.get(0).detonate();
-				//Remove it from the list to detonate
-				if(data.remoteExplosives.get(0).detonated)
-					data.remoteExplosives.remove(0);
-				
-				//If not in creative and the tool should decay, damage it
-				if(!entityplayer.capabilities.isCreativeMode && type.toolLife > 0)
-					itemstack.setItemDamage(itemstack.getItemDamage() + 1);
-				//If the tool is damagable and is destroyed upon being used up, then destroy it
-				if(type.toolLife > 0 && type.destroyOnEmpty && itemstack.getItemDamage() == itemstack.getMaxDamage())
-					itemstack.shrink(1);
-				//Our work here is done. Let's be off
-				return new ActionResult(EnumActionResult.SUCCESS, itemstack);
-			}
 		}
 		else
 		{
