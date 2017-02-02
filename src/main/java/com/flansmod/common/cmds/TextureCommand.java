@@ -2,7 +2,7 @@ package com.flansmod.common.cmds;
 
 import com.flansmod.common.data.player.PlayerHandler;
 
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

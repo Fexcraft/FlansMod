@@ -4,8 +4,7 @@ import java.util.List;
 
 import com.flansmod.common.FlansMod;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,22 +12,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class ItemKey extends Item implements IItem {
+public class ItemKey extends Item{
 	
 	public ItemKey(){
 		this.setMaxStackSize(1);
-		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
-	}
-	
-	@Override
-	public String getName(){
-		return "key";
-	}
-
-	@Override
-	public int getVariantAmount(){
-		return default_variant;
+		Registry.registerItemManually(FlansMod.MODID, "key", 0, null, this);
 	}
 	
 	@Override

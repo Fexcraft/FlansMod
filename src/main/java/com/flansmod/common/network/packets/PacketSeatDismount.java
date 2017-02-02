@@ -1,31 +1,27 @@
 package com.flansmod.common.network.packets;
 
-import com.flansmod.common.driveables.EntitySeat;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class PacketSeatDismount implements IPacket, IMessage{
 	
-	public int entityId, seatId;
+	public int id;
 	
 	public PacketSeatDismount(){}
 	
-	public PacketSeatDismount(EntitySeat seat){
-		entityId = seat.driveable.getEntityId();
-		seatId = seat.seatInfo.id;
+	public PacketSeatDismount(int id){
+		this.id = id;
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf){
-		buf.writeInt(entityId);
-		buf.writeInt(seatId);
+	public void toBytes(ByteBuf bbuf){
+		bbuf.writeInt(id);
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf){
-		entityId = buf.readInt();
-		seatId = buf.readInt();
+	public void fromBytes(ByteBuf bbuf){
+		id = bbuf.readInt();
 	}
 	
 }

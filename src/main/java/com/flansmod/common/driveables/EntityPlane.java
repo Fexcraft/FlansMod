@@ -11,13 +11,13 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
 import com.flansmod.common.vector.Vector3f;
 
-import net.fexcraft.mod.lib.util.cls.MathHelper;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -207,7 +207,7 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				seats[0].removeSeatPassenger();
+				seats[0].getControllingPassenger().dismountRidingEntity();
 		  		return true;
 			}
 			case 7 : //Inventory : Check to see if this plane allows in-flight inventory editing or if the plane is on the ground
@@ -382,9 +382,9 @@ public class EntityPlane extends EntityDriveable
 				double x = posX + (serverPosX - posX) / serverPositionTransitionTicker;
 				double y = posY + (serverPosY - posY) / serverPositionTransitionTicker;
 				double z = posZ + (serverPosZ - posZ) / serverPositionTransitionTicker;
-				double dYaw = MathHelper.wrapAngleTo180_double(serverYaw - axes.getYaw());
-				double dPitch = MathHelper.wrapAngleTo180_double(serverPitch - axes.getPitch());
-				double dRoll = MathHelper.wrapAngleTo180_double(serverRoll - axes.getRoll());
+				double dYaw = MathHelper.wrapDegrees(serverYaw - axes.getYaw());
+				double dPitch = MathHelper.wrapDegrees(serverPitch - axes.getPitch());
+				double dRoll = MathHelper.wrapDegrees(serverRoll - axes.getRoll());
 				rotationYaw = (float)(axes.getYaw() + dYaw / serverPositionTransitionTicker);
 				rotationPitch = (float)(axes.getPitch() + dPitch / serverPositionTransitionTicker);
 				float rotationRoll = (float)(axes.getRoll() + dRoll / serverPositionTransitionTicker);

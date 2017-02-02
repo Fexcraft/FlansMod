@@ -5,7 +5,7 @@ import com.flansmod.common.network.packets.*;
 
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.PacketHandler.PacketHandlerType;
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -32,12 +32,11 @@ public class FPacketHandler {
 		instance.registerMessage(VehicleControlPacketHandler.Client.class,        PacketVehicleControl.class,      id++, Side.CLIENT);
 		instance.registerMessage(SeatUpdatePacketHandler.Server.class,            PacketSeatUpdate.class,          id++, Side.SERVER);
 		instance.registerMessage(SeatUpdatePacketHandler.Client.class,            PacketSeatUpdate.class,          id++, Side.CLIENT);
-		instance.registerMessage(SeatRemovalPacketHandler.Client.class,           PacketSeatRemoval.class,         id++, Side.CLIENT);
-		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
 		instance.registerMessage(DriveableColorPacketHandler.Client.class,        PacketDriveableColor.class,      id++, Side.CLIENT);
 		instance.registerMessage(DriveableSyncPacketHandler.Server.class,         PacketDriveableSync.class,       id++, Side.SERVER);
 		instance.registerMessage(DriveableSyncPacketHandler.Client.class,         PacketDriveableSync.class,       id++, Side.CLIENT);
 		instance.registerMessage(DriveableTexturePacketHandler.Client.class,      PacketDriveableTexture.class,    id++, Side.CLIENT);
+		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
 		
 		PacketHandler.registerListener(PacketHandlerType.JSON, Side.CLIENT, new JsonPacketHandler.Client());
 		PacketHandler.registerListener(PacketHandlerType.JSON, Side.SERVER, new JsonPacketHandler.Server());

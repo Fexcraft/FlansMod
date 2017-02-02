@@ -3,11 +3,10 @@ package com.flansmod.common.network.handlers;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.frsm.util.java.BoolUtil;
 import net.fexcraft.mod.lib.api.network.IPacketListener;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketJsonObject;
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class JsonPacketHandler{
@@ -22,7 +21,7 @@ public class JsonPacketHandler{
 			if(packet.obj.has("task")){
 				switch(packet.obj.get("task").getAsString()){
 					case "debug":
-						FlansMod.DEBUG = BoolUtil.reverse(FlansMod.DEBUG);
+						FlansMod.DEBUG = !FlansMod.DEBUG;
 						break;
 					case "tick":
 						Print.spam(1, "TICK => " + Util.getTime() + ";");

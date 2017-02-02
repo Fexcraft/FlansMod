@@ -8,7 +8,6 @@ import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.monster.EntityMob;
@@ -132,7 +131,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 	@Override
 	public void applyEntityCollision(Entity entity)
 	{
-		//if(entity != EntUtil.getPassengerOf(this))
+		//if(entity != this.getControllingPassenger())
 			//super.applyEntityCollision(entity);
 	}
 
@@ -165,12 +164,12 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		if (damagesource.damageType.equals("player"))
 		{
 			Entity player = damagesource.getEntity();
-			if (player == EntUtil.getPassengerOf(this))
+			if (player == this.getControllingPassenger())
 			{
 				
-			} else if(EntUtil.getPassengerOf(this) != null)
+			} else if(this.getControllingPassenger() != null)
 			{
-				return EntUtil.getPassengerOf(this).attackEntityFrom(damagesource, i);
+				return this.getControllingPassenger().attackEntityFrom(damagesource, i);
 			} else if(Config.canBreakGuns)
 			{
 				setDead();
@@ -219,11 +218,11 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 			setDead();
 		}
 
-		if (EntUtil.getPassengerOf(this) != null)
+		if (this.getControllingPassenger() != null)
 		{
 			ticksSinceUsed = 0;
-			gunYaw = EntUtil.getPassengerOf(this).rotationYaw - 90;
-			gunPitch = EntUtil.getPassengerOf(this).rotationPitch;
+			gunYaw = this.getControllingPassenger().rotationYaw - 90;
+			gunPitch = this.getControllingPassenger().rotationPitch;
 		}
 
 		if (gunPitch > type.bottomViewLimit)
@@ -280,7 +279,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		motionZ *= 0.5;
 		move(MoverType.SELF, motionX, motionY, motionZ);
 		
-		if (world.isRemote && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) == FMLClientHandler.instance().getClient().player)
+		if (world.isRemote && this.getControllingPassenger() != null && this.getControllingPassenger() == FMLClientHandler.instance().getClient().player)
 		{
 			checkForShooting();
 		}
@@ -308,7 +307,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 			return;
 		}
 
-		if (EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this).isDead)
+		if (this.getControllingPassenger() != null && this.getControllingPassenger().isDead)
 		{
 			this.getPassengers().removeAll(this.getPassengers());
 		}
@@ -326,14 +325,14 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 					ammo[i] = null;
 					// Scrap metal output?
 				}
-				if (ammo[i] == null && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) instanceof EntityPlayer)
+				if (ammo[i] == null && this.getControllingPassenger() != null && this.getControllingPassenger() instanceof EntityPlayer)
 				{
-					int slot = findAmmo(((EntityPlayer) EntUtil.getPassengerOf(this)));
+					int slot = findAmmo(((EntityPlayer) this.getControllingPassenger()));
 					if (slot >= 0)
 					{
-						ammo[i] = ((EntityPlayer) EntUtil.getPassengerOf(this)).inventory.getStackInSlot(slot);
-						if (!((EntityPlayer)EntUtil.getPassengerOf(this)).capabilities.isCreativeMode)
-							((EntityPlayer) EntUtil.getPassengerOf(this)).inventory.decrStackSize(slot, 1);
+						ammo[i] = ((EntityPlayer) this.getControllingPassenger()).inventory.getStackInSlot(slot);
+						if (!((EntityPlayer)this.getControllingPassenger()).capabilities.isCreativeMode)
+							((EntityPlayer) this.getControllingPassenger()).inventory.decrStackSize(slot, 1);
 						reloadTimer = type.reloadTime;
 						PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.reloadSound, true);
 					}
@@ -344,16 +343,16 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		
 		if(!world.isRemote && reloadTimer <= 0 && shootDelay <= 0)
 		{
-			if(mouseHeld && EntUtil.getPassengerOf(this) != null && EntUtil.getPassengerOf(this) instanceof EntityPlayer)
+			if(mouseHeld && this.getControllingPassenger() != null && this.getControllingPassenger() instanceof EntityPlayer)
 			{
-				EntityPlayer player = (EntityPlayer)EntUtil.getPassengerOf(this);
+				EntityPlayer player = (EntityPlayer)this.getControllingPassenger();
 				for(int j = 0; j < type.numBarrels; j++)
 				{
 					if(shootDelay <= 0 && ammo[j] != null && (!type.fireAlternately || type.fireAlternately && currentBarrel == j))
 					{
 						// Fire
 						//BulletType bullet = BulletType.getBullet(ammo[j].getItem());
-						if (!((EntityPlayer)EntUtil.getPassengerOf(this)).capabilities.isCreativeMode)
+						if (!((EntityPlayer)this.getControllingPassenger()).capabilities.isCreativeMode)
 							ammo[j].damageItem(1, player);
 						shootDelay = type.shootDelay;
 						barrelRecoil[j] = type.recoil;
@@ -482,7 +481,7 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 		double x2 = x * cosYaw + z * sinYaw;
 		double z2 = -x * sinYaw + z * cosYaw;
 
-		EntUtil.getPassengerOf(this).setPosition(posX + x2, posY + y, posZ + z2);
+		this.getControllingPassenger().setPosition(posX + x2, posY + y, posZ + z2);
 	}
 
 	@Override
@@ -520,13 +519,13 @@ public class EntityAAGun extends Entity implements IEntityAdditionalSpawnData
 	{
 		// Player right clicked on gun
 		// Mount gun
-		if (EntUtil.getPassengerOf(this) != null && (EntUtil.getPassengerOf(this) instanceof EntityPlayer) && EntUtil.getPassengerOf(this) != entityplayer)
+		if (this.getControllingPassenger() != null && (this.getControllingPassenger() instanceof EntityPlayer) && this.getControllingPassenger() != entityplayer)
 		{
 			return true;
 		}
 		if (!world.isRemote)
 		{
-			if (EntUtil.getPassengerOf(this) == entityplayer)
+			if (this.getControllingPassenger() == entityplayer)
 			{
 				entityplayer.dismountRidingEntity();
 				return true;

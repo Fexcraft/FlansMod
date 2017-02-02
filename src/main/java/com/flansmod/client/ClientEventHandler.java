@@ -66,7 +66,6 @@ public class ClientEventHandler {
 		    	//InstantBulletRenderer.UpdateAllTrails();
 				renderHooks.update();
 				FlansModClient.tick();
-				
 				break;
 			}
 		}	

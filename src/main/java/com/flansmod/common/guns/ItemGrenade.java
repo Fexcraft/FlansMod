@@ -12,8 +12,7 @@ import com.flansmod.common.util.CTabs;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -29,18 +28,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>, IItem
-{
+public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType> {
+	
 	public GrenadeType type;
 	
-	public ItemGrenade(GrenadeType t) 
-	{
+	public ItemGrenade(GrenadeType t){
 		super(t);
 		type = t;
 		type.item = this;
 		setCreativeTab(CTabs.weapons);
-		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
+		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}
 	
 	@Override
@@ -165,21 +162,9 @@ public class ItemGrenade extends ItemShootable implements IFlanItem<GrenadeType>
 		}
 	}
 	
-	public void Shoot(World world,
-			Vector3f origin,
-			Vector3f direction,
-			float damageModifier,
-			float spreadModifier,
-			float speedModifier,
-			InfoType shotFrom,
-			EntityLivingBase shooter)
-	{
+	public void Shoot(World world, Vector3f origin, Vector3f direction, float damageModifier, float spreadModifier, float speedModifier, InfoType shotFrom, EntityLivingBase shooter){
 		EntityGrenade grenade = getGrenade(world, shooter);
 		world.spawnEntity(grenade);
 	}
-
-	@Override
-	public String getName(){
-		return type.shortName;
-	}
+	
 }

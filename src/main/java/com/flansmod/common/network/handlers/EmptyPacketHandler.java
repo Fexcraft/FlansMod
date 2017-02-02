@@ -2,7 +2,7 @@ package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.network.packets.PacketEmpty;
 
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

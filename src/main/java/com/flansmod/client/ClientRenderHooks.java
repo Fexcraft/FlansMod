@@ -21,7 +21,6 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.vector.Vector3f;
 
@@ -638,13 +637,11 @@ public class ClientRenderHooks
 		}
 	}
 	
-	public void ModifyHUD(RenderGameOverlayEvent event)
-	{
+	public void ModifyHUD(RenderGameOverlayEvent event){
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		//Remove crosshairs if looking down the sights of a gun
-		if(event.getType() == ElementType.CROSSHAIRS && FlansModClient.currentScope != null)
-		{
+		if(event.getType() == ElementType.CROSSHAIRS && FlansModClient.currentScope != null){
 			event.setCanceled(true);
 			return;
 		}
@@ -655,25 +652,20 @@ public class ClientRenderHooks
 					
 		//Tessellator tessellator = Tessellator.getInstance();
 		
-		if(!event.isCancelable() && event.getType() == ElementType.HELMET)
-		{
+		if(!event.isCancelable() && event.getType() == ElementType.HELMET){
 			//Scopes and helmet overlays
 			String overlayTexture = null;
-			if (FlansModClient.currentScope != null && FlansModClient.currentScope.hasZoomOverlay() && FMLClientHandler.instance().getClient().currentScreen == null && FlansModClient.zoomProgress > 0.8F)
-			{
+			if(FlansModClient.currentScope != null && FlansModClient.currentScope.hasZoomOverlay() && FMLClientHandler.instance().getClient().currentScreen == null && FlansModClient.zoomProgress > 0.8F){
 				overlayTexture = FlansModClient.currentScope.getZoomOverlay();
 			}
-			else if(mc.player != null)
-			{
+			else if(mc.player != null){
 				ItemStack stack = mc.player.inventory.armorInventory.get(3);
-				if(stack != null && stack.getItem() instanceof ItemTeamArmour)
-				{
+				/*if(stack != null && stack.getItem() instanceof ItemTeamArmour){
 					overlayTexture = ((ItemTeamArmour)stack.getItem()).type.overlay;
-				}
+				}*/
 			}
 			
-			if(overlayTexture != null)
-			{
+			if(overlayTexture != null){
 				FlansModClient.minecraft.entityRenderer.setupOverlayRendering();
 				GL11.glEnable(3042 /* GL_BLEND */);
 				GL11.glDisable(2929 /* GL_DEPTH_TEST */);
@@ -697,10 +689,8 @@ public class ClientRenderHooks
 			}
 		}
 		
-		if(event.isCancelable() && event.getType() == ElementType.CROSSHAIRS)
-		{
-			if(FlansModClient.hitMarkerTime > 0)
-			{
+		if(event.isCancelable() && event.getType() == ElementType.CROSSHAIRS){
+			if(FlansModClient.hitMarkerTime > 0){
 				//Off-hand weapon graphics
 				mc.renderEngine.bindTexture(hitMarker);
 				

@@ -10,7 +10,7 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.driveables.VehicleType;
 import com.flansmod.common.vector.Vector3f;
 
-import net.fexcraft.mod.lib.api.item.IItem;
+import net.fexcraft.mod.lib.api.item.fItem;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -310,7 +310,7 @@ public class ModelVehicle extends ModelDriveable
 		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof ItemBlock == false){
 			return CrateBlock.instance.getDefaultState();
 		}
-		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof IItem){
+		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof fItem){
 			return Blocks.BEDROCK.getDefaultState();
 		}
 		else{

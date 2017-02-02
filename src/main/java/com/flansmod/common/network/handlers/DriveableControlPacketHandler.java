@@ -1,7 +1,9 @@
 package com.flansmod.common.network.handlers;
 
+import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.packets.PacketDriveableControl;
+import com.flansmod.common.util.Config;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -9,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -32,7 +35,12 @@ public class DriveableControlPacketHandler {
 						}
 					}
 					if(driveable != null){
-						updateDriveable(driveable, packet);
+						if(packet.send_back){
+							FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableControl(driveable, true), new TargetPoint(driveable.dimension, driveable.posX, driveable.posY, driveable.posZ, Config.driveableUpdateRange));
+						}
+						else{
+							updateDriveable(player, driveable, packet);
+						}
 					}
 					
 				}
@@ -54,18 +62,18 @@ public class DriveableControlPacketHandler {
 						return;
 					}
 					EntityDriveable driveable = null;
-					for(Object obj : player.world.loadedEntityList){
-						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){
-							driveable = (EntityDriveable)obj;
+					for(Entity ent : player.world.loadedEntityList){
+						if(ent instanceof EntityDriveable && ent.getEntityId() == packet.entityId){
+							driveable = (EntityDriveable)ent;
 							driveable.driveableData.fuelInTank = packet.fuelInTank;
-							if(driveable.seats[0] != null && driveable.seats[0].getControllingPassenger() == player){
+							if(driveable.seats[0] != null && driveable.seats[0].getControllingPassenger() == player && !packet.send_back){
 								return;
 							}
 							break;
 						}
 					}
 					if(driveable != null){
-						updateDriveable(driveable, packet);
+						updateDriveable(player, driveable, packet);
 					}
 				}
 			});
@@ -73,7 +81,7 @@ public class DriveableControlPacketHandler {
 		}
 	}
 	
-	protected static void updateDriveable(EntityDriveable driveable, PacketDriveableControl pkt){
+	protected static void updateDriveable(EntityPlayer player, EntityDriveable driveable, PacketDriveableControl pkt){
 		if(pkt.errored){
 			return;
 		}

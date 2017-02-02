@@ -14,8 +14,7 @@ import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.creativetab.CreativeTabs;
@@ -37,36 +36,30 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
-{
+public class ItemPlane extends Item implements IPaintableItem<PlaneType> {
+	
 	public PlaneType type;
 	
-	public ItemPlane(PlaneType type1)
-	{
+	public ItemPlane(PlaneType type1){
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
-		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
+		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}
 
 	@Override
 	/** Make sure client and server side NBTtags update */
-	public boolean getShareTag()
-	{
+	public boolean getShareTag(){
 		return true;
 	}
 	
-	private NBTTagCompound getTagCompound(ItemStack stack, World world)
-	{
-		if(stack.getTagCompound() == null)
-		{
-			if(!world.isRemote && stack.getItemDamage() != 0)
+	private NBTTagCompound getTagCompound(ItemStack stack, World world){
+		if(stack.getTagCompound() == null){
+			if(!world.isRemote && stack.getItemDamage() != 0){
 				stack.setTagCompound(getOldTagCompound(stack, world));
-			if(stack.getTagCompound() == null)
-			{
+			}
+			if(stack.getTagCompound() == null){
 				NBTTagCompound tags = new NBTTagCompound();
 				stack.setTagCompound(tags);
 				tags.setString("Type", type.shortName);
@@ -76,17 +69,13 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 		return stack.getTagCompound();
 	}
 	
-	private NBTTagCompound getOldTagCompound(ItemStack stack, World world)
-	{
-		try
-		{
+	private NBTTagCompound getOldTagCompound(ItemStack stack, World world){
+		try{
 			File file1 = world.getSaveHandler().getMapFileFromName("plane_" + stack.getItemDamage());
-			if(file1 != null && file1.exists())
-			{
+			if(file1 != null && file1.exists()){
 				FileInputStream fileinputstream = new FileInputStream(file1);
 				NBTTagCompound tags = CompressedStreamTools.readCompressed(fileinputstream).getCompoundTag("data");
-				for(EnumDriveablePart part : EnumDriveablePart.values())
-				{
+				for(EnumDriveablePart part : EnumDriveablePart.values()){
 					tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
 					tags.setBoolean(part.getShortName() + "_Fire", false);
 				}
@@ -94,8 +83,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 				return tags;
 			}
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			Util.log("Failed to read old vehicle file");
 			e.printStackTrace();
 		}
@@ -139,8 +127,7 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 	}
 	
 	@Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
-    {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand){
 		ItemStack itemstack = entityplayer.getHeldItemMainhand();
 		
     	//Raytracing
@@ -154,24 +141,19 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
         RayTraceResult movingobjectposition = world.rayTraceBlocks(posVec, lookVec, type.placeableOnWater);
         
         //Result check
-        if(movingobjectposition == null)
-        {
+        if(movingobjectposition == null){
             return new ActionResult(EnumActionResult.PASS, itemstack);
         }
-        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK)
-        {
+        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
         	BlockPos pos = movingobjectposition.getBlockPos();
             Block block = world.getBlockState(pos).getBlock();
-            if(type.placeableOnLand || block instanceof BlockLiquid)
-            {
-	            if(!world.isRemote)
-	            {
+            if(type.placeableOnLand || block instanceof BlockLiquid){
+	            if(!world.isRemote){
 	            	DriveableData data = getPlaneData(itemstack, world);
 	            	if(data != null)
 	            		world.spawnEntity(new EntityPlane(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, data));
 	            }
-				if(!entityplayer.capabilities.isCreativeMode)
-				{	
+				if(!entityplayer.capabilities.isCreativeMode){	
 					itemstack.shrink(1);
 				}
 			}
@@ -179,14 +161,11 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 	}
 
-	public Entity spawnPlane(World world, double x, double y, double z, ItemStack stack)
-	{
+	public Entity spawnPlane(World world, double x, double y, double z, ItemStack stack){
 		DriveableData data = getPlaneData(stack, world);
-		if(data != null)
-		{
+		if(data != null){
 			Entity entity = new EntityPlane(world, x, y, z, type, data);
-			if(!world.isRemote)
-			{
+			if(!world.isRemote){
 				world.spawnEntity(entity);
 			}
 			return entity;
@@ -194,29 +173,25 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
 		return null;
 	}
 	
-	public DriveableData getPlaneData(ItemStack itemstack, World world)
-	{
+	public DriveableData getPlaneData(ItemStack itemstack, World world){
 		return new DriveableData(getTagCompound(itemstack, world));
 	}
-		
-	//TODO @Override
+	
 	@SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack par1ItemStack, int par2)
-    {
+    public int getColorFromItemStack(ItemStack par1ItemStack, int par2){
     	return type.colour;
     }
     
     /** Make sure that creatively spawned planes have nbt data */
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
-    {
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
     	ItemStack planeStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.shortName);
-    	if(PartType.defaultEngines.containsKey(EnumType.plane))
+    	if(PartType.defaultEngines.containsKey(EnumType.plane)){
     		tags.setString("Engine", PartType.defaultEngines.get(EnumType.plane).shortName);
-    	for(EnumDriveablePart part : EnumDriveablePart.values())
-    	{
+    	}
+    	for(EnumDriveablePart part : EnumDriveablePart.values()){
     		tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
     		tags.setBoolean(part.getShortName() + "_Fire", false);
     	}
@@ -225,15 +200,8 @@ public class ItemPlane extends Item implements IPaintableItem<PlaneType>, IItem
     }
 	
 	@Override
-	public PlaneType getInfoType()
-	{
+	public PlaneType getInfoType(){
 		return type;
 	}
-
-	@Override
-	public String getName(){
-		return type.shortName;
-	}
-
-
+	
 }

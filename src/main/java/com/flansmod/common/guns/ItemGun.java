@@ -39,8 +39,7 @@ import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Multimap;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -79,8 +78,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
-{
+public class ItemGun extends Item implements IPaintableItem<GunType> {
+	
 	private static final int CLIENT_TO_SERVER_UPDATE_INTERVAL = 1;
 	private static final int SERVER_TO_CLIENT_UPDATE_INTERVAL = 2;
 	
@@ -117,8 +116,7 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 		type.item = this;
 		setMaxDamage(0);
 		setCreativeTab(CTabs.weapons);
-		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
-		ItemUtil.register(FlansMod.MODID, this);
+		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 		
 		//moved code to another class cause client imports in the constructor crash the server
 		if(FMLCommonHandler.instance().getSide() == Side.CLIENT){
@@ -1354,9 +1352,6 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
 			map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier("Weapon modifier", type.meleeDamage, 0));
 		return map;
 	}
-
-
-
 	
 	// For when we have custom paintjob names
 	//@Override
@@ -1366,13 +1361,8 @@ public class ItemGun extends Item implements IPaintableItem<GunType>, IItem
     //}
 	
 	@Override
-    public boolean canItemEditBlocks()
-    {
+    public boolean canItemEditBlocks(){
         return false;
     }
-
-    @Override
-	public String getName(){
-		return type.shortName;
-	}
+	
 }

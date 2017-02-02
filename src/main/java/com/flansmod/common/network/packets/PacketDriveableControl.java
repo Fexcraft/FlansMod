@@ -20,6 +20,7 @@ public class PacketDriveableControl implements IPacket, IMessage{
 	public float fuelInTank;
 	public float steeringYaw;
 	public boolean errored = false;
+	public boolean send_back = false;
 	public RGB primary;
 	public RGB secondary;
 	
@@ -53,8 +54,14 @@ public class PacketDriveableControl implements IPacket, IMessage{
 		//this.secondary = driveable.driveableData.secondary_color;
 	}
 
+	public PacketDriveableControl(EntityDriveable driveable, boolean b) {
+		this(driveable);
+		send_back = true;
+	}
+
 	@Override
 	public void toBytes(ByteBuf buf){
+		buf.writeBoolean(send_back);
 		buf.writeInt(entityId);
 		buf.writeDouble(posX);
 		buf.writeDouble(posY);
@@ -82,6 +89,7 @@ public class PacketDriveableControl implements IPacket, IMessage{
 	@Override
 	public void fromBytes(ByteBuf buf){
 		try{
+			send_back = buf.readBoolean();
 			entityId = buf.readInt();
 			posX = buf.readDouble();
 			posY = buf.readDouble();

@@ -11,8 +11,7 @@ import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.util.CTabs;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -30,26 +29,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
-{
+public class ItemMecha extends Item implements IPaintableItem<MechaType> {
 	public MechaType type;
 
-	public ItemMecha(MechaType type1)
-	{
+	public ItemMecha(MechaType type1){
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
-		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
+		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean b)
-	{
-		if(type.description != null)
-		{
+	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean b){
+		if(type.description != null){
 			Collections.addAll(lines, type.description.split("_"));
 		}
 		NBTTagCompound tags = getTagCompound(stack, player.world);
@@ -61,17 +54,13 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	
 	@Override
 	/** Make sure client and server side NBTtags update */
-	public boolean getShareTag()
-	{
+	public boolean getShareTag(){
 		return true;
 	}
 	
-	private NBTTagCompound getTagCompound(ItemStack stack, World world)
-	{
-		if(stack.getTagCompound() == null)
-		{
-			if(stack.getTagCompound() == null)
-			{
+	private NBTTagCompound getTagCompound(ItemStack stack, World world){
+		if(stack.getTagCompound() == null){
+			if(stack.getTagCompound() == null){
 				NBTTagCompound tags = new NBTTagCompound();
 				stack.setTagCompound(tags);
 				tags.setString("Type", type.shortName);
@@ -82,8 +71,7 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
 	}
 	
 	@Override
-	public ActionResult onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
-    {
+	public ActionResult onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand){
 		ItemStack itemstack = entityplayer.getHeldItemMainhand();
 		
     	//Raytracing
@@ -97,47 +85,39 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
         RayTraceResult movingobjectposition = world.rayTraceBlocks(posVec, lookVec, true);
         
         //Result check
-        if(movingobjectposition == null)
-        {
+        if(movingobjectposition == null){
             return new ActionResult(EnumActionResult.PASS, itemstack);
         }
-        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK)
-        {
+        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
         	BlockPos pos = movingobjectposition.getBlockPos();
-            if(!world.isRemote)
-            {
+            if(!world.isRemote){
 				world.spawnEntity(new EntityMecha(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.5F + type.yOffset, (double)pos.getZ() + 0.5F, entityplayer, type, getData(itemstack, world), getTagCompound(itemstack, world)));
             }
-			if(!entityplayer.capabilities.isCreativeMode)
-			{	
+			if(!entityplayer.capabilities.isCreativeMode){	
 				itemstack.shrink(1);
 			}
 		}
 		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 	}
 	
-	public DriveableData getData(ItemStack itemstack, World world)
-	{
+	public DriveableData getData(ItemStack itemstack, World world){
 		return new DriveableData(getTagCompound(itemstack, world));
 	}
-   
-	//TODO @Override
+	
 	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack par1ItemStack, int par2)
-	{
+	public int getColorFromItemStack(ItemStack par1ItemStack, int par2){
 		return type.colour;
 	}
 	
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
-    {
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
     	ItemStack mechaStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.shortName);
-    	if(PartType.defaultEngines.containsKey(EnumType.mecha))
+    	if(PartType.defaultEngines.containsKey(EnumType.mecha)){
     		tags.setString("Engine", PartType.defaultEngines.get(EnumType.mecha).shortName);
-    	for(EnumDriveablePart part : EnumDriveablePart.values())
-    	{
+    	}
+    	for(EnumDriveablePart part : EnumDriveablePart.values()){
     		tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
     		tags.setBoolean(part.getShortName() + "_Fire", false);
     	}
@@ -146,14 +126,8 @@ public class ItemMecha extends Item implements IPaintableItem<MechaType>, IItem
     }
     
 	@Override
-	public MechaType getInfoType()
-	{
+	public MechaType getInfoType(){
 		return type;
 	}
-
-
-	@Override
-	public String getName(){
-		return type.shortName;
-	}
+	
 }

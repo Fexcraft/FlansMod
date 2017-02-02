@@ -32,16 +32,14 @@ import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.ArmourType;
 import com.flansmod.common.teams.BlockArmourBox;
-import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.teams.PlayerClass;
 import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.tools.ToolType;
 
 public enum EnumType 
 {
-	part("parts"), bullet("bullets"), attachment("attachments"), grenade("grenades"), gun("guns"), aa("aaguns"), vehicle("vehicles"), plane("planes"), mechaItem("mechaItems"), mecha("mechas"), tool("tools"), armour("armorFiles"), armourBox("armorBoxes"), box("boxes"), playerClass("classes"), team("teams"), itemHolder("itemHolders");
+	part("parts"), bullet("bullets"), attachment("attachments"), grenade("grenades"), gun("guns"), aa("aaguns"), vehicle("vehicles"), plane("planes"), mechaItem("mechaItems"), mecha("mechas"), tool("tools"), armourBox("armorBoxes"), box("boxes"), playerClass("classes"), team("teams"), itemHolder("itemHolders");
 	
 	public String folderName;
 	
@@ -74,7 +72,6 @@ public enum EnumType
 		case gun : 			return GunType.class;
 		case grenade : 		return GrenadeType.class;
 		case tool :			return ToolType.class;
-		case armour : 		return ArmourType.class;
 		case armourBox : 	return ArmourBoxType.class;
 		case playerClass :	return PlayerClass.class;
 		case box :			return GunBoxType.class;
@@ -96,7 +93,6 @@ public enum EnumType
 		if(o instanceof GunType  			|| o instanceof ItemGun  		|| o instanceof EntityMG ) 		return gun;
 		if(o instanceof GrenadeType 		|| o instanceof ItemGrenade 	|| o instanceof EntityGrenade) 	return grenade;
 		if(o instanceof ToolType 			|| o instanceof ItemTool) 										return tool;
-		if(o instanceof ArmourType  		|| o instanceof ItemTeamArmour) 								return armour;
 		if(o instanceof ArmourBoxType  		|| o instanceof BlockArmourBox) 								return armourBox;
 		if(o instanceof PlayerClass) 																		return playerClass;
 		if(o instanceof GunBoxType  		|| o instanceof BlockGunBox) 									return box;

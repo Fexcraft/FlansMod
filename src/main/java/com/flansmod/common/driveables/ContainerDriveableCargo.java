@@ -7,7 +7,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class ContainerDriveableInventory extends Container
+public class ContainerDriveableCargo extends Container
 {
 	public InventoryPlayer inventory;
 	public World world;
@@ -17,7 +17,7 @@ public class ContainerDriveableInventory extends Container
 	public int maxScroll;
 	public int scroll;
 	
-	public ContainerDriveableInventory(InventoryPlayer inventoryplayer, World worldy, EntityDriveable entPlane, int i)
+	public ContainerDriveableCargo(InventoryPlayer inventoryplayer, World worldy, EntityDriveable entPlane, int i)
 	{
 		inventory = inventoryplayer;
 		world = worldy;

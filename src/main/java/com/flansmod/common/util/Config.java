@@ -5,7 +5,9 @@ import java.io.File;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class Config {
 	
@@ -67,6 +69,11 @@ public class Config {
 		}
 		JsonUtil.write(file, object);
 		Util.log("Config Saved.");
+	}
+
+
+	public static TargetPoint getTargetPoint(Entity entity){
+		return new TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, driveableUpdateRange);
 	}
 	
 }

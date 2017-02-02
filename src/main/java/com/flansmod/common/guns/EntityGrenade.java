@@ -7,7 +7,6 @@ import com.flansmod.common.FlansModExplosion;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.PacketPlaySound;
-import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
@@ -33,8 +32,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class EntityGrenade extends EntityShootable implements IEntityAdditionalSpawnData
-{
+public class EntityGrenade extends EntityShootable implements IEntityAdditionalSpawnData {
+	
 	public GrenadeType type;
 	/** The entity that threw them */
 	public EntityLivingBase thrower;
@@ -146,12 +145,12 @@ public class EntityGrenade extends EntityShootable implements IEntityAdditionalS
 								smokeThem = false;
 						}
 					}*/
-					for(ItemStack stack : entity.getEquipmentAndArmor()){//is fancier ~fex
-						if(stack != null && stack.getItem() instanceof ItemTeamArmour){
+					for(ItemStack stack : entity.getEquipmentAndArmor()){
+						/*if(stack != null && stack.getItem() instanceof ItemTeamArmour){
 							if(((ItemTeamArmour)stack.getItem()).type.smokeProtection){
 								smokeThem = false;
 							}
-						}
+						}*/
 					}
 					
 					if(smokeThem)

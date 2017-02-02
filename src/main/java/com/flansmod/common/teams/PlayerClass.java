@@ -3,7 +3,6 @@ package com.flansmod.common.teams;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.AttachmentType;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
@@ -38,58 +37,13 @@ public class PlayerClass extends InfoType
 	}
 	
 	@Override
-	protected void read(String[] split, TypeFile file)
-	{
+	protected void read(String[] split, TypeFile file){
 		super.read(split, file);
-		if (split[0].equals("AddItem"))
-		{
+		if(split[0].equals("AddItem")){
 			startingItemStrings.add(split);
 		}
-		if(split[0].equals("SkinOverride"))
+		if(split[0].equals("SkinOverride")){
 			texture = split[1];
-		if(split[0].equals("Hat") || split[0].equals("Helmet"))
-		{
-			if(split[1].equals("None"))
-				return;
-			for(Item item : FlansMod.armourItems)
-			{
-				ArmourType armour = ((ItemTeamArmour)item).type;
-				if(armour != null && armour.shortName.equals(split[1]))
-					hat = new ItemStack(item);
-			}
-		}
-		if(split[0].equals("Chest") || split[0].equals("Top"))
-		{
-			if(split[1].equals("None"))
-				return;
-			for(Item item : FlansMod.armourItems)
-			{
-				ArmourType armour = ((ItemTeamArmour)item).type;
-				if(armour != null && armour.shortName.equals(split[1]))
-					chest = new ItemStack(item);
-			}
-		}
-		if(split[0].equals("Legs") || split[0].equals("Bottom"))
-		{
-			if(split[1].equals("None"))
-				return;
-			for(Item item : FlansMod.armourItems)
-			{
-				ArmourType armour = ((ItemTeamArmour)item).type;
-				if(armour != null && armour.shortName.equals(split[1]))
-					legs = new ItemStack(item);
-			}
-		}
-		if(split[0].equals("Shoes") || split[0].equals("Boots"))
-		{
-			if(split[1].equals("None"))
-				return;
-			for(Item item : FlansMod.armourItems)
-			{
-				ArmourType armour = ((ItemTeamArmour)item).type;
-				if(armour != null && armour.shortName.equals(split[1]))
-					shoes = new ItemStack(item);
-			}
 		}
 	}
 	

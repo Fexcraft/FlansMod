@@ -14,8 +14,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import com.flansmod.client.debug.UtilGui;
 import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
+import com.flansmod.common.cmds.QuickFix;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
@@ -49,17 +51,14 @@ import com.flansmod.common.guns.boxes.BlockGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.network.FPacketHandler;
 import com.flansmod.common.paintjob.BlockPaintjobTable;
-import com.flansmod.common.paintjob.TileEntityPaintjobTable;
 import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.parts.ItemPart;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.teams.ArmourType;
 import com.flansmod.common.teams.BlockArmourBox;
 import com.flansmod.common.teams.BlockSpawner;
 import com.flansmod.common.teams.ChunkLoadingHandler;
 import com.flansmod.common.teams.EntityGunItem;
-import com.flansmod.common.teams.ItemTeamArmour;
 import com.flansmod.common.teams.TileEntitySpawner;
 import com.flansmod.common.tools.EntityParachute;
 import com.flansmod.common.tools.ItemTool;
@@ -73,7 +72,7 @@ import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
-import net.fexcraft.mod.lib.util.block.BlockUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -99,15 +98,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = "ffmm", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
-public class FlansMod
-{
+@Mod(modid = "flansmod", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+public class FlansMod {
+	
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F0.7-EX";
+	public static final String VERSION = "5.F1.7-EX";
 	public static final String NAME = "Flan's Mod Minus";
-	@Mod.Instance("ffmm")
+	@Mod.Instance("flansmod")
 	public static FlansMod INSTANCE;
 	@SidedProxy(clientSide = "com.flansmod.client.ClientProxy", serverSide = "com.flansmod.common.CommonProxy")
 	public static CommonProxy proxy;
@@ -126,14 +125,13 @@ public class FlansMod
 	public static ArrayList<ItemPart> partItems = new ArrayList<ItemPart>();
 	public static ArrayList<ItemMecha> mechaItems = new ArrayList<ItemMecha>();
 	public static ArrayList<ItemTool> toolItems = new ArrayList<ItemTool>();
-	public static ArrayList<ItemTeamArmour> armourItems = new ArrayList<ItemTeamArmour>();
 	
 	/** Custom paintjob item */
 	public static Item rainbowPaintcan;
 	public static BlockPaintjobTable paintjobTable;
 	
 	public static ItemKey key;
-	private static final String prefix = TextFormatting.BLACK + " [" + TextFormatting.RED + "FM-" + TextFormatting.BLACK + "]" + TextFormatting.GRAY + "";
+	private static final String prefix = TextFormatting.BLACK + "[" + TextFormatting.RED + "FM-" + TextFormatting.BLACK + "]" + TextFormatting.GRAY + "";
 
 	/** The mod pre-initialiser method */
 	@Mod.EventHandler
@@ -156,6 +154,11 @@ public class FlansMod
 		if(event.getSide().isClient()){
 			CrateBlock.instance = new CrateBlock();
 		}
+		
+		Registry.registerAllBlocks(MODID);
+		Registry.registerAllItems(MODID);
+		Registry.registerAllEntities(MODID);
+		
 		key = new ItemKey();
 		workbench = (BlockFlansWorkbench)(new BlockFlansWorkbench());
 		workbench.setRegistryName(MODID, "flansWorkbench");
@@ -174,9 +177,6 @@ public class FlansMod
 		rainbowPaintcan.setUnlocalizedName(rainbowPaintcan.getRegistryName().toString());
 		GameRegistry.register(rainbowPaintcan);
 		paintjobTable = new BlockPaintjobTable();
-		BlockUtil.register(MODID, paintjobTable);
-		BlockUtil.registerFIB(paintjobTable);
-		GameRegistry.registerTileEntity(TileEntityPaintjobTable.class, MODID);
 		GameRegistry.registerTileEntity(TileEntityItemHolder.class, "itemHolder");
 		
 		//Read content packs
@@ -226,7 +226,7 @@ public class FlansMod
 		//EntityRegistry.registerGlobalEntityID(EntityVehicle.class, "Vehicle", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Vehicle"), EntityVehicle.class, "Vehicle", 95, this, 250, 10, false);
 		//EntityRegistry.registerGlobalEntityID(EntitySeat.class, "Seat", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Seat"), EntitySeat.class, "Seat", 99, this, 250, 1000, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Seat"), EntitySeat.class, "Seat", 99, this, 250, 10, false);
 		//EntityRegistry.registerGlobalEntityID(EntityWheel.class, "Wheel", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Wheel"), EntityWheel.class, "Wheel", 103, this, 250, 20, false);
 		//EntityRegistry.registerGlobalEntityID(EntityParachute.class, "Parachute", EntityRegistry.findGlobalUniqueEntityId());
@@ -262,7 +262,7 @@ public class FlansMod
 	public void postInit(FMLPostInitializationEvent event){
 		//packetHandler.postInitialise();
 		packet_handler.initialise();
-		
+		MinecraftForge.EVENT_BUS.register(new UtilGui());
 		hooks.hook();
 	}
 	
@@ -289,6 +289,7 @@ public class FlansMod
 		//handler.registerCommand(new CommandTeams());
 		event.registerServerCommand(new TextureCommand());
 		event.registerServerCommand(new KeyCommand());
+		event.registerServerCommand(new QuickFix());
 	}
 	
 	@SubscribeEvent
@@ -445,7 +446,6 @@ public class FlansMod
 					case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
 					case tool : 		toolItems.add((ItemTool)new ItemTool((ToolType)infoType)); break;
 					case box : 			new BlockGunBox((GunBoxType)infoType); break;
-					case armour : 		armourItems.add((ItemTeamArmour)new ItemTeamArmour((ArmourType)infoType)); break;
 					case armourBox : 	new BlockArmourBox((ArmourBoxType)infoType); break; 
 					case playerClass : 	break;
 					case team : 		break;

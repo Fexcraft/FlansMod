@@ -58,8 +58,8 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityMecha extends EntityDriveable
-{
+public class EntityMecha extends EntityDriveable {
+	
 	private int ticksSinceUsed;
 	public int toggleTimer = 0;
 	protected float moveX = 0;
@@ -245,7 +245,7 @@ public class EntityMecha extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				seats[0].removeSeatPassenger();
+				seats[0].getControllingPassenger().dismountRidingEntity();
 		  		return true;
 			}
 			case 7 : //Inventory
@@ -626,9 +626,9 @@ public class EntityMecha extends EntityDriveable
 				double x = posX + (serverPosX - posX) / serverPositionTransitionTicker;
 				double y = posY + (serverPosY - posY) / serverPositionTransitionTicker;
 				double z = posZ + (serverPosZ - posZ) / serverPositionTransitionTicker;
-				double dYaw = net.fexcraft.mod.lib.util.cls.MathHelper.wrapAngleTo180_double(serverYaw - axes.getYaw());
-				double dPitch = net.fexcraft.mod.lib.util.cls.MathHelper.wrapAngleTo180_double(serverPitch - axes.getPitch());
-				double dRoll = net.fexcraft.mod.lib.util.cls.MathHelper.wrapAngleTo180_double(serverRoll - axes.getRoll());
+				double dYaw = MathHelper.wrapDegrees(serverYaw - axes.getYaw());
+				double dPitch = MathHelper.wrapDegrees(serverPitch - axes.getPitch());
+				double dRoll = MathHelper.wrapDegrees(serverRoll - axes.getRoll());
 				rotationYaw = (float)(axes.getYaw() + dYaw / serverPositionTransitionTicker);
 				rotationPitch = (float)(axes.getPitch() + dPitch / serverPositionTransitionTicker);
 				float rotationRoll = (float)(axes.getRoll() + dRoll / serverPositionTransitionTicker);

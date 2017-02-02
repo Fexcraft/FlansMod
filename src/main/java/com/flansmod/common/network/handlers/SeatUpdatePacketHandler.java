@@ -36,6 +36,7 @@ public class SeatUpdatePacketHandler {
 					if(driveable != null){
 						driveable.seats[packet.seatId].prevLooking = driveable.seats[packet.seatId].looking.clone();
 						driveable.seats[packet.seatId].looking.setAngles(packet.yaw, packet.pitch, 0F);
+						//driveable.seats[packet.seatId].updatePassenger(driveable.seats[packet.seatId].getControllingEntity());
 						FlansMod.getNewPacketHandler().sendToAllAround(packet, new TargetPoint(driveable.dimension, driveable.getPosition().getX(), driveable.getPosition().getY(), driveable.getPosition().getZ(), Config.soundRange));
 					}
 				}
@@ -67,6 +68,7 @@ public class SeatUpdatePacketHandler {
 						}
 						driveable.seats[packet.seatId].prevLooking = driveable.seats[packet.seatId].looking.clone();
 						driveable.seats[packet.seatId].looking.setAngles(packet.yaw, packet.pitch, 0F);
+						//driveable.seats[packet.seatId].updatePassenger(driveable.seats[packet.seatId].getControllingEntity());
 					}
 				}
 			});

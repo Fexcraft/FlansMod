@@ -1,7 +1,6 @@
 package com.flansmod.common.tools;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -45,8 +44,9 @@ public class EntityParachute extends Entity implements IEntityAdditionalSpawnDat
 			setDead();
 		}
 		
-		if(getPassengers() != null)
-			EntUtil.setFallDistance(this, 0F);
+		if(getPassengers() != null){
+			this.getControllingPassenger().fallDistance = 0f;
+		}
 		
 		motionY = -0.1D;
 		
@@ -55,13 +55,13 @@ public class EntityParachute extends Entity implements IEntityAdditionalSpawnDat
 			float speedMultiplier = 0.002F;
 			double moveForwards = ((EntityLivingBase)this.getPassengers()).moveForward;
 			double moveStrafing = ((EntityLivingBase)this.getPassengers()).moveStrafing;
-			double sinYaw = -Math.sin((EntUtil.getPassengerOf(this).rotationYaw * (float)Math.PI / 180.0F));
-			double cosYaw = Math.cos((EntUtil.getPassengerOf(this).rotationYaw * (float)Math.PI / 180.0F));
+			double sinYaw = -Math.sin((this.getControllingPassenger().rotationYaw * (float)Math.PI / 180.0F));
+			double cosYaw = Math.cos((this.getControllingPassenger().rotationYaw * (float)Math.PI / 180.0F));
 			motionX += (moveForwards * sinYaw + moveStrafing * cosYaw) * speedMultiplier;
 			motionZ += (moveForwards * cosYaw - moveStrafing * sinYaw) * speedMultiplier;
 			
 			prevRotationYaw = rotationYaw;
-			rotationYaw = EntUtil.getPassengerOf(this).rotationYaw;
+			rotationYaw = this.getControllingPassenger().rotationYaw;
 		}		
 		
 		motionX *= 0.8F;

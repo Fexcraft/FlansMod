@@ -2,7 +2,7 @@ package com.flansmod.common.network.packets;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class PacketEmpty implements IPacket, IMessage{

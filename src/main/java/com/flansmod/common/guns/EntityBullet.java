@@ -26,7 +26,6 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.entity.EntUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -501,7 +500,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 	private boolean isPartOfOwner(Entity entity) {
 		if (owner == null)
 			return false;
-		if (entity == owner || entity == EntUtil.getPassengerOf(owner) || entity == owner.getRidingEntity())
+		if (entity == owner || entity == owner.getControllingPassenger() || entity == owner.getRidingEntity())
 			return true;
 		if (owner instanceof EntityPlayer) {
 			if (PlayerHandler.getPlayerData((EntityPlayer) owner,

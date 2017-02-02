@@ -328,12 +328,13 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		
 		//Unregister to Radar
 		//RadarRegistry.unregister(this);
-		if(world.isRemote)
+		if(world.isRemote){
 			camera.setDead();
+		}
 		
 		for(EntitySeat seat : seats){
 			if(seat != null){
-				seat.remove();
+				seat.setDead();
 			}
 		}
 	}
@@ -1134,9 +1135,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		if(dRoll < -180)
 			prevRotationRoll -= 360F;
 	}
-			
-	public void setRotation(float rotYaw, float rotPitch, float rotRoll)
-	{
+	
+	public void setRotation(float rotYaw, float rotPitch, float rotRoll){
 		axes.setAngles(rotYaw, rotPitch, rotRoll);
 	}
 	
@@ -1470,6 +1470,12 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		if(secondary)
 			currentGunSecondary = i;
 		else currentGunPrimary = i;
+	}
+
+	public void updatePassengers(){
+		for(EntitySeat s : seats){
+			s.updatePassenger();
+		}
 	}
 	
 }

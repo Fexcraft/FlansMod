@@ -5,7 +5,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.util.Config;
 
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

@@ -5,7 +5,7 @@ import org.lwjgl.input.Keyboard;
 import com.flansmod.api.IControllable;
 import com.flansmod.common.FlansMod;
 
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;

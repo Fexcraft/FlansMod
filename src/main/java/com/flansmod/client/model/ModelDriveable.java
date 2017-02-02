@@ -6,7 +6,7 @@ import com.flansmod.client.tmt.ModelRendererTurbo;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.client.model.ModelBase;
 
 public class ModelDriveable extends ModelBase 

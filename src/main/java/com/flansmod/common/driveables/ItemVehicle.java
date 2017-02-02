@@ -14,8 +14,7 @@ import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.lib.api.item.IItem;
-import net.fexcraft.mod.lib.util.item.ItemUtil;
+import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.creativetab.CreativeTabs;
@@ -38,19 +37,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleType>, IItem
-{
+public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleType> {
+	
 	public VehicleType type;
 	
-	public ItemVehicle(VehicleType type1)
-	{
+	public ItemVehicle(VehicleType type1){
 		maxStackSize = 1;
 		type = type1;
 		type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		//GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
-		ItemUtil.register(FlansMod.MODID, this);
-		ItemUtil.registerRender(this);
+		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
 	}
 
 	@Override
@@ -74,23 +70,19 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 		return stack.getTagCompound();
 	}
 	
-	private NBTTagCompound getOldTagCompound(ItemStack stack, World world)
-	{
-		try
-		{
+	private NBTTagCompound getOldTagCompound(ItemStack stack, World world){
+		try{
 			File file1 = world.getSaveHandler().getMapFileFromName("vehicle_" + stack.getItemDamage());
 			FileInputStream fileinputstream = new FileInputStream(file1);
 			NBTTagCompound tags = CompressedStreamTools.readCompressed(fileinputstream).getCompoundTag("data");
-			for(EnumDriveablePart part : EnumDriveablePart.values())
-			{
+			for(EnumDriveablePart part : EnumDriveablePart.values()){
 				tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
 				tags.setBoolean(part.getShortName() + "_Fire", false);
 			}
 			fileinputstream.close();
 			return tags;
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			Util.log("Failed to read old vehicle file");
 			e.printStackTrace();
 			return null;
@@ -144,8 +136,7 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand)
-    {
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entityplayer, EnumHand hand){
     	//Raytracing
         float cosYaw = MathHelper.cos(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
         float sinYaw = MathHelper.sin(-entityplayer.rotationYaw * 0.01745329F - 3.141593F);
@@ -157,22 +148,17 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
         RayTraceResult movingobjectposition = world.rayTraceBlocks(posVec, lookVec, type.placeableOnWater);
         
         //Result check
-        if(movingobjectposition == null)
-        {
+        if(movingobjectposition == null){
             return new ActionResult(EnumActionResult.PASS, entityplayer.getHeldItemMainhand());
         }
-        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK)
-        {
+        if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
             BlockPos pos = movingobjectposition.getBlockPos();
             Block block = world.getBlockState(pos).getBlock();
-            if(type.placeableOnLand || block instanceof BlockLiquid)
-            {
-	            if(!world.isRemote)
-	            {
+            if(type.placeableOnLand || block instanceof BlockLiquid){
+	            if(!world.isRemote){
 					world.spawnEntity(new EntityVehicle(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, getData(entityplayer.getHeldItemMainhand(), world)));
 	            }
-				if(!entityplayer.capabilities.isCreativeMode)
-				{	
+				if(!entityplayer.capabilities.isCreativeMode){	
 					entityplayer.getHeldItemMainhand().shrink(1);
 				}
 			}
@@ -180,39 +166,33 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 		return new ActionResult(EnumActionResult.SUCCESS, entityplayer.getHeldItemMainhand());
 	}
 
-	public Entity spawnVehicle(World world, double x, double y, double z, ItemStack stack)
-	{
+	public Entity spawnVehicle(World world, double x, double y, double z, ItemStack stack){
 		Entity entity = new EntityVehicle(world, x, y, z, type, getData(stack, world));
-		if(!world.isRemote)
-		{
+		if(!world.isRemote){
 			world.spawnEntity(entity);
 		}
 		return entity;
 	}
 	
-	public DriveableData getData(ItemStack itemstack, World world)
-	{
+	public DriveableData getData(ItemStack itemstack, World world){
 		return new DriveableData(getTagCompound(itemstack, world));
 	}
 	
-	//TODO @Override
 	@SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack par1ItemStack, int par2)
-    {
+    public int getColorFromItemStack(ItemStack par1ItemStack, int par2){
     	return type.colour;
     }
     
     /** Make sure that creatively spawned planes have nbt data */
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list)
-    {
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
     	ItemStack planeStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.shortName);
-    	if(PartType.defaultEngines.containsKey(EnumType.vehicle))
+    	if(PartType.defaultEngines.containsKey(EnumType.vehicle)){
     		tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);
-    	for(EnumDriveablePart part : EnumDriveablePart.values())
-    	{
+    	}
+    	for(EnumDriveablePart part : EnumDriveablePart.values()){
     		tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
     		tags.setBoolean(part.getShortName() + "_Fire", false);
     	}
@@ -221,13 +201,8 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
     }
 	
 	@Override
-	public VehicleType getInfoType()
-	{
+	public VehicleType getInfoType(){
 		return type;
 	}
-
-	@Override
-	public String getName(){
-		return type.shortName;
-	}
+	
 }

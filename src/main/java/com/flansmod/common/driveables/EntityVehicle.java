@@ -12,14 +12,12 @@ import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableTexture;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.parts.ItemKey;
-import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.util.cls.MathHelper;
-import net.fexcraft.mod.lib.util.cls.Print;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -181,24 +180,20 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			Print.chat(entityplayer, "Vehicle is locked.");
 			return true;
 		}
-		
-		
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
-			return true;
-		}
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && !entityplayer.isSneaking()){
-			if(driveableData.hasColor){
-				driveableData.primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
-				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
-				currentItem.shrink(1);
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye){
+			if(entityplayer.isSneaking()){
+				if(driveableData.hasColor){
+					driveableData.secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+					currentItem.shrink(1);
+				}
 			}
-			return true;
-		}
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemDye && entityplayer.isSneaking()){
-			if(driveableData.hasColor){
-				driveableData.secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
-				FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
-				currentItem.shrink(1);
+			else{
+				if(driveableData.hasColor){
+					driveableData.primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+					currentItem.shrink(1);
+				}
 			}
 			return true;
 		}
@@ -287,7 +282,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				}
 				case 6 : //Exit : Get out
 				{
-					seats[0].removeSeatPassenger();
+					seats[0].getControllingPassenger().dismountRidingEntity();
 			  		return true;
 				}
 				case 7 : //Inventory
@@ -420,9 +415,9 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				double x = posX + (serverPosX - posX) / serverPositionTransitionTicker;
 				double y = posY + (serverPosY - posY) / serverPositionTransitionTicker;
 				double z = posZ + (serverPosZ - posZ) / serverPositionTransitionTicker;
-				double dYaw = MathHelper.wrapAngleTo180_double(serverYaw - axes.getYaw());
-				double dPitch = MathHelper.wrapAngleTo180_double(serverPitch - axes.getPitch());
-				double dRoll = MathHelper.wrapAngleTo180_double(serverRoll - axes.getRoll());
+				double dYaw = MathHelper.wrapDegrees(serverYaw - axes.getYaw());
+				double dPitch = MathHelper.wrapDegrees(serverPitch - axes.getPitch());
+				double dRoll = MathHelper.wrapDegrees(serverRoll - axes.getRoll());
 				rotationYaw = (float)(axes.getYaw() + dYaw / serverPositionTransitionTicker);
 				rotationPitch = (float)(axes.getPitch() + dPitch / serverPositionTransitionTicker);
 				float rotationRoll = (float)(axes.getRoll() + dRoll / serverPositionTransitionTicker);
@@ -591,15 +586,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			soundPosition = type.engineSoundLength;
 		}
 		
-		for(EntitySeat seat : seats)
-		{
-			if(seat != null)
+		for(EntitySeat seat : seats){
+			if(seat != null){
 				seat.updatePosition();
+			}
 		}
 		
 		//Calculate movement on the client and then send position, rotation etc to the server
-		if(thePlayerIsDrivingThis)
-		{
+		if(thePlayerIsDrivingThis){
 			FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
 			serverPosX = posX;
 			serverPosY = posY;
@@ -608,8 +602,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		}
 		
 		//If this is the server, send position updates to everyone, having received them from the driver
-		if(!world.isRemote && ticksExisted % 5 == 0)
-		{
+		if(!world.isRemote && ticksExisted % 5 == 0){
 			//FlansMod.getPacketHandler().sendToAllAround(new PacketVehicleControl(this), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
 			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 		}
@@ -643,14 +636,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
                 	animFrame --;
         		}
         }
-	//Cycle the animation frame, but only if we have anything to cycle
-	if(type.animFrames != 0){
-        if(animFrame > type.animFrames){
-        	animFrame = 0;
-        } if(animFrame < 0){
-        	animFrame = type.animFrames;
-        }
-	}
+		//Cycle the animation frame, but only if we have anything to cycle
+		if(type.animFrames != 0){
+	        if(animFrame > type.animFrames){
+	        	animFrame = 0;
+	        } if(animFrame < 0){
+	        	animFrame = type.animFrames;
+	        }
+		}
 	}
 
 	private float averageAngles(float a, float b)
