@@ -19,7 +19,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.11-13.19.1.2188"
+    version = "1.11.2-13.20.0.2223"
     runDir = "run"
 
     replace "@ALLOWED_VERSION@", "[5.2,5.3)"
@@ -29,8 +29,8 @@ minecraft {
 	replace "@APOCALYPSEALLOWEDVERSIONS@", "[1.0, 1.1)"
     replace "@APOCALYPSEVERSION@", "1.0"
     replaceIn "FlansModApocalypse.java"
-	
-	mappings = "snapshot_20161206"
+    
+    mappings = "snapshot_20161220"
 }
 
 processResources
