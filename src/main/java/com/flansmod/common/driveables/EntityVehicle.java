@@ -4,6 +4,8 @@ import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.data.DriveableData;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.data.player.IPlayerData;
 import com.flansmod.common.data.player.PlayerHandler;
 import com.flansmod.common.network.PacketPlaySound;
@@ -220,10 +222,10 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Check each seat in order to see if the player can sit in it
 		for(int i = 0; i <= type.numPassengers; i++){
 			if(seats[i].processInitialInteract(entityplayer, hand)){
-				if(i == 0){
+				/*if(i == 0){
 					shellDelay = type.vehicleShellDelay;
 					FlansMod.proxy.doTutorialStuff(entityplayer, this);
-				}
+				}*/
 				return true;
 			}
 		}
@@ -700,7 +702,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		
 	public VehicleType getVehicleType()
 	{
-		return VehicleType.getVehicle(driveableType);
+		return (VehicleType)VehicleType.getDriveable(driveableType);
 	}
 
 	@Override

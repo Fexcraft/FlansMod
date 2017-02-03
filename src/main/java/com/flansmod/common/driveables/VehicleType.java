@@ -11,7 +11,7 @@ import com.flansmod.common.types.TypeFile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class VehicleType extends DriveableType
+public class VehicleType extends DriveableTypeOld
 {
 	/** Movement modifiers */
 	public float turnLeftModifier = 1F, turnRightModifier = 1F;

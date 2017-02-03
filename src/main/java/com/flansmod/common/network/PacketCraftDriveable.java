@@ -1,7 +1,5 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.util.Util;
 
 import io.netty.buffer.ByteBuf;
@@ -37,9 +35,9 @@ public class PacketCraftDriveable extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		DriveableType type = DriveableType.getDriveable(shortName);   
+		/*DriveableType type = DriveableType.getDriveable(shortName);   
 		//Try to craft the driveable
-		FlansMod.proxy.craftDriveable(playerEntity, type);
+		FlansMod.proxy.craftDriveable(playerEntity, type);*/
 	}
 
 	@Override

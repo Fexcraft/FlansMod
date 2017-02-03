@@ -3,8 +3,8 @@ package com.flansmod.client.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.driveables.ContainerDriveableMenu;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;

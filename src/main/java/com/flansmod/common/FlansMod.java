@@ -19,20 +19,17 @@ import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
 import com.flansmod.common.cmds.QuickFix;
 import com.flansmod.common.cmds.TextureCommand;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
-import com.flansmod.common.driveables.ItemPlane;
 import com.flansmod.common.driveables.ItemVehicle;
-import com.flansmod.common.driveables.PlaneType;
-import com.flansmod.common.driveables.VehicleType;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.driveables.mechas.ItemMecha;
 import com.flansmod.common.driveables.mechas.ItemMechaAddon;
 import com.flansmod.common.driveables.mechas.MechaItemType;
-import com.flansmod.common.driveables.mechas.MechaType;
-import com.flansmod.common.eventhandlers.PlayerDeathEventListener;
 import com.flansmod.common.guns.AAGunType;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EntityAAGun;
@@ -56,6 +53,7 @@ import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -173,7 +171,7 @@ public class FlansMod {
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CommonGuiHandler());		
 		
 		// Recipes
-		for(InfoType type : InfoType.infoTypes.values()){
+		for(InfoType type : InfoType.types.values()){
 			type.addRecipe();
 		}
 		if(Config.addGunpowderRecipe){
@@ -213,7 +211,6 @@ public class FlansMod {
 		//Config
 		MinecraftForge.EVENT_BUS.register(INSTANCE);
 		//Starting the EventListener
-		new PlayerDeathEventListener();
 		Util.log("Loading complete.");
 	}
 	
@@ -297,6 +294,37 @@ public class FlansMod {
 							e.printStackTrace();
 						}
 					}		
+				}
+				File dir = new File(contentPack, "/vehicles/");
+				if(dir.exists()){
+					for(File file : dir.listFiles()){
+						try{
+							BufferedReader reader = new BufferedReader(new FileReader(file));
+							ArrayList<String> lines = new ArrayList<String>();
+							for(;;){
+								String line = null;
+								try{
+									line = reader.readLine();
+								} 
+								catch (Exception e){
+									break;
+								}
+								if(line == null){
+									break;
+								}
+								lines.add(line);
+							}
+							reader.close();
+							String[] arr = new String[lines.size()];
+							arr = lines.toArray(arr);
+							String[] filename = file.getName().split("/");
+							VehicleType type = new VehicleType(contentPack.getName(), filename[filename.length - 1].split("\\.")[0], arr);
+							VehicleType.addType(type);
+						}
+						catch(Exception e){
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 			else
@@ -383,11 +411,11 @@ public class FlansMod {
 					switch(type){
 						case bullet : 		new ItemBullet((BulletType)infoType); break;
 						case part : 		partItems.add((ItemPart)new ItemPart((PartType)infoType)); break;
-						case plane : 		new ItemPlane((PlaneType)infoType); break;
-						case vehicle : 		new ItemVehicle((VehicleType)infoType); break;
+						//case plane : 		new ItemPlane((PlaneType)infoType); break;
+						//case vehicle : 		new ItemVehicle((VehicleType)infoType); break;
 						case aa : 			new ItemAAGun((AAGunType)infoType); break;
 						case mechaItem : 	new ItemMechaAddon((MechaItemType)infoType); break;
-						case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
+						//case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
 						case tool : 		toolItems.add((ItemTool)new ItemTool((ToolType)infoType)); break;
 						case team : 		break;
 						case itemHolder:	new BlockItemHolder((ItemHolderType)infoType); break;
@@ -400,6 +428,15 @@ public class FlansMod {
 				}
 			}
 			Util.log("Loaded " + type.name() + ".");
+		}
+		for(DriveableType type : DriveableType.getTypes()){
+			if(type instanceof VehicleType){
+				type.read();
+				type.item = ItemVehicle.getNew((VehicleType)type);
+			}
+			else{
+				Static.exception(3);
+			}
 		}
 		
 		//Automates JSON adding for old content packs

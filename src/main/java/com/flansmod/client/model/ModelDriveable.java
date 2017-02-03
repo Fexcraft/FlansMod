@@ -3,7 +3,7 @@ package com.flansmod.client.model;
 import java.util.HashMap;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 
 import net.fexcraft.mod.lib.util.common.Print;

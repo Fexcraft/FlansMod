@@ -1,9 +1,6 @@
 package com.flansmod.common.driveables;
 
 import java.util.ArrayList;
-import java.util.List;
-//import cofh.api.energy.IEnergyContainerItem;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
@@ -12,9 +9,8 @@ import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.data.DriveableData;
-import com.flansmod.common.driveables.DriveableType.ParticleEmitter;
+import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.InventoryHelper;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
 import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
@@ -34,7 +30,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,9 +41,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameType;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
@@ -122,7 +115,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public EntityDriveable(World world, DriveableType t, DriveableData d)
 	{
 		this(world);
-		driveableType = t.shortName;
+		driveableType = t.registryname;
 		driveableData = d;
 	}
 	
@@ -149,11 +142,11 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		stepHeight = type.wheelStepHeight;
 		yOffset = type.yOffset;
 		
-		emitterTimers = new int[type.emitters.size()];
+		/*emitterTimers = new int[type.emitters.size()];
 		for(int i = 0; i < type.emitters.size(); i++)
 		{
 			emitterTimers[i] = rand.nextInt(type.emitters.get(i).emitRate);
-		}
+		}*/
 		
 		//Register Plane to Radar on Spawning
 		//if(type.onRadar == true)
@@ -198,12 +191,12 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		data.writeFloat(axes.getRoll());
 		
 		//Write damage
-		for(EnumDriveablePart ep : EnumDriveablePart.values())
+		/*for(EnumDriveablePart ep : EnumDriveablePart.values())
 		{
 			DriveablePart part = getDriveableData().parts.get(ep);
 			data.writeShort((short)part.health);
 			data.writeBoolean(part.onFire);
-		}
+		}*/
 	}
 
 	@Override
@@ -221,12 +214,12 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 			prevRotationRoll = axes.getRoll();
 			
 			//Read damage
-			for(EnumDriveablePart ep : EnumDriveablePart.values())
+			/*for(EnumDriveablePart ep : EnumDriveablePart.values())
 			{
 				DriveablePart part = getDriveableData().parts.get(ep);
 				part.health = data.readShort();
 				part.onFire = data.readBoolean();
-			}
+			}*/
 
 		}
 		catch(Exception e)
@@ -499,7 +492,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
   			harvesterAngle += throttle / 5F;	
   		}
   		//Actual harvesting
-  		if(type.harvestBlocks && type.health.get(EnumDriveablePart.harvester) != null)
+  		/*if(type.harvestBlocks && type.health.get(EnumDriveablePart.harvester) != null)
   		{
   			CollisionBox box = type.health.get(EnumDriveablePart.harvester);
   			for(float x = box.x; x <= box.x + box.w; x++)
@@ -542,7 +535,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
   					}
   				}
   			}
-  		}
+  		}*/
 
         
         for(DriveablePart part : getDriveableData().parts.values())
@@ -592,7 +585,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
         	}
         }
         
-        for(int i = 0; i < type.emitters.size(); i++)
+        /*for(int i = 0; i < type.emitters.size(); i++)
         {
         	ParticleEmitter emitter = type.emitters.get(i);
         	emitterTimers[i]--;
@@ -635,7 +628,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
         		}
         		emitterTimers[i] = emitter.emitRate;
         	}
-        }
+        }*/
         
         checkParts();
 
@@ -1037,7 +1030,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		
 		
 		//If the core was destroyed, kill the driveable
-		if(getDriveableData().parts.get(EnumDriveablePart.core).dead)
+		/*if(getDriveableData().parts.get(EnumDriveablePart.core).dead)
 		{
 			if(!world.isRemote)
 			{
@@ -1048,7 +1041,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				}
 			}
 			setDead();
-		}
+		}*/
 			
 	}
 	
@@ -1061,7 +1054,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		part.dead = true;
 		
 		//Drop items
-		DriveableType type = getDriveableType();
+		//DriveableType type = getDriveableType();
 		if(!world.isRemote){
 			Vector3f pos = new Vector3f(0, 0, 0);
 					
@@ -1070,13 +1063,13 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				pos = axes.findLocalVectorGlobally(new Vector3f(part.box.x / 16F + part.box.w / 32F, part.box.y / 16F + part.box.h / 32F, part.box.z / 16F + part.box.d / 32F));
 			}
 
-			ArrayList<ItemStack> drops = type.getItemsRequired(part, getDriveableData().engine);
+			/*ArrayList<ItemStack> drops = type.getItemsRequired(part, getDriveableData().engine);
 			if(drops != null){
 				//Drop each itemstack 
 				for(ItemStack stack : drops){
 					world.spawnEntity(new EntityItem(world, posX + pos.x, posY + pos.y, posZ + pos.z, stack.copy()));
 				}
-			}
+			}*/
 			dropItemsOnPartDeath(pos, part);
 			
 			//Inventory is in the core, so drop it if the core is broken
@@ -1121,8 +1114,9 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	}
 	
 	public boolean isPartIntact(EnumDriveablePart part){
-		DriveablePart thisPart = getDriveableData().parts.get(part);
-		return thisPart.maxHealth == 0 || thisPart.health > 0;
+		/*DriveablePart thisPart = getDriveableData().parts.get(part);
+		return thisPart.maxHealth == 0 || thisPart.health > 0;*/
+		return true;
 	}
 	
 	public abstract boolean hasMouseControlMode();

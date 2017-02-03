@@ -28,8 +28,6 @@ import com.flansmod.client.model.RenderVehicle;
 import com.flansmod.common.CommonProxy;
 import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
@@ -291,7 +289,7 @@ public class ClientProxy extends CommonProxy
 		return player == FMLClientHandler.instance().getClient().player;
 	}
 	
-	@Override
+	/*@Override
 	public void craftDriveable(EntityPlayer player, DriveableType type)
 	{
 		//Craft it this side (so the inventory updates immediately) and then send a packet to the server so that it is crafted that side too
@@ -309,7 +307,7 @@ public class ClientProxy extends CommonProxy
 		if(driver.world.isRemote){
 			//TODO FlansMod.getPacketHandler().sendToServer(new PacketRepairDriveable(part.type));
 		}
-	}
+	}*/
 	
 	/** Helper method that returns whether there is a GUI open */
 	@Override

@@ -1,7 +1,5 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.util.Util;
 
@@ -38,9 +36,9 @@ public class PacketRepairDriveable extends PacketBase
 	@Override
 	public void handleServerSide(EntityPlayerMP playerEntity) 
 	{
-		EnumDriveablePart part = EnumDriveablePart.getPart(shortName);   
+		/*EnumDriveablePart part = EnumDriveablePart.getPart(shortName);   
 		//Try to repair the driveable
-		FlansMod.proxy.repairDriveable(playerEntity, ((EntitySeat)playerEntity.getRidingEntity()).driveable, ((EntitySeat)playerEntity.getRidingEntity()).driveable.getDriveableData().parts.get(part));
+		FlansMod.proxy.repairDriveable(playerEntity, ((EntitySeat)playerEntity.getRidingEntity()).driveable, ((EntitySeat)playerEntity.getRidingEntity()).driveable.getDriveableData().parts.get(part));*/
 	}
 
 	@Override

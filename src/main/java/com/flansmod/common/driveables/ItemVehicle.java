@@ -3,14 +3,14 @@ package com.flansmod.common.driveables;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.data.DriveableData;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.EnumType;
-import com.flansmod.common.types.IPaintableItem;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Util;
 
@@ -37,16 +37,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleType> {
+public class ItemVehicle extends ItemMapBase {
 	
+	private static final ArrayList<String> rs = new ArrayList<String>();
 	public VehicleType type;
 	
 	public ItemVehicle(VehicleType type1){
 		maxStackSize = 1;
 		type = type1;
-		type.item = this;
+		//type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		Registry.registerItemManually(FlansMod.MODID, type.shortName, 0, null, this);
+		Registry.registerItemManually(FlansMod.MODID, type.registryname, 0, null, this);
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 			}
 			if(stack.getTagCompound() == null){
 				NBTTagCompound tags = new NBTTagCompound();
-				tags.setString("Type", type.shortName);
+				tags.setString("Type", type.registryname);
 				tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);				
 				stack.setTagCompound(tags);
 			}
@@ -75,10 +76,10 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 			File file1 = world.getSaveHandler().getMapFileFromName("vehicle_" + stack.getItemDamage());
 			FileInputStream fileinputstream = new FileInputStream(file1);
 			NBTTagCompound tags = CompressedStreamTools.readCompressed(fileinputstream).getCompoundTag("data");
-			for(EnumDriveablePart part : EnumDriveablePart.values()){
+			/*for(EnumDriveablePart part : EnumDriveablePart.values()){
 				tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
 				tags.setBoolean(part.getShortName() + "_Fire", false);
-			}
+			}*/
 			fileinputstream.close();
 			return tags;
 		}
@@ -92,7 +93,9 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips){
 		if(type.description != null){
-			Collections.addAll(lines, type.description.split("_"));
+			for(String s : type.description){
+				lines.add(s);
+			}
 		}
 		NBTTagCompound tags = getTagCompound(stack, player.world);
 		PartType part = PartType.getPart(tags.getString("Engine"));
@@ -188,21 +191,26 @@ public class ItemVehicle extends ItemMapBase implements IPaintableItem<VehicleTy
     public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
     	ItemStack planeStack = new ItemStack(item, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
-    	tags.setString("Type", type.shortName);
+    	tags.setString("Type", type.registryname);
     	if(PartType.defaultEngines.containsKey(EnumType.vehicle)){
     		tags.setString("Engine", PartType.defaultEngines.get(EnumType.vehicle).shortName);
     	}
-    	for(EnumDriveablePart part : EnumDriveablePart.values()){
+    	/*for(EnumDriveablePart part : EnumDriveablePart.values()){
     		tags.setInteger(part.getShortName() + "_Health", type.health.get(part) == null ? 0 : type.health.get(part).health);
     		tags.setBoolean(part.getShortName() + "_Fire", false);
-    	}
+    	}*/
     	planeStack.setTagCompound(tags);
         list.add(planeStack);
     }
-	
-	@Override
-	public VehicleType getInfoType(){
-		return type;
+
+	public static Item getNew(VehicleType type){
+		if(rs.contains(type.registryname)){
+			return null;
+		}
+		else{
+			rs.add(type.registryname);
+			return new ItemVehicle(type);
+		}
 	}
 	
 }

@@ -3,7 +3,6 @@ package com.flansmod.common.data;
 import java.util.HashMap;
 
 import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.parts.EnumPartCategory;
@@ -101,9 +100,9 @@ public class DriveableData implements IInventory {
  		}
 		fuel = new ItemStack(tag.getCompoundTag("Fuel"));
 		fuelInTank = tag.getInteger("FuelInTank");
-		for(EnumDriveablePart part : EnumDriveablePart.values()){
+		/*for(EnumDriveablePart part : EnumDriveablePart.values()){
 			parts.put(part, new DriveablePart(part, dType.health.get(part)));
-		}
+		}*/
 		for(DriveablePart part : parts.values()){
 			part.readFromNBT(tag);
 		}

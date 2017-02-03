@@ -67,7 +67,7 @@ public class GuiDriveableRepair extends GuiScreen
 	@Override
 	protected void actionPerformed(GuiButton button)
 	{
-		FlansMod.proxy.repairDriveable(driver, driving, partsToDraw.get(button.id));
+		//FlansMod.proxy.repairDriveable(driver, driving, partsToDraw.get(button.id));
 	}
 
 	private void updateButtons()
@@ -144,7 +144,7 @@ public class GuiDriveableRepair extends GuiScreen
 				InventoryPlayer temporaryInventory = new InventoryPlayer(null);
 				temporaryInventory.copyInventory(driver.inventory);
 				
-				ArrayList<ItemStack> stacksNeeded = driving.getDriveableType().getItemsRequired(part, driving.getDriveableData().engine);
+				/*ArrayList<ItemStack> stacksNeeded = driving.getDriveableType().getItemsRequired(part, driving.getDriveableData().engine);
 				//Draw the stacks that should be in each slot
 				for(int n = 0; n < 7; n++)
 				{
@@ -189,7 +189,7 @@ public class GuiDriveableRepair extends GuiScreen
 						}
 						drawSlotInventory(stacksNeeded.get(stackNum), guiOriginX + 67 + 18 * n, guiOriginY + y + 22);
 					}
-				}
+				}*/
 			}
 			
 			//Increase the render y value for the next part

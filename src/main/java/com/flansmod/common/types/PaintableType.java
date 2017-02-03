@@ -29,8 +29,7 @@ public abstract class PaintableType extends InfoType
 	}
 
 	@Override
-	public void postRead(TypeFile file)
-	{
+	public void postRead(TypeFile file){
 		//After all lines have been read, set up the default paintjob
 		defaultPaintjob = new Paintjob(0, defaultName, iconPath, texture, new ItemStack[0]);
 		//Move to a new list to ensure that the default paintjob is always first
@@ -38,13 +37,9 @@ public abstract class PaintableType extends InfoType
 		newPaintjobList.add(defaultPaintjob);
 		newPaintjobList.addAll(paintjobs);
 		paintjobs = newPaintjobList;
-		if(infoTypes.containsKey(shortName.hashCode()))
-		{
+		if(types.containsKey(shortName.hashCode())){
 			FlansMod.Assert(false, "Duplicate info type name " + shortName);
 		}
-		
-		// Add all custom paintjobs to dungeon loot. Equal chance for each
-		totalDungeonChance += dungeonChance * (paintjobs.size() - 1);
 	}
 	
 	/** Pack reader */

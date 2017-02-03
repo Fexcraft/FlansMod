@@ -7,22 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.parts.EnumPartCategory;
-import com.flansmod.common.parts.ItemPart;
-import com.flansmod.common.parts.PartType;
-import com.flansmod.common.types.EnumType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class CommonProxy {
@@ -94,7 +84,7 @@ public class CommonProxy {
 		//TODO FlansMod.packetHandler.sendToAll(new PacketBreakSound(x, y, z, blockHit));
 	}
 		
-	public void craftDriveable(EntityPlayer player, DriveableType type)
+	/*public void craftDriveable(EntityPlayer player, DriveableType type)
 	{
 		//Create a temporary copy of the player inventory for backup purposes
 		InventoryPlayer temporaryInventory = new InventoryPlayer(null);
@@ -234,9 +224,9 @@ public class CommonProxy {
 		if(!player.inventory.addItemStackToInventory(driveableStack))
 			//player.dropPlayerItemWithRandomChoice(driveableStack, false);
 			player.dropItem(driveableStack, false);
-	}
+	}*/
 
-	public void repairDriveable(EntityPlayer driver, EntityDriveable driving, DriveablePart part) 
+	/*public void repairDriveable(EntityPlayer driver, EntityDriveable driving, DriveablePart part) 
 	{
 		//If any of this parts parent parts are broken, then it cannot be repaired
 		for(EnumDriveablePart parent : part.type.getParents())
@@ -295,7 +285,7 @@ public class CommonProxy {
 			part.dead = false;
 			driving.checkParts();
 		}
-	}
+	}*/
 	
 	public boolean isScreenOpen()
 	{

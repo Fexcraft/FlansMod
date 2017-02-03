@@ -8,6 +8,7 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.IScope;
@@ -269,7 +270,10 @@ public class FlansModClient extends FlansMod
 	}
 	
 	public static void reloadModels(boolean reloadSkins){
-		for(InfoType type : InfoType.infoTypes.values()){
+		for(InfoType type : InfoType.types.values()){
+			type.reloadModel();
+		}
+		for(DriveableType type : DriveableType.getTypes()){
 			type.reloadModel();
 		}
 		if(reloadSkins){

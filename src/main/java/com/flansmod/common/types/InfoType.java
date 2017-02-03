@@ -1,8 +1,6 @@
 package com.flansmod.common.types;
 
 import java.util.HashMap;
-import java.util.Random;
-
 import com.flansmod.common.util.Util;
 
 import net.minecraft.block.material.Material;
@@ -19,8 +17,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class InfoType {
-	/** infoTypes */
-	public static HashMap<Integer, InfoType> infoTypes = new HashMap<Integer, InfoType>();
+	
+	public static final HashMap<Integer, InfoType> types = new HashMap<Integer, InfoType>();
 
 	public String contentPack;
 	public Item item;
@@ -39,16 +37,6 @@ public class InfoType {
 	public float modelScale = 1F;
 	/** If this is set to false, then this item cannot be dropped */
 	public boolean canDrop = true;
-	
-	/** The probability that this item will appear in a dungeon chest. 
-	 *  Scaled so that each chest is likely to have a fixed number of Flan's Mod items.
-	 *  Must be greater than or equal to 0, and should probably not exceed 100 */
-	public int dungeonChance = 1;
-	
-	private static Random random = new Random();
-	
-	/** Used for scaling */
-	public static int totalDungeonChance = 0;
 	
 	public InfoType(TypeFile file){
 		contentPack = file.contentPack;
@@ -70,8 +58,7 @@ public class InfoType {
 		}
 		postRead(file);
 
-		infoTypes.put(shortName.hashCode(), this);
-		totalDungeonChance += dungeonChance;
+		types.put(shortName.hashCode(), this);
 	}
 	
 	/** Method for performing actions prior to reading the type file */
@@ -110,9 +97,6 @@ public class InfoType {
 			}
 			else if(split[0].equals("Icon")){
 				iconPath = split[1];
-			}
-			else if(split[0].equals("DungeonProbabilty") || split[0].equals("DungeonLootChance")){
-				dungeonChance = Integer.parseInt(split[1]);
 			}
 			else if(split[0].equals("RecipeOutput")){
 				recipeOutput = Integer.parseInt(split[1]);
@@ -289,7 +273,7 @@ public class InfoType {
 				return new ItemStack(item, amount, damage);
 			}
 		}
-		for(InfoType type : infoTypes.values()){
+		for(InfoType type : types.values()){
 			if(type.shortName.equals(s))
 				return new ItemStack(type.item, amount, damage);
 		}
@@ -314,11 +298,11 @@ public class InfoType {
 	}
 	
 	public static InfoType getType(String s){
-		return infoTypes.get(s.hashCode());
+		return types.get(s.hashCode());
 	}
 	
 	public static InfoType getType(int hash){
-		return infoTypes.get(hash);
+		return types.get(hash);
 	}
 
 	public void onWorldLoad(World world) {
@@ -344,4 +328,5 @@ public class InfoType {
 	public static Material getMaterial(String mat){
 		return Material.GROUND;
 	}
+	
 }

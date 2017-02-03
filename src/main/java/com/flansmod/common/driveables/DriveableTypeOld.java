@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class DriveableType extends PaintableType
+public abstract class DriveableTypeOld extends PaintableType
 {
 	@SideOnly(value = Side.CLIENT)
 	/** The plane model */
@@ -148,9 +148,9 @@ public abstract class DriveableType extends PaintableType
 	public boolean hasLock = true;
 	public List<Vec3d> cargopos = new ArrayList<Vec3d>();
 	
-	public static ArrayList<DriveableType> types = new ArrayList<DriveableType>();
+	public static ArrayList<DriveableTypeOld> types = new ArrayList<DriveableTypeOld>();
 	
-	public DriveableType(TypeFile file){
+	public DriveableTypeOld(TypeFile file){
 		super(file);
 	}
 
@@ -621,9 +621,9 @@ public abstract class DriveableType extends PaintableType
 		return stacks;
 	}
 	
-	public static DriveableType getDriveable(String find)
+	public static DriveableTypeOld getDriveable(String find)
 	{
-		for(DriveableType type : types)
+		for(DriveableTypeOld type : types)
 		{
 			if(type.shortName.equals(find))
 				return type;

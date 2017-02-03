@@ -51,10 +51,10 @@ public enum EnumType
 		{
 		case bullet : 		return BulletType.class;
 		case aa : 			return AAGunType.class;
-		case vehicle :		return VehicleType.class;
-		case plane : 		return PlaneType.class;
+		//case vehicle :		return VehicleType.class;
+		//case plane : 		return PlaneType.class;
 		case mechaItem : 	return MechaItemType.class;
-		case mecha : 		return MechaType.class;
+		//case mecha : 		return MechaType.class;
 		case tool :			return ToolType.class;
 		case part :			return PartType.class;
 		case itemHolder:	return ItemHolderType.class;

@@ -2,17 +2,12 @@ package com.flansmod.client.model;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveablePosition;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityVehicle;
-import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.VehicleType;
-import com.flansmod.common.guns.Paintjob;
-
 import net.fexcraft.mod.lib.util.render.RemoteTextureRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -72,7 +67,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 					modVehicle.render(this, vehicle, f1);
 				
 				GL11.glPushMatrix();
-				if(type.turretOrigin != null && vehicle.isPartIntact(EnumDriveablePart.turret) && vehicle.seats != null && vehicle.seats[0] != null)
+				if(type.turretOrigin != null && vehicle.seats != null && vehicle.seats[0] != null)
 				{
 					dYaw = (vehicle.seats[0].looking.getYaw() - vehicle.seats[0].prevLooking.getYaw());
 					for(; dYaw > 180F; dYaw -= 360F) {}
@@ -92,7 +87,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 						GL11.glRotatef(-vehicle.seats[0].looking.getPitch(), 0.0F, 0.0F, 1.0F);
 						GL11.glTranslatef(-type.turretOrigin.x, -type.turretOrigin.y, -type.turretOrigin.z);
 						
-						//Render shoot points
+						/*//Render shoot points
 						GL11.glColor4f(0F, 0F, 1F, 0.3F);
 						for(DriveablePosition point : type.shootPointsPrimary)			
 							if(point.part == EnumDriveablePart.turret)
@@ -102,6 +97,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 						for(DriveablePosition point : type.shootPointsSecondary)	
 							if(point.part == EnumDriveablePart.turret)
 								renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
+								*/
 					}
 				}
 				GL11.glPopMatrix();
@@ -138,7 +134,7 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 				//	renderAABB(AxisAlignedBB.getBoundingBox(type.barrelPosition.x - 0.25F, type.barrelPosition.y - 0.25F, type.barrelPosition.z - 0.25F, type.barrelPosition.x + 0.25F, type.barrelPosition.y + 0.25F, type.barrelPosition.z + 0.25F));
 				
 				//Render shoot points
-				GL11.glColor4f(0F, 0F, 1F, 0.3F);
+				/*GL11.glColor4f(0F, 0F, 1F, 0.3F);
 				for(DriveablePosition point : type.shootPointsPrimary)			
 					if(point.part != EnumDriveablePart.turret)
 						renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
@@ -147,7 +143,8 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 				for(DriveablePosition point : type.shootPointsSecondary)	
 					if(point.part != EnumDriveablePart.turret)
 						renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
-
+				*/
+				
 				
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -168,15 +165,16 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 	protected ResourceLocation getEntityTexture(Entity entity){
 		EntityVehicle vehicle = (EntityVehicle)entity;
 		if(!vehicle.driveableData.allowURL){
-			DriveableType type = ((EntityDriveable)entity).getDriveableType();
+			/*DriveableType type = ((EntityDriveable)entity).getDriveableType();
 			Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-			return FlansModResourceHandler.getPaintjobTexture(paintjob);
+			return FlansModResourceHandler.getPaintjobTexture(paintjob);*/
+			DriveableType type = ((EntityDriveable)entity).getDriveableType();
+			return type.textures.get(type.paintjob);
     	}
     	else{
     		if(vehicle.driveableData.texture_url == null || vehicle.driveableData.texture_url.length() < 4){
     			DriveableType type = ((EntityDriveable)entity).getDriveableType();
-    			Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-    			return FlansModResourceHandler.getPaintjobTexture(paintjob);
+    			return type.textures.get(type.paintjob);
     		}
     		else{
     			return RemoteTextureRenderHelper.get(vehicle.driveableData.texture_url);
