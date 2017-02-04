@@ -1,8 +1,11 @@
 package com.flansmod.client.model;
 
+import org.lwjgl.opengl.GL11;
+
 import com.flansmod.client.tmt.ModelRendererTurbo;
 import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.UpgradeType;
 import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
@@ -11,6 +14,7 @@ import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.api.item.fItem;
+import net.fexcraft.mod.lib.util.math.Pos;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -288,6 +292,14 @@ public class ModelVehicle extends ModelDriveable
 		            render.bindTexture(vehicle);
 		        }
 			}
+		}
+		
+		for(UpgradeType type : vehicle.driveableData.upgrades){
+			GlStateManager.pushMatrix();
+			Pos pos = type.offset.get(vehicle.driveableData.type);
+			GL11.glTranslatef(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ());
+			((ModelUpgradePart)type.getModel()).render(f5, render, vehicle, f);
+			GlStateManager.popMatrix();
 		}
 	}
 	

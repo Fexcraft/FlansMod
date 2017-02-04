@@ -9,8 +9,10 @@ import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.data.player.IPlayerData;
 import com.flansmod.common.data.player.PlayerHandler;
 import com.flansmod.common.items.ItemKey;
+import com.flansmod.common.items.ItemUpgrade;
 import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketDriveableSync;
 import com.flansmod.common.network.packets.PacketDriveableTexture;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.util.Config;
@@ -187,6 +189,17 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable, Lock
 					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 					currentItem.shrink(1);
 				}
+			}
+			return true;
+		}
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemUpgrade){
+			if(((ItemUpgrade)currentItem.getItem()).type.canInstallUpgrade(driveableData)){
+				driveableData.upgrades.add(((ItemUpgrade)currentItem.getItem()).type);
+				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableSync(this));
+				Print.chat(entityplayer, "Upgrade installed.");
+			}
+			else{
+				Print.chat(entityplayer, "Upgrade can not be applied to this vehicle.");
 			}
 			return true;
 		}

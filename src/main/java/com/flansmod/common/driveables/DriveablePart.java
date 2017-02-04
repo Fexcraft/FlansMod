@@ -40,10 +40,8 @@ public class DriveablePart
 		tags.setBoolean(type.getShortName() + "_Fire", onFire);
 	}
 	
-	public void readFromNBT(NBTTagCompound tags)
-	{
-		if(!tags.hasKey(type.getShortName() + "_Health"))
-		{
+	public void readFromNBT(NBTTagCompound tags){
+		if(!tags.hasKey(type.getShortName() + "_Health")){
 			health = maxHealth;
 			onFire = false;
 			return;

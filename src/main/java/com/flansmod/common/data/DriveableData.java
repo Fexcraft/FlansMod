@@ -1,12 +1,18 @@
 package com.flansmod.common.data;
 
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.items.ItemPart;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -32,6 +38,7 @@ public class DriveableData implements IInventory {
 	public float fuelInTank;
 	/** Each driveable part has a small class that holds its current status */
 	public HashMap<EnumDriveablePart, DriveablePart> parts;
+	public Set<UpgradeType> upgrades;
 	/** Paintjob index */
 	public int paintjobID;
 	
@@ -54,6 +61,7 @@ public class DriveableData implements IInventory {
 	
 	public DriveableData(NBTTagCompound tags){
 		parts = new HashMap<EnumDriveablePart, DriveablePart>();
+		upgrades = new TreeSet<UpgradeType>();
 		readFromNBT(tags);
 	}
 
@@ -157,6 +165,17 @@ public class DriveableData implements IInventory {
 				lock_code = KeyItem.getNewKeyCode();
 				spawnedKeys = 0;
 			}
+
+			if(tag.hasKey("Upgrades")){
+				JsonArray array = JsonUtil.getFromString(tag.getString("Upgrades")).getAsJsonArray();
+				for(JsonElement elm : array){
+					UpgradeType type = UpgradeType.getUpgrade(elm.getAsString());
+					if(type != null){
+						upgrades.add(type);
+					}
+				}
+			}
+			
 		}
 	}
 
@@ -213,6 +232,13 @@ public class DriveableData implements IInventory {
 			nbt.setBoolean("Locked", isLocked);
 			nbt.setString("LockCode", lock_code);
 			nbt.setInteger("SpawnedKeys", spawnedKeys);
+		}
+		if(upgrades.size() > 0){
+			JsonArray array = new JsonArray();
+			for(UpgradeType type : upgrades){
+				array.add(new JsonPrimitive(type.registryname));
+			}
+			tag.setString("Upgrades", array.toString());
 		}
 		tag.setTag("Minus", nbt);
 		

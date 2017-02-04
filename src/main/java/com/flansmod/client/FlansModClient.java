@@ -8,7 +8,6 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.data.DataType;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3i;
@@ -232,9 +231,7 @@ public class FlansModClient extends FlansMod {
 	}
 	
 	public static void reloadModels(boolean reloadSkins){
-		for(DataType type : DataType.getTypes()){
-			type.reloadModel();
-		}
+		//loop datatypes - reload models
 		if(reloadSkins){
 			proxy.forceReload();
 		}

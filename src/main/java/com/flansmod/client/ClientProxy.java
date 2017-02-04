@@ -21,6 +21,7 @@ import com.flansmod.client.model.RenderPlane;
 import com.flansmod.client.model.RenderVehicle;
 import com.flansmod.common.CommonProxy;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.DataType;
 import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
@@ -109,9 +110,11 @@ public class ClientProxy extends CommonProxy
 		
 	/** This method reloads all textures from all mods and resource packs. It forces Minecraft to read images from the content packs added after mod init */
 	@Override
-	public void forceReload()
-	{
+	public void forceReload(){
 		Minecraft.getMinecraft().refreshResources();
+		for(DataType type : DataType.getTypes()){
+			type.reloadModel();
+		}
 	}
 
 	/** This method grabs all the content packs and puts them in a list. The client side part registers them as FMLModContainers which adds their resources to the game after a refresh */

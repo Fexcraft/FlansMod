@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.common.items.ItemPart;
 import com.flansmod.common.items.ItemPlane;
+import com.flansmod.common.items.ItemUpgrade;
 import com.flansmod.common.items.ItemVehicle;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.math.Pos;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.model.ModelBase;
@@ -44,7 +45,7 @@ public abstract class DataType implements Comparable<DataType> {
 	public float modelScale = 1F;
 	public String modelString;
 	@SideOnly(value = Side.CLIENT)
-	public ModelDriveable model;
+	public ModelBase model;
 	
 	public DataType(String contentpack, String filename, String[] lines){
 		this.contentpack = contentpack;
@@ -129,7 +130,7 @@ public abstract class DataType implements Comparable<DataType> {
 
 	protected abstract void postRead(String[] s);
 	
-	public final DataType getType(String s){
+	public final static DataType getType(String s){
 		for(DataType type : types){
 			if(type.registryname != null && type.registryname.equals(s)){
 				return type;
@@ -250,6 +251,9 @@ public abstract class DataType implements Comparable<DataType> {
 		else if(this instanceof PlaneType){
 			item = ItemPlane.getNew((PlaneType)this);
 		}
+		else if(this instanceof UpgradeType){
+			item = ItemUpgrade.getNew((UpgradeType)this);
+		}
 		else if(this instanceof PartType){
 			item = ItemPart.getNew((PartType)this);
 		}
@@ -274,6 +278,20 @@ public abstract class DataType implements Comparable<DataType> {
 		}
 		for(DataType type : list){
 			types.remove(type);
+		}
+	}
+	
+	protected Pos getPos(String[] split){
+		return getPos(split, 0);
+	}
+	
+	protected Pos getPos(String[] split, int i){
+		try{
+			return new Pos(Float.parseFloat(split[1 + i]), Float.parseFloat(split[2 + i]), Float.parseFloat(split[3 + i]));
+		}
+		catch(Exception e){
+			exception(e, split[0]);
+			return new Pos(0, 0, 0);
 		}
 	}
 	

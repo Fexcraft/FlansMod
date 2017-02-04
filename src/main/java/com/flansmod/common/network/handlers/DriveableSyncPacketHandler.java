@@ -1,9 +1,12 @@
 package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.UpgradeType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.network.packets.PacketDriveableSync;
+import com.google.gson.JsonElement;
 
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -54,6 +57,12 @@ public class DriveableSyncPacketHandler {
 							driveable.driveableData.primary_color = packet.primary;
 							driveable.driveableData.secondary_color = packet.secondary;
 							driveable.driveableData.texture_url = packet.texture_url;
+							for(JsonElement elm : packet.upgrades){
+								UpgradeType type = UpgradeType.getUpgrade(elm.getAsString());
+								if(type != null){
+									driveable.driveableData.upgrades.add(type);
+								}
+							}
 							driveable.sync = true;
 							break;
 						}

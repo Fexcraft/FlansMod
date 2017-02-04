@@ -10,7 +10,7 @@ import com.flansmod.common.items.ItemVehicle;
 
 public enum EnumType {
 	
-	part("parts"), vehicle("vehicles"), plane("planes");
+	part("parts"), upgrade("upgrades"), vehicle("vehicles"), plane("planes");
 	
 	public String folderName;
 	
@@ -31,6 +31,7 @@ public enum EnumType {
 		if(o instanceof PlaneType 			|| o instanceof ItemPlane 		|| o instanceof EntityPlane) 	return plane;
 		if(o instanceof VehicleType			|| o instanceof ItemVehicle 	|| o instanceof EntityVehicle) 	return vehicle;
 		if(o instanceof PartType  			|| o instanceof ItemPart) 										return part;
+		if(o instanceof UpgradeType         /*|| o instanceof ItemUpgrade*/)                                    return upgrade;
 		return null;
 	}
 
@@ -42,6 +43,8 @@ public enum EnumType {
 				return new PlaneType(string, string2, arr);
 			case vehicle:
 				return new VehicleType(string, string2, arr);
+			case upgrade:
+				return new UpgradeType(string, string2, arr);
 			default:
 				return null;
 		}

@@ -154,6 +154,9 @@ public class PartType extends DataType {
 			return EnumPartCategory.FUEL;
 		if(s.equals("Misc"))
 			return EnumPartCategory.MISC;
+		if(s.equals("Upgrade")){
+			return EnumPartCategory.UPGRADE;
+		}
 		return EnumPartCategory.MISC;
 	}
 
@@ -164,9 +167,8 @@ public class PartType extends DataType {
 	}
 
 	@Override
-	public void reloadModel() {
-		// TODO Auto-generated method stub
-		
+	public void reloadModel(){
+		//
 	}
 	
 }

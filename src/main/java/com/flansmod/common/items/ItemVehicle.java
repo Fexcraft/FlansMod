@@ -109,6 +109,7 @@ public class ItemVehicle extends ItemMapBase {
 			return;
 		}
 		NBTTagCompound nbt = tags.getCompoundTag("Minus");
+		lines.add("Upgrades: " + nbt.getString("Upgrades"));
 		if(type.hasColor){
 			if(nbt.hasKey("PrimaryColorRed")){
 				lines.add("Primary Color R:" + nbt.getFloat("PrimaryColorRed") + " G:" + nbt.getFloat("PrimaryColorGreen") + " B:" + nbt.getFloat("PrimaryColorBlue"));
