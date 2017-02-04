@@ -5,13 +5,9 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.util.Ticker;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -205,13 +201,13 @@ public class GuiDriveableRepair extends GuiScreen
 		int m = i - guiOriginX;
 		int n = j - guiOriginY;
 		if(m > 185 && m < 195 && n > 5 && n < 15)
-			if(driving instanceof EntityMecha)
+			/*if(driving instanceof EntityMecha)
 			{
 				//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				(driver).openGui(FlansMod.INSTANCE, 10, driver.world, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
 			}
-			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.world, driving));
+			else*/
+			mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.world, driving));
 	}
 
 	/** Item stack renderering method */

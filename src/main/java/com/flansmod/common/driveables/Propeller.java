@@ -1,6 +1,6 @@
 package com.flansmod.common.driveables;
 
-import com.flansmod.common.parts.PartType;
+import com.flansmod.common.data.PartType;
 import com.flansmod.common.vector.Vector3f;
 
 public class Propeller 

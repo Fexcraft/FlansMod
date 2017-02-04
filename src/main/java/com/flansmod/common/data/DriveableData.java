@@ -4,12 +4,9 @@ import java.util.HashMap;
 
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.parts.EnumPartCategory;
-import com.flansmod.common.parts.ItemPart;
-import com.flansmod.common.parts.PartType;
-import com.flansmod.common.util.Util;
+import com.flansmod.common.items.ItemPart;
 
+import net.fexcraft.mod.lib.api.item.KeyItem;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -73,6 +70,9 @@ public class DriveableData implements IInventory {
 		numCargo = dType.numCargoSlots;
 		numMissiles = dType.numMissileSlots;
 		engine = PartType.getPart(tag.getString("Engine"));
+		if(engine == null){
+			engine = PartType.defaultEngines.get(EnumType.getFromObject(dType));
+		}
 		paintjobID = tag.getInteger("Paint");
 		ammo = NonNullList.<ItemStack>withSize(numGuns, ItemStack.EMPTY);
 		bombs = NonNullList.<ItemStack>withSize(numBombs, ItemStack.EMPTY);
@@ -154,7 +154,7 @@ public class DriveableData implements IInventory {
 			else{
 				hasLock = dType.hasLock;
 				isLocked = false;
-				lock_code = Util.randomKeyCode();
+				lock_code = KeyItem.getNewKeyCode();
 				spawnedKeys = 0;
 			}
 		}
@@ -163,7 +163,7 @@ public class DriveableData implements IInventory {
 	public NBTTagCompound writeToNBT(NBTTagCompound tag){
 		tag.setString("Type", type);
 		if(engine != null){
-			tag.setString("Engine", engine.shortName);
+			tag.setString("Engine", engine.registryname);
 		}
 		tag.setInteger("Paint", paintjobID);
 		for(int i = 0; i < ammo.size(); i++){
@@ -359,18 +359,6 @@ public class DriveableData implements IInventory {
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-		if(i < getBombInventoryStart() && itemstack != null && itemstack.getItem() instanceof ItemBullet) //Ammo
-		{
-			return true;
-		}		
-		if(i >= getBombInventoryStart() && i < getMissileInventoryStart() && itemstack != null && itemstack.getItem() instanceof ItemBullet) //Ammo
-		{
-			return true;
-		}
-		if(i >= getMissileInventoryStart() && i < getCargoInventoryStart() && itemstack != null && itemstack.getItem() instanceof ItemBullet)
-		{
-			return true;
-		}
 		if(i >= getCargoInventoryStart() && i < getFuelSlot())
 		{
 			return true;

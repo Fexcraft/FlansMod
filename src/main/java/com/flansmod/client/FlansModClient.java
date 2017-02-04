@@ -8,31 +8,25 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.data.DriveableType;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.IScope;
-import com.flansmod.common.types.InfoType;
+import com.flansmod.common.data.DataType;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3i;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class FlansModClient extends FlansMod
-{
+public class FlansModClient extends FlansMod {
+	
 	//Plane / Vehicle control handling
 	/** Whether the player has received the vehicle tutorial text */
 	public static boolean doneTutorial = false;
@@ -54,8 +48,6 @@ public class FlansModClient extends FlansMod
 	//Scope variables
 	/** A delayer on the scope button to avoid repeat presses */
 	public static int scopeTime;
-	/** The scope that is currently being looked down */
-	public static IScope currentScope = null;
 	/** The transition variable for zooming in / out with a smoother. 0 = unscoped, 1 = scoped */
 	public static float zoomProgress = 0F, lastZoomProgress = 0F;
 	/** The zoom level of the last scope used, for transitioning out of being scoped, even after the scope is forgotten */
@@ -163,14 +155,12 @@ public class FlansModClient extends FlansMod
 
 		//Calculate new zoom variables
 		lastZoomProgress = zoomProgress;
-		if(currentScope == null)
-		{
+		//if(currentScope == null){
 			zoomProgress *= 0.66F;
-		}
-		else
-		{
+		/*}
+		else{
 			zoomProgress = 1F - (1F - zoomProgress) * 0.66F; 
-		}
+		}*/
 		
 		if(minecraft.player.getRidingEntity() instanceof IControllable){
 			inPlane = true;	
@@ -194,34 +184,6 @@ public class FlansModClient extends FlansMod
 		}
 		if (controlModeSwitchTimer > 0)
 			controlModeSwitchTimer--;
-	}
-	
-	public static void SetScope(IScope scope)
-	{
-		GameSettings gameSettings = FMLClientHandler.instance().getClient().gameSettings;
-		
-		if(scopeTime <= 0 && FMLClientHandler.instance().getClient().currentScreen == null)
-		{
-			if(currentScope == null)
-			{
-				currentScope = scope;
-				lastZoomLevel = scope.getZoomFactor();
-				lastFOVZoomLevel = scope.getFOVFactor();
-				float f = originalMouseSensitivity = gameSettings.mouseSensitivity;
-				gameSettings.mouseSensitivity = f / (float) Math.sqrt(scope.getZoomFactor());
-				originalThirdPerson = gameSettings.thirdPersonView;
-				gameSettings.thirdPersonView = 0;
-				originalFOV = gameSettings.fovSetting;
-			}
-			else
-			{
-				currentScope = null;
-				gameSettings.mouseSensitivity = originalMouseSensitivity;
-				gameSettings.thirdPersonView = originalThirdPerson;
-				gameSettings.fovSetting = originalFOV;
-			}
-			scopeTime = 10;
-		}
 	}
 	
 	public static void UpdateCameraZoom(float smoothing)
@@ -270,10 +232,7 @@ public class FlansModClient extends FlansMod
 	}
 	
 	public static void reloadModels(boolean reloadSkins){
-		for(InfoType type : InfoType.types.values()){
-			type.reloadModel();
-		}
-		for(DriveableType type : DriveableType.getTypes()){
+		for(DataType type : DataType.getTypes()){
 			type.reloadModel();
 		}
 		if(reloadSkins){
@@ -540,63 +499,7 @@ public class FlansModClient extends FlansMod
 					}
 				}
 			}*/
-			
-			for(Object obj : mc.world.loadedEntityList)
-			{
-				if(obj instanceof EntityBullet)
-				{
-					EntityBullet bullet = (EntityBullet)obj;
-					if(!bullet.isDead && bullet.type.hasLight)
-					{
-						int x = MathHelper.floor(bullet.posX);
-						int y = MathHelper.floor(bullet.posY);
-						int z = MathHelper.floor(bullet.posZ);
-						blockLightOverrides.add(new Vector3i(x, y, z));
-						mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), 15);
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
-					}
-				}
-				else if(obj instanceof EntityMecha)
-				{
-					EntityMecha mecha = (EntityMecha)obj;
-					int x = MathHelper.floor(mecha.posX);
-					int y = MathHelper.floor(mecha.posY);
-					int z = MathHelper.floor(mecha.posZ);
-					if(mecha.lightLevel() > 0)
-					{
-						blockLightOverrides.add(new Vector3i(x, y, z));
-						mc.world.setLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z), Math.max(mc.world.getLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z)), mecha.lightLevel()));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y + 1, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y - 1, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x + 1, y, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x - 1, y, z));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z + 1));
-						mc.world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z - 1));
-					}
-					if(mecha.forceDark())
-					{
-						for(int i = -3; i <= 3; i++)
-						{
-							for(int j = -3; j <= 3; j++)
-							{
-								for(int k = -3; k <= 3; k++)
-								{
-									int xd = i + x;
-									int yd = j + y;
-									int zd = k + z;
-									blockLightOverrides.add(new Vector3i(xd, yd, zd));
-									mc.world.setLightFor(EnumSkyBlock.SKY, new BlockPos(xd, yd, zd), Math.abs(i) + Math.abs(j) + Math.abs(k));
-								}
-							}
-						}
-					}
-				}
-			}
 		}
 	}
+	
 }

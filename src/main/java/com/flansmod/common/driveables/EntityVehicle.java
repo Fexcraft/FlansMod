@@ -8,17 +8,19 @@ import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.data.player.IPlayerData;
 import com.flansmod.common.data.player.PlayerHandler;
-import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableTexture;
 import com.flansmod.common.network.packets.PacketVehicleControl;
-import com.flansmod.common.parts.ItemKey;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.lib.api.common.LockableObject;
+import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
@@ -39,7 +41,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-public class EntityVehicle extends EntityDriveable implements IExplodeable
+public class EntityVehicle extends EntityDriveable implements IExplodeable, LockableObject
 {
 	/** Weapon delays */
 	public int shellDelay, gunDelay;
@@ -159,22 +161,11 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
 		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemKey){
-			if(!getDriveableType().hasLock){
-				Print.chat(entityplayer, "This vehicle doesn't allow locking.");
+			if(this.isLocked()){
+				this.unlock(world, entityplayer, currentItem, (KeyItem)currentItem.getItem());
 			}
 			else{
-				if(currentItem.getTagCompound() != null){
-					if(currentItem.getTagCompound().getString("code").equals(driveableData.lock_code) || currentItem.getTagCompound().getBoolean("universal")){
-						driveableData.isLocked = !driveableData.isLocked;
-						Print.chat(entityplayer, "The Vehicle is now " + (driveableData.isLocked ? "locked" : "unlocked") + ".");
-					}
-					else{
-						Print.chat(entityplayer, "Wrong key.\n[" + driveableData.lock_code.toUpperCase() + "] != [" + currentItem.getTagCompound().getString("code").toUpperCase() + "]");
-					}
-				}
-				else{
-					Print.chat(entityplayer, "Error, this key is empty!");
-				}
+				this.lock(world, entityplayer, currentItem, (KeyItem)currentItem.getItem());
 			}
 			return true;
 		}
@@ -363,7 +354,6 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 
 		//Get vehicle type
 		VehicleType type = this.getVehicleType();
-		DriveableData data = getDriveableData();
 		if(type == null){
 			Util.log("Vehicle type null. Not ticking vehicle");
 			return;
@@ -473,7 +463,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			//If the player driving this is in creative, then we can thrust, no matter what
 			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
-			if(canThrustCreatively || data.fuelInTank > data.engine.fuelConsumption * throttle)
+			if(canThrustCreatively || driveableData.fuelInTank > driveableData.engine.fuelConsumption * throttle)
 			{
 				if(getVehicleType().tank)
 				{
@@ -483,7 +473,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 					wheel.motionX *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					wheel.motionZ *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					
-					float velocityScale = 0.04F * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * data.engine.engineSpeed;
+					float velocityScale = 0.04F * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * driveableData.engine.engineSpeed;
 					float steeringScale = 0.1F * (wheelsYaw > 0 ? type.turnLeftModifier : type.turnRightModifier);
 					float effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
@@ -495,7 +485,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				{
 					//if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
 					{
-						float velocityScale = 0.1F * throttle * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * data.engine.engineSpeed;
+						float velocityScale = 0.1F * throttle * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * driveableData.engine.engineSpeed;
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					}
@@ -578,13 +568,13 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		//Starting sound
 		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.startSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.startSound, false);
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
 		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.engineSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.engineSound, false);
 			soundPosition = type.engineSoundLength;
 		}
 		
@@ -750,4 +740,64 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			}
 		}
 	}
+
+	@Override
+	public boolean isLocked(){
+		return driveableData.isLocked;
+	}
+
+	@Override
+	public boolean unlock(World world, EntityPlayer entity, ItemStack stack, KeyItem item){
+		if(!stack.hasTagCompound()){
+			Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+			return false;
+		}
+		else{
+			if(item.getCode(stack).equals(driveableData.lock_code)){
+				driveableData.isLocked = false;
+				Print.chat(entity, "Vehicle is now unlocked.");
+				return true;
+			}
+			else if(item.getType(stack) == KeyType.ADMIN){
+				driveableData.isLocked = true;
+				Print.chat(entity, "[SU] Vehicle is now unlocked.");
+				return true;
+			}
+			else{
+				Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
+		if(!getDriveableType().hasLock){
+			Print.chat(entity, "This vehicle doesn't allow locking.");
+			return false;
+		}
+		else{
+			if(!stack.hasTagCompound()){
+				Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+				return false;
+			}
+			else{
+				if(item.getCode(stack).equals(driveableData.lock_code)){
+					driveableData.isLocked = true;
+					Print.chat(entity, "Vehicle is now locked.");
+					return true;
+				}
+				else if(item.getType(stack) == KeyType.ADMIN){
+					driveableData.isLocked = true;
+					Print.chat(entity, "[SU] Vehicle is now locked.");
+					return true;
+				}
+				else{
+					Print.chat(entity, "Wrong key.");
+					return false;
+				}
+			}
+		}
+	}
+	
 }

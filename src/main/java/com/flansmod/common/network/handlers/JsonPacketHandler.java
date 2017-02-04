@@ -1,12 +1,11 @@
 package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.util.Util;
-
 import net.fexcraft.mod.lib.api.network.IPacketListener;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketJsonObject;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class JsonPacketHandler{
@@ -24,7 +23,7 @@ public class JsonPacketHandler{
 						FlansMod.DEBUG = !FlansMod.DEBUG;
 						break;
 					case "tick":
-						Print.spam(1, "TICK => " + Util.getTime() + ";");
+						Print.spam(1, "TICK => " + Time.getDate() + ";");
 						break;
 				}
 			}

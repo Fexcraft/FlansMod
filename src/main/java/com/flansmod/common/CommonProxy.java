@@ -3,12 +3,10 @@ package com.flansmod.common;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
 
 import net.minecraft.block.Block;
@@ -31,10 +29,6 @@ public class CommonProxy {
 		}
 		Util.log("Loaded content pack list server side.");
 		return contentPacks;
-	}
-	
-	public void addMissingJSONs(HashMap<Integer, InfoType> types){
-		
 	}
 	
 	/** A ton of client only methods follow */

@@ -16,29 +16,17 @@ import com.flansmod.client.debug.RenderDebugAABB;
 import com.flansmod.client.debug.RenderDebugDot;
 import com.flansmod.client.debug.RenderDebugVector;
 import com.flansmod.client.gui.GuiDriveableMenu;
-import com.flansmod.client.model.RenderAAGun;
-import com.flansmod.client.model.RenderBullet;
-import com.flansmod.client.model.RenderCustomEntityItem;
-import com.flansmod.client.model.RenderCustomItem;
-import com.flansmod.client.model.RenderMecha;
 import com.flansmod.client.model.RenderNull;
-import com.flansmod.client.model.RenderParachute;
 import com.flansmod.client.model.RenderPlane;
 import com.flansmod.client.model.RenderVehicle;
 import com.flansmod.common.CommonProxy;
-import com.flansmod.common.EntityCustomItem;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
-import com.flansmod.common.driveables.PlaneType;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.tools.EntityParachute;
-import com.flansmod.common.types.IFlanItem;
 import com.flansmod.common.util.Util;
 
 import net.minecraft.client.Minecraft;
@@ -164,51 +152,39 @@ public class ClientProxy extends CommonProxy
 	
 	/** Register entity renderers */
 	@Override
-	public void registerRenderers()
-	{
+	public void registerRenderers(){
 		
-		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, RenderBullet::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, RenderPlane::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, RenderVehicle::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, RenderAAGun::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
 		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityParachute.class, RenderParachute::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityMecha.class, RenderMecha::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityCustomItem.class, RenderCustomEntityItem::new);
 		
 	}
 	
 	/** Old one time tutorial code that displays messages the first time you enter a plane / vehicle. Needs reworking */
 	@Override
-	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType)
-	{
-		if (!FlansModClient.doneTutorial)
-		{
+	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType){
+		if(!FlansModClient.doneTutorial){
 			FlansModClient.doneTutorial = true;
-			
 			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.inventoryKey.getKeyCode()) + " to open the menu"));
 			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode()) + " to get out"));
 			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.controlSwitchKey.getKeyCode()) + " to switch controls"));
 			player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch VTOL mode"));
-			if (entityType instanceof EntityPlane)
-			{
-				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasGear)
+			if(entityType instanceof EntityPlane){
+				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasGear){
 					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.gearKey.getKeyCode()) + " to switch the gear"));
-				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasDoor)
+				}
+				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasDoor){
 					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.doorKey.getKeyCode()) + " to switch the doors"));
-				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasWing)
+				}
+				if(PlaneType.getPlane(((EntityPlane)entityType).driveableType).hasWing){
 					player.sendMessage(new TextComponentString("Press " + Keyboard.getKeyName(KeyInputHandler.modeKey.getKeyCode()) + " to switch the wings"));
+				}
 			}
 		}
-	}
-
-	public static RenderCustomItem getRenderer(IFlanItem item)
-	{
-		return item.getRenderItemEntity();
 	}
 
 	/** Adds the client side text message regarding mouse control mode switching */
@@ -278,7 +254,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void loadSound(String contentPack, String type, String sound)
 	{
-		FlansModResourceHandler.getSound(sound);
+		//FlansModResourceHandler.getSound(sound);
 		//FMLClientHandler.instance().getClient().installResource("sound3/" + type + "/" + sound + ".ogg", new File(FMLClientHandler.instance().getClient().mcDataDir, "/Flan/" + contentPack + "/sounds/" + sound + ".ogg"));
 	}
 	

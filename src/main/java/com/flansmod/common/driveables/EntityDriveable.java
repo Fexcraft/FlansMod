@@ -1,6 +1,5 @@
 package com.flansmod.common.driveables;
 
-import java.util.ArrayList;
 import com.flansmod.api.IControllable;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
@@ -10,14 +9,11 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.data.DriveableData;
 import com.flansmod.common.data.DriveableType;
-import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.BulletHit;
-import com.flansmod.common.guns.raytracing.FlansModRaytracer.DriveableHit;
+import com.flansmod.common.data.EnumPartCategory;
+import com.flansmod.common.data.PartType;
+import com.flansmod.common.items.ItemPart;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketDriveableSync;
-import com.flansmod.common.parts.EnumPartCategory;
-import com.flansmod.common.parts.ItemPart;
-import com.flansmod.common.parts.PartType;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
@@ -784,8 +780,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	/** Attack a certain part of a driveable and return whether it broke or not */
 	public boolean attackPart(EnumDriveablePart ep, DamageSource source, float damage)
 	{
-		DriveablePart part = driveableData.parts.get(ep);
-		return part.attack(damage, source.isFireDamage());
+		//DriveablePart part = driveableData.parts.get(ep);
+		return false;//part.attack(damage, source.isFireDamage());
 	}
 		
 	/** Takes a vector (such as the origin of a seat / gun) and translates it from local coordinates to global coordinates */
@@ -949,63 +945,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	public boolean onGround()
 	{
 		return onGround;
-	}
-		
-	/** Attack method called by bullets hitting the plane. Does advanced raytracing to detect which part of the plane is hit */
-	public ArrayList<BulletHit> attackFromBullet(Vector3f origin, Vector3f motion)
-	{
-		//Make an array to contain the hits
-		ArrayList<BulletHit> hits = new ArrayList<BulletHit>();
-		//Get the position of the bullet origin, relative to the centre of the plane, and then rotate the vectors onto local co-ordinates
-		Vector3f relativePosVector = Vector3f.sub(origin, new Vector3f((float)posX, (float)posY, (float)posZ), null);
-		Vector3f rotatedPosVector = axes.findGlobalVectorLocally(relativePosVector);
-		Vector3f rotatedMotVector = axes.findGlobalVectorLocally(motion);
-		//Check each part
-		for(DriveablePart part : getDriveableData().parts.values())
-		{
-			//Ray trace the bullet
-			DriveableHit hit = part.rayTrace(this, rotatedPosVector, rotatedMotVector);
-			if(hit != null)
-				hits.add(hit);
-		}
-		return hits;
-	}
-	
-	/** Called if the bullet actually hit the part returned by the raytrace 
-	 * @param penetratingPower */
-	public float bulletHit(BulletType bulletType, float damage, DriveableHit hit, float penetratingPower)
-	{
-		DriveablePart part = getDriveableData().parts.get(hit.part);
-		part.hitByBullet(bulletType, damage);
-		
-		//This is server side bsns
-		if(!world.isRemote)
-		{
-			checkParts();
-			//If it hit, send a damage update packet
-			//FlansMod.getPacketHandler().sendToAllAround(new PacketDriveableDamage(this), posX, posY, posZ, 100, dimension);
-		}
-		
-		return penetratingPower - 5F;
-	}
-	
-	/** A simple raytracer for the driveable. Called by tools */
-	public DriveablePart raytraceParts(Vector3f origin, Vector3f motion)
-	{
-		//Get the position of the bullet origin, relative to the centre of the plane, and then rotate the vectors onto local co-ordinates
-		Vector3f relativePosVector = Vector3f.sub(origin, new Vector3f((float)posX, (float)posY, (float)posZ), null);
-		Vector3f rotatedPosVector = axes.findGlobalVectorLocally(relativePosVector);
-		Vector3f rotatedMotVector = axes.findGlobalVectorLocally(motion);
-		//Check each part
-		for(DriveablePart part : getDriveableData().parts.values())
-		{
-			//Ray trace the bullet
-			if(part.rayTrace(this, rotatedPosVector, rotatedMotVector) != null)
-			{
-				return part;
-			}
-		}
-		return null;
 	}
 	
 	/** For overriding for toggles such as gear up / down on planes */

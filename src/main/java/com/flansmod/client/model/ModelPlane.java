@@ -1,13 +1,13 @@
 package com.flansmod.client.model;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EnumDriveablePart;
 import com.flansmod.common.driveables.EnumPlaneMode;
-import com.flansmod.common.driveables.PlaneType;
 import com.flansmod.common.driveables.Propeller;
 import com.flansmod.common.vector.Vector3f;
 

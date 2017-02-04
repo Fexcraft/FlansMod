@@ -1,9 +1,7 @@
 package com.flansmod.client;
 
-import com.flansmod.client.model.InstantBulletRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -66,11 +64,6 @@ public class ClientEventHandler {
 	@SubscribeEvent
 	public void checkKeyInput(KeyInputEvent event){
 		keyInputHandler.checkKeyInput(event);
-	}
-	
-	@SubscribeEvent
-	public void renderWorld(RenderWorldLastEvent event){
-		InstantBulletRenderer.RenderAllTrails(event.getPartialTicks());
 	}
 
 }

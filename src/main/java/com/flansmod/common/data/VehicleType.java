@@ -76,6 +76,7 @@ public class VehicleType extends DriveableType {
 		}
 	}
 	
+	@Override
 	public void reloadModel(){
 		model = FlansMod.proxy.loadModel(modelString, registryname, ModelVehicle.class);
 	}
@@ -83,6 +84,10 @@ public class VehicleType extends DriveableType {
 	@Override
 	public EntityDriveable createDriveable(World world, double x, double y, double z, DriveableData data) {
 		return new EntityVehicle(world, x, y, z, this, data);
+	}
+
+	public static VehicleType getPlane(String string){
+		return (VehicleType)getDriveable(string);
 	}
 	
 }

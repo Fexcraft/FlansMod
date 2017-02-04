@@ -15,41 +15,14 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Vec3f;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class DriveableType {
+public abstract class DriveableType extends DataType {
 	
-	private static final List<DriveableType> types = new ArrayList<DriveableType>();
-	private String[] lines;
-	protected String filename;
-	public int colour = 0xffffff;
-	public String contentpack;
-	public Item item;
-	//
-	public Object[] recipe;
-	public String[] recipeLine;
-	public int recipeOutput = 1;
-	public boolean shapeless;
-	public String smeltableFrom = null;
-	public boolean canDrop = true;
-	//
-	public String name;
-	public String registryname;
-	public ArrayList<String> description;
-	public ArrayList<ResourceLocation> textures;
-	public int paintjob = 0;
-	public float modelScale = 1F;
-	public String modelString;
 	public int numPassengers = 0;
 	public Seat[] seats;
-	@SideOnly(value = Side.CLIENT)
-	public ModelDriveable model;
-	//
 	public float maxThrottle = 1F, maxNegativeThrottle = 0F, drag = 1f;
 	public boolean canRoll = false;
 	public Vector3f turretOrigin = new Vector3f();
@@ -88,31 +61,9 @@ public abstract class DriveableType {
 	
 	
 	public DriveableType(String contentpack, String filename, String[] lines){
-		this.contentpack = contentpack;
-		this.filename = filename;
-		this.lines = lines;
+		super(contentpack, filename, lines);
 		this.description = new ArrayList<String>();
 		this.textures = new ArrayList<ResourceLocation>();
-	}
-	
-	public final void read(){
-		ArrayList<String[]> arr = new ArrayList<String[]>();
-		for(String s : lines){
-			String[] split = s.split(" ");
-			if(split.length < 2){
-				continue;
-			}
-			arr.add(split);
-		}
-		for(String[] s : arr){
-			preRead(s);
-		}
-		for(String[] s : arr){
-			read(s);
-		}
-		for(String[] s : arr){
-			postRead(s);
-		}
 	}
 	
 	protected void preRead(String[] split){
@@ -140,49 +91,10 @@ public abstract class DriveableType {
 	}
 	
 	protected void read(String[] split){
+		super.read(split);
 		try{
 			String s = split[0];
 			switch(s){
-				case "Model":
-					modelString = split[1];
-					break;
-				case "ModelScale":
-					modelScale = getFloat(split);
-					break;
-				case "Name":
-					name = getString(split);
-					break;
-				case "Description":
-					description.add(getString(split));
-					break;
-				case "ShortName":
-				case "RegistryName":
-					registryname = getString(split);
-					break;
-				case "Colour":
-				case "Color":
-					try{
-						colour = (Integer.parseInt(split[1]) << 16) + ((Integer.parseInt(split[2])) << 8) + ((Integer.parseInt(split[3])));
-					}
-					catch(Exception e){
-						exception(e, s);
-					}
-					break;
-				case "RecipeOutput":
-					recipeOutput = getInteger(split);
-					break;
-				case "Recipe":
-					//TODO
-					break;
-				case "ShapelessRecipe":
-					//TODO
-					break;
-				case "SmeltableFrom":
-					smeltableFrom = getString(split);
-					break;
-				case "CanDrop":
-					canDrop = getBoolean(split);
-					break;
 				case "Paintjob":
 					try{
 						textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + getString(split)));
@@ -462,7 +374,7 @@ public abstract class DriveableType {
 		}
 	}
 
-	private void postRead(String[] split){
+	protected void postRead(String[] split){
 		try{
 			String s = split[0];
 			switch(s){
@@ -491,128 +403,24 @@ public abstract class DriveableType {
 		
 	}
 	
-	public static DriveableType getType(String s){
-		for(DriveableType type : types){
-			if(type.registryname.equals(s)){
-				return type;
-			}
-		}
-		return null;
-	}
-	
-	public DriveableType getType(ItemStack stack){
+	public static DriveableType getDriveable(ItemStack stack){
 		if(stack.hasTagCompound()){
 			if(stack.getTagCompound().hasKey("DriveableType")){
-				return getType(stack.getTagCompound().getString("DriveableType"));
+				return getDriveable(stack.getTagCompound().getString("DriveableType"));
 			}
 		}
 		return null;
-	}
-	
-	float getFloat(String[] split){
-		try{
-			return Float.parseFloat(split[1]);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return 0;
-		}
-	}
-	
-	String getString(String[] split){
-		try{
-			String result = split[1];
-			for(int i = 0; i < split.length - 2; i++){
-				result = result + " " + split[i + 2];
-			}
-			return result;
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return "";
-		}
-	}
-	
-	private void exception(Exception e, String s){
-		Print.log("FFMM", "Failed to read config line (" + s + ") in [" + filename + ">" + contentpack + "];");
-		e.printStackTrace();
-		Static.stop();
-	}
-	
-	int getInteger(String[] split){
-		try{
-			return Integer.parseInt(split[1]);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return 0;
-		}
-	}
-	
-	boolean getBoolean(String[] split){
-		try{
-			return Boolean.parseBoolean(split[1]);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return false;
-		}
-	}
-	
-	Vector3f getVectorF(String[] split, int i){
-		try{
-			return new Vector3f(Float.parseFloat(split[1 + i]) / 16F, Float.parseFloat(split[2 + i]) / 16F, Float.parseFloat(split[3 + i]) / 16F);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return new Vector3f(0, 0, 0);
-		}
-	}
-
-	private Vector3f getVectorF(String[] split){
-		return getVectorF(split, 0);
-	}
-	
-	Vector3f getVectorI(String[] split, int i){
-		try{
-			return new Vector3f(Integer.parseInt(split[1 + i]) / 16F, Integer.parseInt(split[2 + i]) / 16F, Integer.parseInt(split[3 + i]) / 16F);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return new Vector3f(0, 0, 0);
-		}
-	}
-	
-	RGB parseRGB(String[] split){
-		try{
-			return new RGB(Float.parseFloat(split[1]) / 16F, Float.parseFloat(split[2]) / 16F, Float.parseFloat(split[3]) / 16F);
-		}
-		catch(Exception e){
-			exception(e, split[0]);
-			return new RGB(RGB.WHITE.red, RGB.WHITE.green, RGB.WHITE.blue);
-		}
-	}
-	
-	private Vector3f getVectorI(String[] split){
-		return getVectorI(split, 0);
-	}
-	
-	private Material getMaterial(String[] split){
-		return Material.GROUND;
-	}
-	
-	public static List<DriveableType> getTypes(){
-		return types;
-	}
-
-	public static DriveableType getDriveable(String string){
-		return getType(string);
-	}
-
-	public static void addType(DriveableType type){
-		types.add(type);
 	}
 
 	public abstract EntityDriveable createDriveable(World world, double x, double y, double z, DriveableData data);
+
+	public static DriveableType getDriveable(String string){
+		for(DataType type : getTypes()){
+			if(type.registryname.equals(string)){
+				return (DriveableType)type;
+			}
+		}
+		return null;
+	}
 	
 }

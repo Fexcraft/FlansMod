@@ -1,10 +1,6 @@
 package com.flansmod.common.util;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.data.DriveableType;
-
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -33,11 +29,11 @@ public class CTabs {
 		public ItemStack getIconItemStack(){
 			icon = Ticker.tick / 20;
 			switch(id){
-				case 0 : return DriveableType.getTypes().size() == 0 ? new ItemStack(Blocks.WOOL, 1, 14) : new ItemStack(DriveableType.getTypes().get(icon % DriveableType.getTypes().size()).item);
-				case 1 : return FlansMod.partItems.size() == 0 ? new ItemStack(Blocks.WOOL, 1, 5) : new ItemStack(FlansMod.partItems.get(icon % FlansMod.partItems.size()));
+				//case 0 : return DriveableType.getTypes().size() == 0 ? new ItemStack(Blocks.WOOL, 1, 14) : new ItemStack(DriveableType.getTypes().get(icon % DriveableType.getTypes().size()).item);
+				//case 1 : return FlansMod.partItems.size() == 0 ? new ItemStack(Blocks.WOOL, 1, 5) : new ItemStack(FlansMod.partItems.get(icon % FlansMod.partItems.size()));
 				case 2 : return new ItemStack(Items.SNOWBALL, 1);
 			}
-			return /*new ItemStack(Blocks.WOOL, 1, id);*/ new ItemStack(Items.BRICK, 2);
+			return new ItemStack(Items.BRICK, 2);
 		}
 	}
 

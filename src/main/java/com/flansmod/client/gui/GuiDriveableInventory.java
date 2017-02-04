@@ -12,10 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.ContainerDriveableInventory;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.mechas.EntityMecha;
 
 public class GuiDriveableInventory extends GuiContainer
 {
@@ -150,13 +148,13 @@ public class GuiDriveableInventory extends GuiContainer
 		}
 		if(m > 161 && m < 171 && n > 5 && n < 15)
 		{
-			if(driveable instanceof EntityMecha)
+			/*if(driveable instanceof EntityMecha)
 			{
 				//FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				(inventory.player).openGui(FlansMod.INSTANCE, 10, world, driveable.chunkCoordX, driveable.chunkCoordY, driveable.chunkCoordZ);
 			}
-			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, driveable));
+			else*/
+			mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, driveable));
 		}
 	}
 	

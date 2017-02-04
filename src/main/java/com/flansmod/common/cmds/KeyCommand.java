@@ -5,6 +5,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.util.Config;
 
+import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -91,10 +92,11 @@ public class KeyCommand extends CommandBase {
 				if(stack.getTagCompound() == null){
 					stack.setTagCompound(new NBTTagCompound());
 				}
-				stack.getTagCompound().setString("owner", sender.getGameProfile().getId().toString());
-				stack.getTagCompound().setString("code", driveable.driveableData.lock_code);
-				stack.getTagCompound().setBoolean("universal", universal);
-				stack.getTagCompound().setString("vehicle", driveable.driveableData.type);
+				stack.getTagCompound().setString("KeyCreator", sender.getGameProfile().getId().toString());
+				stack.getTagCompound().setString("KeyOrigin", "crafted");
+				stack.getTagCompound().setString("KeyCode", driveable.driveableData.lock_code);
+				stack.getTagCompound().setString("VehicleType", driveable.driveableData.type);
+				stack.getTagCompound().setString("KeyType", universal ? KeyType.ADMIN.toString() : KeyType.COMMON.toString());
 				sender.inventory.addItemStackToInventory(stack);
 				driveable.driveableData.spawnedKeys++;
 			}

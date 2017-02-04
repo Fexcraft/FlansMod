@@ -3,7 +3,6 @@ package com.flansmod.common;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,35 +16,17 @@ import java.util.zip.ZipInputStream;
 import com.flansmod.client.debug.UtilGui;
 import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
-import com.flansmod.common.cmds.QuickFix;
 import com.flansmod.common.cmds.TextureCommand;
+import com.flansmod.common.data.DataType;
 import com.flansmod.common.data.DriveableType;
-import com.flansmod.common.data.VehicleType;
+import com.flansmod.common.data.EnumType;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
-import com.flansmod.common.driveables.ItemVehicle;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.driveables.mechas.ItemMecha;
-import com.flansmod.common.driveables.mechas.ItemMechaAddon;
-import com.flansmod.common.driveables.mechas.MechaItemType;
-import com.flansmod.common.guns.AAGunType;
-import com.flansmod.common.guns.BulletType;
-import com.flansmod.common.guns.EntityAAGun;
-import com.flansmod.common.guns.EntityBullet;
-import com.flansmod.common.guns.ItemAAGun;
-import com.flansmod.common.guns.ItemBullet;
-import com.flansmod.common.network.FPacketHandler;
-import com.flansmod.common.parts.ItemKey;
-import com.flansmod.common.parts.ItemPart;
-import com.flansmod.common.parts.PartType;
-import com.flansmod.common.tools.EntityParachute;
-import com.flansmod.common.tools.ItemTool;
-import com.flansmod.common.tools.ToolType;
-import com.flansmod.common.types.EnumType;
-import com.flansmod.common.types.InfoType;
-import com.flansmod.common.types.TypeFile;
+import com.flansmod.common.items.ItemKey;
+import com.flansmod.common.items.ItemPart;
+import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.ChunkLoadingHandler;
 import com.flansmod.common.util.Config;
@@ -53,7 +34,6 @@ import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
-import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -93,16 +73,12 @@ public class FlansMod {
 	public static File flanDir;
 
 	//Handlers
-	//public static final PacketHandler packetHandler = new PacketHandler();
-	public static final FPacketHandler packet_handler = new FPacketHandler();
-	public static final PlayerHandler playerHandler = new PlayerHandler();
+	public static final PacketHandler packet_handler = new PacketHandler();
 	public static final Ticker tick_handler = new Ticker();
 	public static FlansHooks hooks = new FlansHooks();
 	
 	//Items and creative tabs
 	public static ArrayList<ItemPart> partItems = new ArrayList<ItemPart>();
-	public static ArrayList<ItemMecha> mechaItems = new ArrayList<ItemMecha>();
-	public static ArrayList<ItemTool> toolItems = new ArrayList<ItemTool>();
 	
 	/** Custom paintjob item */
 	public static Item rainbowPaintcan;
@@ -142,7 +118,6 @@ public class FlansMod {
 		rainbowPaintcan.setRegistryName(MODID, "rainbowPaintcan");
 		rainbowPaintcan.setUnlocalizedName(rainbowPaintcan.getRegistryName().toString());
 		GameRegistry.register(rainbowPaintcan);
-		GameRegistry.registerTileEntity(TileEntityItemHolder.class, "itemHolder");
 		
 		//Read content packs
 		readContentPacks(event);
@@ -171,9 +146,9 @@ public class FlansMod {
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CommonGuiHandler());		
 		
 		// Recipes
-		for(InfoType type : InfoType.types.values()){
+		/*for(InfoType type : InfoType.types.values()){
 			type.addRecipe();
-		}
+		}*/
 		if(Config.addGunpowderRecipe){
 			ItemStack charcoal = new ItemStack(Items.COAL, 1, 1);
 			GameRegistry.addShapelessRecipe(new ItemStack(Items.GUNPOWDER), charcoal, charcoal, charcoal, new ItemStack(Items.GLOWSTONE_DUST));
@@ -192,17 +167,6 @@ public class FlansMod {
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Seat"), EntitySeat.class, "Seat", 99, this, 250, 10, false);
 		//EntityRegistry.registerGlobalEntityID(EntityWheel.class, "Wheel", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Wheel"), EntityWheel.class, "Wheel", 103, this, 250, 20, false);
-		//EntityRegistry.registerGlobalEntityID(EntityParachute.class, "Parachute", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Parachute"), EntityParachute.class, "Parachute", 101, this, 40, 20, false);
-		//EntityRegistry.registerGlobalEntityID(EntityMecha.class, "Mecha", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Mecha"), EntityMecha.class, "Mecha", 102, this, 250, 20, false);
-		
-		//Register bullets and grenades
-		//EntityRegistry.registerGlobalEntityID(EntityBullet.class, "Bullet", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Bullet"), EntityBullet.class, "Bullet", 96, this, 40, 100, false);
-		
-		//EntityRegistry.registerGlobalEntityID(EntityAAGun.class, "AAGun", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "AAGun"), EntityAAGun.class, "AAGun", 92, this, 40, 500, false);
 		
 		//Register the chunk loader 
 		//TODO : Re-do chunk loading
@@ -227,7 +191,7 @@ public class FlansMod {
 	public void playerDrops(PlayerDropsEvent event){
 		for(int i = event.getDrops().size() - 1; i >= 0; i--){
 			EntityItem ent = event.getDrops().get(i);
-			InfoType type = InfoType.getType(ent.getEntityItem());
+			DriveableType type = DriveableType.getDriveable(ent.getEntityItem());
 			if(type != null && !type.canDrop)
 				event.getDrops().remove(i);
 		}
@@ -235,157 +199,113 @@ public class FlansMod {
 	
 	@SubscribeEvent
 	public void playerDrops(ItemTossEvent event){
-		InfoType type = InfoType.getType(event.getEntityItem().getEntityItem());
-		if(type != null && !type.canDrop)
+		DriveableType type = DriveableType.getDriveable(event.getEntityItem().getEntityItem());
+		if(type != null && !type.canDrop){
 			event.setCanceled(true);
+		}
 	}
 	
 	@Mod.EventHandler
 	public void registerCommand(FMLServerStartingEvent event){
-		//CommandHandler handler = ((CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().getCommandManager());
-		//handler.registerCommand(new CommandTeams());
 		event.registerServerCommand(new TextureCommand());
 		event.registerServerCommand(new KeyCommand());
-		event.registerServerCommand(new QuickFix());
 	}
 	
 	/** Reads type files from all content packs */
-	private void getTypeFiles(List<File> contentPacks)
-	{
-		for (File contentPack : contentPacks)
-		{
-			if(contentPack.isDirectory())
-			{				
-				for(EnumType typeToCheckFor : EnumType.values())
-				{
-					File typesDir = new File(contentPack, "/" + typeToCheckFor.folderName + "/");
-					if(!typesDir.exists())
-						continue;
-					for(File file : typesDir.listFiles())
-					{
-						try
-						{
-							BufferedReader reader = new BufferedReader(new FileReader(file));
-							String[] splitName = file.getName().split("/");
-							TypeFile typeFile = new TypeFile(contentPack.getName(), typeToCheckFor, splitName[splitName.length - 1].split("\\.")[0]);
-							for(;;)
-							{
-								String line = null;
-								try
-								{
-									line = reader.readLine();
-								} 
-								catch (Exception e)
-								{
-									break;
+	private void getTypeFiles(List<File> contentPacks){
+		for(File contentPack : contentPacks){
+			if(contentPack.isDirectory()){
+				for(EnumType et : EnumType.values()){
+					File dir = new File(contentPack, "/" + et.folderName + "/");
+					if(dir.exists()){
+						for(File file : dir.listFiles()){
+							try{
+								BufferedReader reader = new BufferedReader(new FileReader(file));
+								ArrayList<String> lines = new ArrayList<String>();
+								for(;;){
+									String line = null;
+									try{
+										line = reader.readLine();
+									} 
+									catch (Exception e){
+										break;
+									}
+									if(line == null){
+										break;
+									}
+									lines.add(line);
 								}
-								if (line == null)
-									break;
-								typeFile.lines.add(line);
+								reader.close();
+								String[] arr = new String[lines.size()];
+								arr = lines.toArray(arr);
+								String[] filename = file.getName().split("/");
+								DataType type = et.getDataType(contentPack.getName(), filename[filename.length - 1].split("\\.")[0], arr);
+								DataType.addType(type);
 							}
-							reader.close();
-						}
-						catch(FileNotFoundException e)
-						{
-							e.printStackTrace();
-						}
-						catch(IOException e)
-						{
-							e.printStackTrace();
-						}
-					}		
-				}
-				File dir = new File(contentPack, "/vehicles/");
-				if(dir.exists()){
-					for(File file : dir.listFiles()){
-						try{
-							BufferedReader reader = new BufferedReader(new FileReader(file));
-							ArrayList<String> lines = new ArrayList<String>();
-							for(;;){
-								String line = null;
-								try{
-									line = reader.readLine();
-								} 
-								catch (Exception e){
-									break;
-								}
-								if(line == null){
-									break;
-								}
-								lines.add(line);
+							catch(Exception e){
+								e.printStackTrace();
 							}
-							reader.close();
-							String[] arr = new String[lines.size()];
-							arr = lines.toArray(arr);
-							String[] filename = file.getName().split("/");
-							VehicleType type = new VehicleType(contentPack.getName(), filename[filename.length - 1].split("\\.")[0], arr);
-							VehicleType.addType(type);
-						}
-						catch(Exception e){
-							e.printStackTrace();
 						}
 					}
 				}
 			}
-			else
-			{
-				try
-				{
+			else{
+				try{
 					ZipFile zip = new ZipFile(contentPack);
 					ZipInputStream zipStream = new ZipInputStream(new FileInputStream(contentPack));
 					BufferedReader reader = new BufferedReader(new InputStreamReader(zipStream));
 					ZipEntry zipEntry = zipStream.getNextEntry();
-					do
-					{
+					do{
 						zipEntry = zipStream.getNextEntry();
-						if(zipEntry == null)
+						if(zipEntry == null){
 							continue;
-						TypeFile typeFile = null;
-						for(EnumType type : EnumType.values())
-						{
-							if(zipEntry.getName().startsWith(type.folderName + "/") && zipEntry.getName().split(type.folderName + "/").length > 1 && zipEntry.getName().split(type.folderName + "/")[1].length() > 0)
-							{
-								String[] splitName = zipEntry.getName().split("/");
-								typeFile = new TypeFile(zip.getName(), type, splitName[splitName.length - 1].split("\\.")[0]);
+						}
+						String[] filename = null;
+						EnumType et = null;
+						for(EnumType type : EnumType.values()){
+							if(zipEntry.getName().startsWith(type.folderName + "/") && zipEntry.getName().split(type.folderName + "/").length > 1 && zipEntry.getName().split(type.folderName + "/")[1].length() > 0){
+								filename = zipEntry.getName().split("/");
+								et = type;
+								break;
 							}
 						}
-						if(typeFile == null)
-						{
+						if(filename == null || et == null){
 							continue;
 						}
-						for(;;)
-						{
+						ArrayList<String> lines = new ArrayList<String>();
+						for(;;){
 							String line = null;
-							try
-							{
+							try{
 								line = reader.readLine();
 							} 
-							catch (Exception e)
-							{
+							catch(Exception e){
 								break;
 							}
-							if (line == null)
+							if(line == null){
 								break;
-							typeFile.lines.add(line);
+							}
+							lines.add(line);
 						}
+						String[] arr = new String[lines.size()];
+						arr = lines.toArray(arr);
+						DataType type = et.getDataType(contentPack.getName(), filename[filename.length - 1].split("\\.")[0], arr);
+						DataType.addType(type);
 					}
 					while(zipEntry != null);
 					reader.close();
 					zip.close();
 					zipStream.close();
 				}
-				catch(IOException e)
-				{
+				catch(IOException e){
 					e.printStackTrace();
 				}
 			}
 		}
+		
 	}
 	
 	/** Content pack reader method */
 	private void readContentPacks(FMLPreInitializationEvent event){
-		// Icons, Skins, Models
-		// Get the classloader in order to load the images
 		ClassLoader classloader = (net.minecraft.server.MinecraftServer.class).getClassLoader();
 		Method method = null;
 		try{
@@ -396,68 +316,19 @@ public class FlansMod {
 			Util.log("Failed to get class loader. All content loading will now fail.");
 			e.printStackTrace();
 		}
-
-		List<File> contentPacks = proxy.getContentList(method, classloader);
-
-		//TODO : Add gametype loader
-		getTypeFiles(contentPacks);
 		
-		for(EnumType type : EnumType.values()){
-			Class<? extends InfoType> typeClass = type.getTypeClass();
-			for(TypeFile typeFile : TypeFile.files.get(type)){
-				try{
-					InfoType infoType = (typeClass.getConstructor(TypeFile.class).newInstance(typeFile));
-					infoType.read(typeFile);
-					switch(type){
-						case bullet : 		new ItemBullet((BulletType)infoType); break;
-						case part : 		partItems.add((ItemPart)new ItemPart((PartType)infoType)); break;
-						//case plane : 		new ItemPlane((PlaneType)infoType); break;
-						//case vehicle : 		new ItemVehicle((VehicleType)infoType); break;
-						case aa : 			new ItemAAGun((AAGunType)infoType); break;
-						case mechaItem : 	new ItemMechaAddon((MechaItemType)infoType); break;
-						//case mecha : 		mechaItems.add((ItemMecha)new ItemMecha((MechaType)infoType)); break;
-						case tool : 		toolItems.add((ItemTool)new ItemTool((ToolType)infoType)); break;
-						case team : 		break;
-						case itemHolder:	new BlockItemHolder((ItemHolderType)infoType); break;
-						default: Util.log("Unrecognised type for " + infoType.shortName); break;
-					}
-				}
-				catch(Exception e){
-					Util.log("Failed to add " + type.name() + " : " + typeFile.name);
-					e.printStackTrace();
-				}
-			}
-			Util.log("Loaded " + type.name() + ".");
-		}
-		for(DriveableType type : DriveableType.getTypes()){
-			if(type instanceof VehicleType){
-				type.read();
-				type.item = ItemVehicle.getNew((VehicleType)type);
-			}
-			else{
-				Static.exception(3);
-			}
-		}
+		getTypeFiles(proxy.getContentList(method, classloader));
 		
-		//Automates JSON adding for old content packs
-		//No longer needed. We use a CustomModelLoader
-		//proxy.addMissingJSONs(InfoType.infoTypes);
+		for(DataType type : DataType.getTypes()){
+			type.read();
+			type.registerItem();
+		}
+		DataType.removeInvalidTypes();
+		
 	}
-	
-	/*public static PacketHandler getPacketHandler()
-	{
-		return INSTANCE.packetHandler;
-	}*/
 	
 	public static SimpleNetworkWrapper getNewPacketHandler(){
 		return packet_handler.getInstance();
 	}
-
-	public static void Assert(boolean b, String string)
-	{
-		if(!b)
-		{
-			Util.log(string);
-		}
-	}
+	
 }

@@ -97,7 +97,7 @@ public class ModelVehicle extends ModelDriveable
 		animFrame = vehicle.animFrame;
 
 		//Rendering the body
-		//if(vehicle.isPartIntact(EnumDriveablePart.core)){
+		if(vehicle.isPartIntact(EnumDriveablePart.core)){
 			
 			for (ModelRendererTurbo aBodyModel : bodyModel){
 				aBodyModel.render(f5, oldRotateOrder);
@@ -140,50 +140,50 @@ public class ModelVehicle extends ModelDriveable
 				aSteeringWheelModel.rotateAngleX = vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aSteeringWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
+		}
 		
 		//Wheels
-		//if(vehicle.isPartIntact(EnumDriveablePart.backLeftWheel)){
+		if(vehicle.isPartIntact(EnumDriveablePart.backLeftWheel)){
 			for (ModelRendererTurbo aLeftBackWheelModel : leftBackWheelModel) {
 				aLeftBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aLeftBackWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.backRightWheel)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.backRightWheel)){
 			for (ModelRendererTurbo aRightBackWheelModel : rightBackWheelModel) {
 				aRightBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aRightBackWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.frontLeftWheel)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.frontLeftWheel)){
 			for (ModelRendererTurbo aLeftFrontWheelModel : leftFrontWheelModel) {
 				aLeftFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aLeftFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aLeftFrontWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.frontRightWheel)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.frontRightWheel)){
 			for (ModelRendererTurbo aRightFrontWheelModel : rightFrontWheelModel) {
 				aRightFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aRightFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aRightFrontWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.frontWheel)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.frontWheel)){
 			for (ModelRendererTurbo aFrontWheelModel : frontWheelModel) {
 				aFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aFrontWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.backWheel)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.backWheel)){
 			for (ModelRendererTurbo aBackWheelModel : backWheelModel) {
 				aBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aBackWheelModel.render(f5, oldRotateOrder);
 			}
-		//}
+		}
 
-		//if(vehicle.isPartIntact(EnumDriveablePart.leftTrack)){
+		if(vehicle.isPartIntact(EnumDriveablePart.leftTrack)){
 			for (ModelRendererTurbo aLeftTrackModel : leftTrackModel) {
 				aLeftTrackModel.render(f5, oldRotateOrder);
 			}
@@ -202,9 +202,9 @@ public class ModelVehicle extends ModelDriveable
 				}
 			}
 
-		//}
+		}
 
-		//if(vehicle.isPartIntact(EnumDriveablePart.rightTrack)){
+		if(vehicle.isPartIntact(EnumDriveablePart.rightTrack)){
 			for (ModelRendererTurbo aRightTrackModel : rightTrackModel) {
 				aRightTrackModel.render(f5, oldRotateOrder);
 			}
@@ -222,12 +222,12 @@ public class ModelVehicle extends ModelDriveable
 					}
 				}
 			}
-		//}
-		//if(vehicle.isPartIntact(EnumDriveablePart.trailer)){
+		}
+		if(vehicle.isPartIntact(EnumDriveablePart.trailer)){
 			for (ModelRendererTurbo aTrailerModel : trailerModel) {
 				aTrailerModel.render(f5, oldRotateOrder);
 			}
-		//}
+		}
 
 		//Render guns
 		for(EntitySeat seat : vehicle.seats)

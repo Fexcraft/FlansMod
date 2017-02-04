@@ -2,10 +2,10 @@ package com.flansmod.common.driveables;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.data.DriveableData;
-import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
-import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
@@ -46,14 +46,14 @@ public class EntityPlane extends EntityDriveable
 		super(world);
 	}
 
-	public EntityPlane(World world, double x, double y, double z, PlaneType type, DriveableData data)
+	public EntityPlane(World world, double x, double y, double z, PlaneType planeType, DriveableData data)
 	{
-		super(world, type, data);
+		super(world, planeType, data);
 		setPosition(x, y, z);
 		prevPosX = x;
 		prevPosY = y;
 		prevPosZ = z;
-		initType(type, false);
+		initType(planeType, false);
 	}
 
 	public EntityPlane(World world, double x, double y, double z, EntityPlayer placer, PlaneType type, DriveableData data)
@@ -128,8 +128,8 @@ public class EntityPlane extends EntityDriveable
 		
 		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
-			return true;
+		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
+			return true;*/
 		
 		PlaneType type = this.getPlaneType();
 		//Check each seat in order to see if the player can sit in it
@@ -692,13 +692,13 @@ public class EntityPlane extends EntityDriveable
 		//Starting sound
 		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.startSound, false);
+			/*PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.startSound, false);*/
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
 		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel())
 		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.engineSound, false);
+			/*PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.engineSound, false);*/
 			soundPosition = type.engineSoundLength;
 		}
 

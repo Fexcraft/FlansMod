@@ -3,6 +3,7 @@ package com.flansmod.common.driveables;
 import java.util.List;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -25,15 +26,12 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
-import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
-import com.flansmod.common.parts.ItemKey;
-import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
-import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Lists;
 
@@ -157,12 +155,12 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//updatePosition();
 		
 		if (playYawSound == true && yawSoundDelay == 0 && seatInfo.traverseSounds == true){
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.yawSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.yawSound, false);
 			yawSoundDelay = seatInfo.yawSoundLength;
 		}
 		
 		if (playPitchSound == true && pitchSoundDelay == 0 && seatInfo.traverseSounds == true){
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.pitchSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.pitchSound, false);
 			pitchSoundDelay = seatInfo.pitchSoundLength;
 		}
 		
@@ -608,9 +606,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItem(hand);
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
+		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
 			return true;
-		}
+		}*/
 		if(currentItem != null && currentItem.getItem() instanceof ItemKey){
 			return true;
 		}
@@ -673,19 +671,19 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
         else{
         	this.passenger = passenger;
         }
-		Print.debug("AP => " + Util.getTime() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
+		Print.debug("AP => " + Time.getDate() + " " + (world.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 	
 	@Override
 	public void removePassenger(Entity entity){
 		if(world.isRemote){
 			passenger = null;
-			Print.debug("RM => " + Util.getTime() + " [CLIENT] OK");
+			Print.debug("RM => " + Time.getDate() + " [CLIENT] OK");
 		}
 		else{
 			FlansMod.getNewPacketHandler().sendToAllAround(new PacketSeatDismount(passenger.getEntityId()), Config.getTargetPoint(this));
 			passenger = null;
-			Print.debug("RM => " + Util.getTime() + " [SERVER]");
+			Print.debug("RM => " + Time.getDate() + " [SERVER]");
 		}
 	}
 
@@ -698,11 +696,11 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	public void setDead(){
 		if(world.isRemote){
 			this.isDead = true;
-			Print.debug("DD => " + Util.getTime() + " [CLIENT] OK;");
+			Print.debug("DD => " + Time.getDate() + " [CLIENT] OK;");
 		}
 		else{
 			this.isDead = true;
-			Print.debug("DD => " + Util.getTime() + " [SERVER]");
+			Print.debug("DD => " + Time.getDate() + " [SERVER]");
 		}
 	}
 	

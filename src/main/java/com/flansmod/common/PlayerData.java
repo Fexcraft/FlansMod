@@ -2,8 +2,6 @@ package com.flansmod.common;
 
 import java.util.UUID;
 
-import com.flansmod.common.guns.raytracing.PlayerSnapshot;
-import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,9 +18,6 @@ public class PlayerData
 	//Movement related fields
 	/** Roll variables */
 	public float prevRotationRoll, rotationRoll;
-	/** Snapshots for bullet hit detection. Array size is set to number of snapshots required. When a new one is taken, 
-	 * each snapshot is moved along one place and new one is added at the start, so that when the array fills up, the oldest one is lost */
-	public PlayerSnapshot[] snapshots;
 	
 	//Gun related fields
 	/** The slotID of the gun being used by the off-hand. 0 = no slot. 1 ~ 9 = hotbar slots */
@@ -106,7 +101,6 @@ public class PlayerData
 	public PlayerData(UUID uuid)
 	{
 		uniqueId = uuid;
-		snapshots = new PlayerSnapshot[Config.numPlayerSnapshots];
 	}
 	
 	public void tick(EntityPlayer player)
@@ -132,11 +126,6 @@ public class PlayerData
 			if(loopedSoundDelay == 0 && !isShootingRight)
 				shouldPlayCooldownSound = true;
 		}
-				
-		//Move all snapshots along one place
-		System.arraycopy(snapshots, 0, snapshots, 1, snapshots.length - 2 + 1);
-		//Take new snapshot
-		snapshots[0] = new PlayerSnapshot(player);
 	}
 	
 	public void clientTick(EntityPlayer player)
@@ -151,11 +140,6 @@ public class PlayerData
 			offHandGunStack = null;
 		}
 		*/
-	}
-	
-	public void playerKilled(){
-		isShootingRight = isShootingLeft = false;
-		snapshots = new PlayerSnapshot[Config.numPlayerSnapshots];
 	}
 	
 }
