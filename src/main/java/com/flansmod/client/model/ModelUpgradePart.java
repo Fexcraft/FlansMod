@@ -16,6 +16,7 @@ public class ModelUpgradePart extends ModelBase {
 	public ModelRendererTurbo secondaryPaintBodyModel[] = new ModelRendererTurbo[0];
 	public ModelRendererTurbo bodyDoorOpenModel[] = new ModelRendererTurbo[0];
 	public ModelRendererTurbo bodyDoorCloseModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo trailerModel[] = new ModelRendererTurbo[0];
 	
 	public boolean oldRotateOrder = false;
 	
@@ -28,6 +29,9 @@ public class ModelUpgradePart extends ModelBase {
 		renderPart(bodyModel);
 		renderPart(primaryPaintBodyModel);
 		renderPart(secondaryPaintBodyModel);
+		renderPart(bodyDoorOpenModel);
+		renderPart(bodyDoorCloseModel);
+		renderPart(trailerModel);
 	}
 	
 	public void renderPart(ModelRendererTurbo[] part){
@@ -69,6 +73,7 @@ public class ModelUpgradePart extends ModelBase {
 		flip(secondaryPaintBodyModel);
 		flip(bodyDoorOpenModel);
 		flip(bodyDoorCloseModel);
+		flip(trailerModel);
 	}
 	
 	public void translateAll(float x, float y, float z){
@@ -77,6 +82,7 @@ public class ModelUpgradePart extends ModelBase {
 		translate(secondaryPaintBodyModel, x, y, z);
 		translate(bodyDoorOpenModel, x, y, z);
 		translate(bodyDoorCloseModel, x, y, z);
+		translate(trailerModel, x, y, z);
 	}
 	
 	protected void flip(ModelRendererTurbo[] model){

@@ -449,4 +449,16 @@ public class DriveableData implements IInventory {
 	public boolean isEmpty(){
 		return cargo.isEmpty();
 	}
+	
+	//TODO
+	public int getInventorySize(){
+		int i = 0;
+		for(ItemStack stack : cargo){
+			if(!stack.isEmpty()){
+				i += 1;
+			}
+		}
+		return i;
+	}
+	
 }

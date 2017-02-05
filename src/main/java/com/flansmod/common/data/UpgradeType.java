@@ -28,7 +28,7 @@ public class UpgradeType extends PartType {
 
 	@Override
 	protected void preRead(String[] split){
-		//
+		super.preRead(split);
 	}
 
 	@Override
@@ -45,9 +45,8 @@ public class UpgradeType extends PartType {
 					for(int i = 1; i < split.length; i++){
 						incompatible.add(split[i]);
 					}
-					break;
 				case "Texture":
-					textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + getString(split) + ".png"));
+					textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + split[1] + ".png"));
 					break;
 				default:
 					break;
