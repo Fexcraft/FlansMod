@@ -37,30 +37,28 @@ public class ModelUpgradePart extends ModelBase {
 	}
 
 	public void render(float f5, RenderVehicle render, EntityVehicle vehicle, float f){
-		for (ModelRendererTurbo aBodyModel : bodyModel){
+		for(ModelRendererTurbo aBodyModel : bodyModel){
 			aBodyModel.render(f5, oldRotateOrder);
 		}
 		vehicle.driveableData.primary_color.glColorApply();
-		for (ModelRendererTurbo aBodyModel : primaryPaintBodyModel){
+		for(ModelRendererTurbo aBodyModel : primaryPaintBodyModel){
 			aBodyModel.render(f5, oldRotateOrder);
 		}
 		RGB.glColorReset();
 		vehicle.driveableData.secondary_color.glColorApply();
-		for (ModelRendererTurbo aBodyModel : secondaryPaintBodyModel){
+		for(ModelRendererTurbo aBodyModel : secondaryPaintBodyModel){
 			aBodyModel.render(f5, oldRotateOrder);
 		}
 		RGB.glColorReset();
 		
 		if(vehicle.varDoor){
-			for (ModelRendererTurbo aBodyDoorOpenModel : bodyDoorOpenModel) {
-				if (vehicle.varDoor)
-					aBodyDoorOpenModel.render(f5, oldRotateOrder);
+			for(ModelRendererTurbo aBodyDoorOpenModel : bodyDoorOpenModel) {
+				aBodyDoorOpenModel.render(f5, oldRotateOrder);
 			}
 		}
 		else{
-			for (ModelRendererTurbo aBodyDoorCloseModel : bodyDoorCloseModel) {
-				if (!vehicle.varDoor)
-					aBodyDoorCloseModel.render(f5, oldRotateOrder);
+			for(ModelRendererTurbo aBodyDoorCloseModel : bodyDoorCloseModel) {
+				aBodyDoorCloseModel.render(f5, oldRotateOrder);
 			}
 		}
 	}

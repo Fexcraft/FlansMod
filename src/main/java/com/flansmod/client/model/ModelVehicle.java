@@ -270,6 +270,15 @@ public class ModelVehicle extends ModelDriveable
 			}
 		}
 		
+		for(UpgradeType type : vehicle.driveableData.upgrades){
+			GlStateManager.pushMatrix();
+			Pos pos = type.offset.get(vehicle.driveableData.type);
+			GL11.glTranslatef(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ());
+			render.bindTexture(type.getTexture(vehicle.driveableData));
+			((ModelUpgradePart)type.getModel()).render(f5, render, vehicle, f);
+			GlStateManager.popMatrix();
+		}
+		
 		if(vehicle.driveableData.cargo.size() > 0){
 			DriveableType type = vehicle.getVehicleType();
 			for(int i = 0; i < vehicle.driveableData.cargo.size(); i++){
@@ -292,15 +301,6 @@ public class ModelVehicle extends ModelDriveable
 		            render.bindTexture(vehicle);
 		        }
 			}
-		}
-		
-		for(UpgradeType type : vehicle.driveableData.upgrades){
-			GlStateManager.pushMatrix();
-			Pos pos = type.offset.get(vehicle.driveableData.type);
-			GL11.glTranslatef(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ());
-			render.bindTexture(type.getTexture(vehicle.driveableData));
-			((ModelUpgradePart)type.getModel()).render(f5, render, vehicle, f);
-			GlStateManager.popMatrix();
 		}
 	}
 	

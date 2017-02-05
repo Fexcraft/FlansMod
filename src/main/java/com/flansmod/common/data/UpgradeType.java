@@ -46,6 +46,9 @@ public class UpgradeType extends PartType {
 						incompatible.add(split[i]);
 					}
 					break;
+				case "Texture":
+					textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + getString(split) + ".png"));
+					break;
 				default:
 					break;
 			}
