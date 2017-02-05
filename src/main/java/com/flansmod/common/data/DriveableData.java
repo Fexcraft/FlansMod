@@ -40,7 +40,7 @@ public class DriveableData implements IInventory {
 	public HashMap<EnumDriveablePart, DriveablePart> parts;
 	public Set<UpgradeType> upgrades;
 	/** Paintjob index */
-	public int paintjobID;
+	public int paintjobID = 0;
 	
 	//MINUS START
 	public RGB primary_color = RGB.BLUE;

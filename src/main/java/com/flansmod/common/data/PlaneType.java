@@ -13,6 +13,8 @@ import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.render.RemoteTextureRenderHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class PlaneType extends DriveableType {
@@ -155,6 +157,16 @@ public class PlaneType extends DriveableType {
 
 	public static PlaneType getPlane(String string){
 		return (PlaneType)getDriveable(string);
+	}
+
+	@Override
+	public ResourceLocation getTexture(DriveableData data) {
+		if(data.allowURL && data.texture_url != null){
+			return RemoteTextureRenderHelper.get(data.texture_url);
+		}
+		else{
+			return textures.get(data.paintjobID);
+		}
 	}
 	
 }

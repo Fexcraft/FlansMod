@@ -9,6 +9,7 @@ import com.flansmod.common.FlansMod;
 
 import net.fexcraft.mod.lib.util.math.Pos;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -22,6 +23,7 @@ public class UpgradeType extends PartType {
 	
 	public UpgradeType(String contentpack, String filename, String[] lines){
 		super(contentpack, filename, lines);
+		this.textures = new ArrayList<ResourceLocation>();
 	}
 
 	@Override
@@ -58,6 +60,9 @@ public class UpgradeType extends PartType {
 	public void postRead(String[] split){
 		if(compatible.size() < 0){
 			compatible.add("*");
+		}
+		if(textures.isEmpty()){
+			textures.add(new ResourceLocation("minecraft:null"));
 		}
 	}
 
@@ -102,6 +107,14 @@ public class UpgradeType extends PartType {
 				return false;
 			}
 		}
+	}
+	
+	@Override
+	public ResourceLocation getTexture(DriveableData data){
+		if((data.paintjobID + 1) > textures.size()){
+			return textures.get(0);
+		}
+		return textures.get(data.paintjobID);
 	}
 	
 }

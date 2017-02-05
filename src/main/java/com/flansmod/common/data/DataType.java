@@ -41,7 +41,7 @@ public abstract class DataType implements Comparable<DataType> {
 	//
 	public ArrayList<String> description;
 	public ArrayList<ResourceLocation> textures;
-	public int paintjob = 0;
+	public int def_paintjob = 0;
 	public float modelScale = 1F;
 	public String modelString;
 	@SideOnly(value = Side.CLIENT)
@@ -294,5 +294,7 @@ public abstract class DataType implements Comparable<DataType> {
 			return new Pos(0, 0, 0);
 		}
 	}
+	
+	public abstract ResourceLocation getTexture(DriveableData data);
 	
 }

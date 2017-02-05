@@ -298,6 +298,7 @@ public class ModelVehicle extends ModelDriveable
 			GlStateManager.pushMatrix();
 			Pos pos = type.offset.get(vehicle.driveableData.type);
 			GL11.glTranslatef(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ());
+			render.bindTexture(type.getTexture(vehicle.driveableData));
 			((ModelUpgradePart)type.getModel()).render(f5, render, vehicle, f);
 			GlStateManager.popMatrix();
 		}

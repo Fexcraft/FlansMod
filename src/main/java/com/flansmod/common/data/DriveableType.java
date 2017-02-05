@@ -97,7 +97,7 @@ public abstract class DriveableType extends DataType {
 			switch(s){
 				case "Paintjob":
 					try{
-						textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + getString(split)));
+						textures.add(new ResourceLocation(FlansMod.MODID, "skins/" + split[1]));
 					}
 					catch(Exception e){
 						exception(e, s);
@@ -391,6 +391,9 @@ public abstract class DriveableType extends DataType {
 			Print.log("FFMM", "[PRE-READ] Failed to read type file [" + filename + ">" + contentpack + "];");
 			e.printStackTrace();
 			Static.stop();
+		}
+		if(textures.isEmpty()){
+			textures.add(new ResourceLocation("minecraft:null"));
 		}
 	}
 

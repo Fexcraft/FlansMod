@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -34,6 +35,7 @@ public class PartType extends DataType {
 	
 	public PartType(String contentpack, String filename, String[] lines){
 		super(contentpack, filename, lines);
+		this.description = new ArrayList<String>();
 	}
 
 	@Override
@@ -169,6 +171,11 @@ public class PartType extends DataType {
 	@Override
 	public void reloadModel(){
 		//
+	}
+
+	@Override
+	public ResourceLocation getTexture(DriveableData data){
+		return null;
 	}
 	
 }
