@@ -6,11 +6,16 @@ import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
+import com.flansmod.common.network.packets.PacketPlaneControl;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
 import com.flansmod.common.vector.Vector3f;
 
+import net.fexcraft.mod.lib.api.common.LockableObject;
+import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -22,8 +27,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-public class EntityPlane extends EntityDriveable
-{
+public class EntityPlane extends EntityDriveable implements LockableObject {
 	/** The flap positions, used for renderering and for controlling the plane rotations */
 	public float flapsYaw, flapsPitchLeft, flapsPitchRight;	
 	/** Position of looping engine sound */
@@ -127,7 +131,7 @@ public class EntityPlane extends EntityDriveable
 			return false;
 		
 		//If they are using a repair tool, don't put them in
-		ItemStack currentItem = entityplayer.getHeldItemMainhand();
+		//ItemStack currentItem = entityplayer.getHeldItemMainhand();
 		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
 			return true;*/
 		
@@ -706,10 +710,10 @@ public class EntityPlane extends EntityDriveable
 		if(soundPosition > 0)
 			soundPosition--;
 		
-		for(EntitySeat seat : seats)
-		{
-			if(seat != null)
+		for(EntitySeat seat : seats){
+			if(seat != null){
 				seat.updatePosition();
+			}
 		}
 		
 		//Calculate movement on the client and then send position, rotation etc to the server
@@ -723,15 +727,13 @@ public class EntityPlane extends EntityDriveable
 		}
 		
 		//If this is the server, send position updates to everyone, having received them from the driver
-		//float updateSpeed = 0.01F;
-		if(!world.isRemote)// && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed))
-		{
-			//TODO FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+		float updateSpeed = 0.01F;
+		if(!world.isRemote && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed)){
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketPlaneControl(this), Config.getTargetPoint(this));
 		}
 	}
 
-	public boolean canThrust() 
-	{
+	public boolean canThrust() {
 		return (seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
 	}
 
@@ -746,13 +748,11 @@ public class EntityPlane extends EntityDriveable
 	}
 
 	@Override
-	public boolean gearDown()
-	{
+	public boolean gearDown(){
 		return varGear;
 	}
 	
-	private boolean hasWorkingProp()
-	{
+	private boolean hasWorkingProp(){
 		PlaneType type = getPlaneType();
 		if(type.mode == EnumPlaneMode.HELI || type.mode == EnumPlaneMode.VTOL)
 			for(Propeller prop : type.heliPropellers)
@@ -765,15 +765,14 @@ public class EntityPlane extends EntityDriveable
 		return false;
 	}
 
-	public boolean attackEntityFrom(DamageSource damagesource, float i, boolean doDamage)
-	{
-		if(world.isRemote || isDead)
+	public boolean attackEntityFrom(DamageSource damagesource, float i, boolean doDamage){
+		if(world.isRemote || isDead){
 			return true;
+		}
 
 		PlaneType type = PlaneType.getPlane(driveableType);
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
-		{
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			planeStack.setTagCompound(driveableData.writeToNBT(new NBTTagCompound()));
 			entityDropItem(planeStack, 0.5F);
@@ -783,42 +782,96 @@ public class EntityPlane extends EntityDriveable
 	}
   
 	@Override
-	public boolean canHitPart(EnumDriveablePart part)
-	{
+	public boolean canHitPart(EnumDriveablePart part){
 		return varGear || (part != EnumDriveablePart.coreWheel && part != EnumDriveablePart.leftWingWheel && part != EnumDriveablePart.rightWingWheel && part != EnumDriveablePart.tailWheel);
 	}
 
 	@Override
-	public boolean attackEntityFrom(DamageSource damagesource, float i)
-	{
+	public boolean attackEntityFrom(DamageSource damagesource, float i){
 		return attackEntityFrom(damagesource, i, true);
 	}
 		
-	public PlaneType getPlaneType()
-	{
+	public PlaneType getPlaneType(){
 		return PlaneType.getPlane(driveableType);
 	}
 
 	@Override
-	protected void dropItemsOnPartDeath(Vector3f midpoint, DriveablePart part) 
-	{
+	protected void dropItemsOnPartDeath(Vector3f midpoint, DriveablePart part){
+		//
 	}
 
 	@Override
-	public String getBombInventoryName() 
-	{
+	public String getBombInventoryName() {
 		return "Bombs";
 	}
 	
 	@Override
-	public String getMissileInventoryName() 
-	{
+	public String getMissileInventoryName() {
 		return "Missiles";
 	}
 	
 	@Override
-	public boolean hasMouseControlMode()
-	{
+	public boolean hasMouseControlMode(){
 		return true;
 	}
+
+	@Override
+	public boolean isLocked(){
+		return driveableData.isLocked;
+	}
+
+	@Override
+	public boolean unlock(World world, EntityPlayer entity, ItemStack stack, KeyItem item){
+		if(!stack.hasTagCompound()){
+			Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+			return false;
+		}
+		else{
+			if(item.getCode(stack).equals(driveableData.lock_code)){
+				driveableData.isLocked = false;
+				Print.chat(entity, "Vehicle is now unlocked.");
+				return true;
+			}
+			else if(item.getType(stack) == KeyType.ADMIN){
+				driveableData.isLocked = true;
+				Print.chat(entity, "[SU] Vehicle is now unlocked.");
+				return true;
+			}
+			else{
+				Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
+		if(!getDriveableType().hasLock){
+			Print.chat(entity, "This vehicle doesn't allow locking.");
+			return false;
+		}
+		else{
+			if(!stack.hasTagCompound()){
+				Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+				return false;
+			}
+			else{
+				if(item.getCode(stack).equals(driveableData.lock_code)){
+					driveableData.isLocked = true;
+					Print.chat(entity, "Vehicle is now locked.");
+					return true;
+				}
+				else if(item.getType(stack) == KeyType.ADMIN){
+					driveableData.isLocked = true;
+					Print.chat(entity, "[SU] Vehicle is now locked.");
+					return true;
+				}
+				else{
+					Print.chat(entity, "Wrong key.");
+					return false;
+				}
+			}
+		}
+	}
+	
 }

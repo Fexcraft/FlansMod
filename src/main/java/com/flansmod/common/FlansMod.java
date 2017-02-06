@@ -13,7 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import com.flansmod.client.debug.UtilGui;
 import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
 import com.flansmod.common.cmds.TextureCommand;
@@ -28,7 +27,6 @@ import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.items.ItemPart;
 import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.util.CTabs;
-import com.flansmod.common.util.ChunkLoadingHandler;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
@@ -41,7 +39,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -136,13 +133,10 @@ public class FlansMod {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event){
 		Util.log("Initialising Flan's Mod.");
-
-		//Do proxy loading
+		
 		proxy.load();
-		//proxy.registerRenderers();
 
 		//Initialising handlers
-		//packetHandler.initialise();
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CommonGuiHandler());		
 		
 		// Recipes
@@ -155,26 +149,17 @@ public class FlansMod {
 		}
 		Util.log("Loaded recipes.");
 		
-		//EntityRegistry.registerGlobalEntityID(EntityItemCustomRender.class, "CustomItem", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "CustomItem"), EntityCustomItem.class, "CustomItem", 89, this, 100, 20, true);
-		
 		//Register driveables
-		//EntityRegistry.registerGlobalEntityID(EntityPlane.class, "Plane", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Plane"), EntityPlane.class, "Plane", 90, this, 250, 3, false);
-		//EntityRegistry.registerGlobalEntityID(EntityVehicle.class, "Vehicle", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Vehicle"), EntityVehicle.class, "Vehicle", 95, this, 250, 10, false);
-		//EntityRegistry.registerGlobalEntityID(EntitySeat.class, "Seat", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Seat"), EntitySeat.class, "Seat", 99, this, 250, 10, false);
-		//EntityRegistry.registerGlobalEntityID(EntityWheel.class, "Wheel", EntityRegistry.findGlobalUniqueEntityId());
-		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "Wheel"), EntityWheel.class, "Wheel", 103, this, 250, 20, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "plane"), EntityPlane.class, "Plane", 90, this, 256, 3, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "vehicle"), EntityVehicle.class, "Vehicle", 95, this, 256, 10, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "seat"), EntitySeat.class, "Seat", 99, this, 256, 10, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "wheel"), EntityWheel.class, "Wheel", 103, this, 256, 20, false);
 		
 		//Register the chunk loader 
-		//TODO : Re-do chunk loading
-		ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
+		//ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
 
 		//Config
 		MinecraftForge.EVENT_BUS.register(INSTANCE);
-		//Starting the EventListener
 		Util.log("Loading complete.");
 	}
 	
@@ -183,7 +168,9 @@ public class FlansMod {
 	public void postInit(FMLPostInitializationEvent event){
 		//packetHandler.postInitialise();
 		packet_handler.initialise();
-		MinecraftForge.EVENT_BUS.register(new UtilGui());
+		if(event.getSide().isClient()){
+			MinecraftForge.EVENT_BUS.register(new com.flansmod.client.debug.UtilGui());
+		}
 		hooks.hook();
 	}
 	

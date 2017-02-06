@@ -29,6 +29,8 @@ public class PacketHandler {
 		instance.registerMessage(DriveableControlPacketHandler.Client.class,      PacketDriveableControl.class,    id++, Side.CLIENT);
 		instance.registerMessage(VehicleControlPacketHandler.Server.class,        PacketVehicleControl.class,      id++, Side.SERVER);
 		instance.registerMessage(VehicleControlPacketHandler.Client.class,        PacketVehicleControl.class,      id++, Side.CLIENT);
+		instance.registerMessage(PlaneControlPacketHandler.Server.class,          PacketPlaneControl.class,        id++, Side.SERVER);
+		instance.registerMessage(PlaneControlPacketHandler.Client.class,          PacketPlaneControl.class,        id++, Side.CLIENT);
 		instance.registerMessage(SeatUpdatePacketHandler.Server.class,            PacketSeatUpdate.class,          id++, Side.SERVER);
 		instance.registerMessage(SeatUpdatePacketHandler.Client.class,            PacketSeatUpdate.class,          id++, Side.CLIENT);
 		instance.registerMessage(DriveableColorPacketHandler.Client.class,        PacketDriveableColor.class,      id++, Side.CLIENT);

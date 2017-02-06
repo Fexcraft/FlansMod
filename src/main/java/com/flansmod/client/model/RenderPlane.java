@@ -3,10 +3,8 @@ package com.flansmod.client.model;
 import org.lwjgl.opengl.GL11;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.Propeller;
 import net.minecraft.client.Minecraft;
@@ -138,11 +136,9 @@ public class RenderPlane extends Render implements IRenderFactory //implements I
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity) 
-	{
-		DriveableType type = ((EntityDriveable)entity).getDriveableType();
-		//Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-		return type.textures.get(type.paintjob);//FlansModResourceHandler.getPaintjobTexture(paintjob);
+	protected ResourceLocation getEntityTexture(Entity entity){
+		EntityPlane plane = (EntityPlane)entity;
+		return plane.getDriveableType().getTexture(plane.getDriveableData());
 	}
 
 	/*@Override

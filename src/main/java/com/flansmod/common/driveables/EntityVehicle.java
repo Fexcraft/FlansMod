@@ -43,8 +43,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-public class EntityVehicle extends EntityDriveable implements IExplodeable, LockableObject
-{
+public class EntityVehicle extends EntityDriveable implements IExplodeable, LockableObject {
+	
 	/** Weapon delays */
 	public int shellDelay, gunDelay;
 	/** Position of looping sounds */
@@ -60,15 +60,13 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable, Lock
 	/** Delayer for door button */
 	public int toggleTimer = 0;
 
-	public EntityVehicle(World world)
-	{
+	public EntityVehicle(World world){
 		super(world);
 		stepHeight = 1.0F;
 	}
 
 	//This one deals with spawning from a vehicle spawner
-	public EntityVehicle(World world, double x, double y, double z, VehicleType type, DriveableData data)
-	{
+	public EntityVehicle(World world, double x, double y, double z, VehicleType type, DriveableData data){
 		super(world, type, data);
 		stepHeight = 1.0F;
 		setPosition(x, y, z);
@@ -76,8 +74,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable, Lock
 	}
 
 	//This one allows you to deal with spawning from items
-	public EntityVehicle(World world, double x, double y, double z, EntityPlayer placer, VehicleType type, DriveableData data)
-	{
+	public EntityVehicle(World world, double x, double y, double z, EntityPlayer placer, VehicleType type, DriveableData data){
 		super(world, type, data);
 		stepHeight = 1.0F;
 		setPosition(x, y, z);
@@ -86,14 +83,12 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable, Lock
 	}
 	
 	@Override
-	protected void initType(DriveableType type, boolean clientSide)
-	{
+	protected void initType(DriveableType type, boolean clientSide){
 		super.initType(type, clientSide);
 	}
 	
 	@Override
-	public void readSpawnData(ByteBuf data)
-	{
+	public void readSpawnData(ByteBuf data){
 		super.readSpawnData(data);
 	}
 
@@ -594,6 +589,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable, Lock
 		for(EntitySeat seat : seats){
 			if(seat != null){
 				seat.updatePosition();
+				Print.debug("SEAT MOVE");
 			}
 		}
 		
