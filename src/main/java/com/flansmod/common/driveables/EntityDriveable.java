@@ -1,7 +1,6 @@
 package com.flansmod.common.driveables;
 
 import com.flansmod.api.IControllable;
-import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.client.debug.EntityDebugVector;
@@ -43,8 +42,8 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class EntityDriveable extends Entity implements IControllable, IExplodeable, IEntityAdditionalSpawnData
-{
+public abstract class EntityDriveable extends Entity implements IControllable, IEntityAdditionalSpawnData {
+	
 	public boolean syncFromServer = true;
 	/** Ticks since last server update. Use to smoothly transition to new position */
 	public int serverPositionTransitionTicker;
@@ -1040,11 +1039,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	@Override
 	public float getPrevPlayerRoll() {
 		return prevAxes.getRoll();
-	}
-
-	@Override
-	public void explode() {
-		
 	}
 	
 	@Override

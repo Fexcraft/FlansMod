@@ -1,6 +1,5 @@
 package com.flansmod.common.driveables;
 
-import com.flansmod.api.IExplodeable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.data.DriveableData;
@@ -43,7 +42,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-public class EntityVehicle extends EntityDriveable implements IExplodeable, LockableObject {
+public class EntityVehicle extends EntityDriveable implements LockableObject {
 	
 	/** Weapon delays */
 	public int shellDelay, gunDelay;
