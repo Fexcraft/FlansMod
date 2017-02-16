@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
 public class CommonProxy {
+	
 	protected static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
 
 	/** Returns the list of content pack files, and on the client, adds the content pack resources and models to the classpath */
