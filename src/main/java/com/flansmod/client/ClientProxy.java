@@ -29,6 +29,7 @@ import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
 import com.flansmod.common.util.Util;
+import com.flansmod.fvm.FvmHook;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -50,10 +51,7 @@ public class ClientProxy extends CommonProxy
 	/* These renderers handle rendering in hand items */
 	public static RenderPlane planeRenderer;
 	public static RenderVehicle vehicleRenderer;
-
-
-
-
+	
 	/** The file locations of the content packs, used for loading */
 	public List<File> contentPacks;
 	
@@ -156,7 +154,6 @@ public class ClientProxy extends CommonProxy
 	/** Register entity renderers */
 	@Override
 	public void registerRenderers(){
-		
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, RenderPlane::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityVehicle.class, RenderVehicle::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
@@ -164,7 +161,9 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
-		
+		if(FlansMod.fvm){
+			FvmHook.registerRenders();
+		}
 	}
 	
 	/** Old one time tutorial code that displays messages the first time you enter a plane / vehicle. Needs reworking */

@@ -23,8 +23,8 @@ public class KeyInputHandler{
 	private static final String name = FlansMod.NAME;
 	public static KeyBinding downKey          = new KeyBinding("Down key",              Keyboard.KEY_LCONTROL, name);
 	public static KeyBinding inventoryKey     = new KeyBinding("Inventory key",         Keyboard.KEY_R, name);
-	public static KeyBinding bombKey          = new KeyBinding("Bomb Key",              Keyboard.KEY_V, name);
-	public static KeyBinding gunKey           = new KeyBinding("Gun Key",               Keyboard.KEY_B, name);
+	//public static KeyBinding bombKey          = new KeyBinding("Bomb Key",              Keyboard.KEY_V, name);
+	//public static KeyBinding gunKey           = new KeyBinding("Gun Key",               Keyboard.KEY_B, name);
 	public static KeyBinding controlSwitchKey = new KeyBinding("Control Switch key",    Keyboard.KEY_C, name);
 	public static KeyBinding reloadKey        = new KeyBinding("Reload key",            Keyboard.KEY_R, name);
 	public static KeyBinding leftRollKey      = new KeyBinding("Roll Left Key",         Keyboard.KEY_Z, name);
@@ -40,8 +40,8 @@ public class KeyInputHandler{
 	public KeyInputHandler(){
 		ClientRegistry.registerKeyBinding(downKey);
 		ClientRegistry.registerKeyBinding(inventoryKey);
-		ClientRegistry.registerKeyBinding(bombKey);
-		ClientRegistry.registerKeyBinding(gunKey);
+		//ClientRegistry.registerKeyBinding(bombKey);
+		//ClientRegistry.registerKeyBinding(gunKey);
 		ClientRegistry.registerKeyBinding(controlSwitchKey);
 		ClientRegistry.registerKeyBinding(reloadKey);
 		ClientRegistry.registerKeyBinding(leftRollKey);
@@ -132,12 +132,12 @@ public class KeyInputHandler{
 			if(mc.gameSettings.keyBindInventory.isPressed() || inventoryKey.isPressed()){
 				riding.pressKey(7, player);
 			}
-			if(bombKey.isPressed()){
+			/*if(bombKey.isPressed()){
 				riding.pressKey(8, player);
 			}
 			if(gunKey.isPressed()){
 				riding.pressKey(9, player);
-			}
+			}*/
 			if(controlSwitchKey.isPressed()){
 				riding.pressKey(10, player);
 			}
