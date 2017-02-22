@@ -30,6 +30,7 @@ import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
+import com.flansmod.fvm.FvmHook;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
 import net.fexcraft.mod.lib.util.registry.Registry;
@@ -43,6 +44,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -55,11 +57,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = "flansmod", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+@Mod(modid = "flansmod", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl;after:fvm", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod {
 	
 	//Core mod stuff
 	public static boolean DEBUG = false;
+	public static boolean fvm = false;
 	public static final String MODID = "flansmod";
 	public static final String VERSION = "5.F1.7-EX";
 	public static final String NAME = "Flan's Mod Minus";
@@ -72,7 +75,6 @@ public class FlansMod {
 	//Handlers
 	public static final PacketHandler packet_handler = new PacketHandler();
 	public static final Ticker tick_handler = new Ticker();
-	public static FlansHooks hooks = new FlansHooks();
 	
 	//Items and creative tabs
 	public static ArrayList<ItemPart> partItems = new ArrayList<ItemPart>();
@@ -125,6 +127,10 @@ public class FlansMod {
 		proxy.forceReload();
 
 		proxy.registerRenderers();
+		fvm = Loader.isModLoaded("fvm");
+		if(fvm){
+			FvmHook.registerRenders();
+		}
 
 		Util.log("Preinitializing complete.");
 	}
@@ -154,6 +160,9 @@ public class FlansMod {
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "vehicle"), EntityVehicle.class, "Vehicle", 95, this, 256, 10, false);
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "seat"), EntitySeat.class, "Seat", 99, this, 256, 10, false);
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "wheel"), EntityWheel.class, "Wheel", 103, this, 256, 20, false);
+		if(fvm){
+			FvmHook.registerEntities();
+		}
 		
 		//Register the chunk loader 
 		//ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
@@ -166,12 +175,10 @@ public class FlansMod {
 	/** The mod post-initialisation method */
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event){
-		//packetHandler.postInitialise();
 		packet_handler.initialise();
 		if(event.getSide().isClient()){
 			MinecraftForge.EVENT_BUS.register(new com.flansmod.client.debug.UtilGui());
 		}
-		hooks.hook();
 	}
 	
 	@SubscribeEvent
