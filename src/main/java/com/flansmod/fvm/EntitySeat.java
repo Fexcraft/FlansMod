@@ -102,6 +102,32 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
         this.passenger = null;
 		//updatePosition();
 	}
+
+	@Override
+	public void writeSpawnData(ByteBuf data){
+		data.writeInt(vehicleID);
+		data.writeInt(seatInfo.id);
+	}
+
+	@Override
+	public void readSpawnData(ByteBuf data){
+		vehicleID = data.readInt();
+		if(world.getEntityByID(vehicleID) instanceof LandVehicle){
+			vehicle = (LandVehicle)world.getEntityByID(vehicleID);
+		}
+		seatID = data.readInt();
+		driver = seatID == 0;
+		if(vehicle != null){
+			seatInfo = vehicle.getSeatInfo(seatID);
+			Print.debug(seatInfo.x + " " + seatInfo.y + " " + seatInfo.z);
+			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
+			playerPosX = prevPlayerPosX = posX = vehicle.posX;
+			playerPosY = prevPlayerPosY = posY = vehicle.posY;
+			playerPosZ = prevPlayerPosZ = posZ = vehicle.posZ;
+			setPosition(posX, posY, posZ);
+		}
+		
+	}
 	
 	@Override
 	public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int partialticks, boolean b){
@@ -125,6 +151,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			foundvehicle = true;
 			vehicle.seats[seatID] = this;
 			seatInfo = vehicle.getSeatInfo(seatID);
+			Print.debug(seatInfo.x + " " + seatInfo.y + " " + seatInfo.z);
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			prevLooking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			playerPosX = prevPlayerPosX = posX = vehicle.posX;
@@ -723,31 +750,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float f) {
 		return !(world.isRemote && !foundvehicle) && vehicle.attackEntityFrom(source, f);
-	}
-
-	@Override
-	public void writeSpawnData(ByteBuf data){
-		data.writeInt(vehicleID);
-		data.writeInt(seatInfo.id);
-	}
-
-	@Override
-	public void readSpawnData(ByteBuf data){
-		vehicleID = data.readInt();
-		if(world.getEntityByID(vehicleID) instanceof LandVehicle){
-			vehicle = (LandVehicle)world.getEntityByID(vehicleID);
-		}
-		seatID = data.readInt();
-		driver = seatID == 0;
-		if(vehicle != null){
-			seatInfo = vehicle.getSeatInfo(seatID);
-			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
-			playerPosX = prevPlayerPosX = posX = vehicle.posX;
-			playerPosY = prevPlayerPosY = posY = vehicle.posY;
-			playerPosZ = prevPlayerPosZ = posZ = vehicle.posZ;
-			setPosition(posX, posY, posZ);
-		}
-		
 	}
 	
 }

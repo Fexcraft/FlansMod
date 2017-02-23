@@ -40,6 +40,24 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData {
 		initPosition();
 	}
 	
+	@Override
+	public void writeSpawnData(ByteBuf data){
+		data.writeInt(vehicleID);
+		data.writeInt(ID);
+	}
+
+	@Override
+	public void readSpawnData(ByteBuf data){
+		vehicleID = data.readInt();
+		ID = data.readInt();
+		if(world.getEntityByID(vehicleID) instanceof LandVehicle){
+			vehicle = (LandVehicle)world.getEntityByID(vehicleID);
+		}
+		if(vehicle != null){
+			setPosition(posX, posY, posZ);
+		}
+	}
+	
 	public void initPosition(){
 		Pos s = vehicle.getData().wheelPos[ID];
 		Vector3f wheelVector = vehicle.axes.findLocalVectorGlobally(new Vector3f(s.to16FloatX(), s.to16FloatY(), s.to16FloatZ()));
@@ -159,23 +177,5 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData {
     public void setPositionAndRotationDirect(double d, double d1, double d2, float f, float f1, int i, boolean b){
 		
     }
-	
-	@Override
-	public void writeSpawnData(ByteBuf data){
-		data.writeInt(vehicleID);
-		data.writeInt(ID);
-	}
-
-	@Override
-	public void readSpawnData(ByteBuf data){
-		vehicleID = data.readInt();
-		ID = data.readInt();
-		if(world.getEntityByID(vehicleID) instanceof LandVehicle){
-			vehicle = (LandVehicle)world.getEntityByID(vehicleID);
-		}
-		if(vehicle != null){
-			setPosition(posX, posY, posZ);
-		}
-	}
 	
 }

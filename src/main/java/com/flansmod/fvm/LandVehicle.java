@@ -625,12 +625,12 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 		//Handle fuel
 			
-		int fuelMultiplier = 2;
+		//int fuelMultiplier = 2;
 		
 		//The tank is currently full, so do nothing
-		if(data.fuelStored >= data.fuelTankSize){
+		/*if(data.fuelStored >= data.fuelTankSize){
 			return;
-		}
+		}*///TODO
 		
 		//Look through the entire inventory for fuel cans, buildcraft fuel buckets and RedstoneFlux power sources
 		/*for(int i = 0; i < data.getContainer().getSizeInventory(); i++){
@@ -686,7 +686,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		//Vehicle Stuff
 		//Get vehicle type
 		if(data == null){
-			Util.log("Vehicle type null. Not ticking vehicle");
+			Util.log("Vehicle type null. Not ticking vehicle.");
+			Static.stop();
 			return;
 		}
 
@@ -767,7 +768,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			//Update angles
 			wheel.rotationYaw = axes.getYaw();
 			//Front wheels
-			if(/*!data.tank &&*/ (wheel.ID == 2 || wheel.ID == 3))//TODO Drive Mode Types
+			if(!data.hasTracks() && (wheel.ID == 2 || wheel.ID == 3))
 			{
 				wheel.rotationYaw += wheelsYaw;
 			}
@@ -799,18 +800,34 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			
 				}
 				else{
-					if(data.is4WD() || (data.isFWD() && (wheel.ID == 2 || wheel.ID == 3)) || data.isRWD() && (wheel.ID == 0 || wheel.ID == 1)){
+					if(data.is4WD()){
 						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					}
+					if(data.isFWD() && (wheel.ID == 2 || wheel.ID == 3)){
+						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+					}
+					if(data.isRWD() && (wheel.ID == 0 || wheel.ID == 1)){
+						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+					}
+					//TODO truncate
 					
 					//Apply steering
 					if(wheel.ID == 2 || wheel.ID == 3){
 						float velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
-				
-						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						if(!data.isRWD()){
+							wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+							wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						}
+						else{
+							wheel.motionX -= wheels[wheel.ID - 2].getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+							wheel.motionZ += wheels[wheel.ID - 2].getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						}
 					}
 					else{
 						wheel.motionX *= 0.9F;
@@ -1266,8 +1283,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 
 	public Seat getSeatInfo(int id){
-		net.fexcraft.mod.fvm.data.Seat s = data.seats.get(id);
-		return new Seat(s.pos.x, s.pos.y, s.pos.z);
+		Pos s = data.seats.get(id).pos;
+		return new Seat(s.x, s.y, s.z);
 	}
 	
 }

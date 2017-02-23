@@ -14,7 +14,6 @@ public class PacketVehicleControl implements IPacket, IMessage{
 	public double motX, motY, motZ;
 	public float avelx, avely, avelz;
 	public float throttle;
-	public int fuelInTank;
 	public float steeringYaw;
 	public boolean doors;
 	
@@ -35,7 +34,6 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		avely = vehicle.angularVelocity.y;
 		avelz = vehicle.angularVelocity.z;
 		throttle = vehicle.throttle;
-		fuelInTank = vehicle.data.fuelStored;
 		steeringYaw = vehicle.wheelsYaw;
 		doors = vehicle.data.doors;
 	}
@@ -56,7 +54,6 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		buf.writeFloat(avely);
 		buf.writeFloat(avelz);
 		buf.writeFloat(throttle);
-		buf.writeInt(fuelInTank);
 		buf.writeFloat(steeringYaw);
 		buf.writeBoolean(doors);
 	}
@@ -77,7 +74,6 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		avely = buf.readFloat();
 		avelz = buf.readFloat();
 		throttle = buf.readFloat();
-		fuelInTank = buf.readInt();
 		steeringYaw = buf.readFloat();
 		doors = buf.readBoolean();
 	}

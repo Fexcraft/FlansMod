@@ -37,6 +37,9 @@ public class RenderVehicle extends Render implements IRenderFactory {
 	}
 	
     public void render(LandVehicle vehicle, double d, double d1, double d2, float f, float f1){
+    	if(vehicle.data == null){
+    		return;
+    	}
     	bindEntityTexture(vehicle);
         GL11.glPushMatrix();
         {

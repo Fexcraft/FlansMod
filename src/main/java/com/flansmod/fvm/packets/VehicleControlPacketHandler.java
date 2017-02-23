@@ -56,7 +56,6 @@ public class VehicleControlPacketHandler {
 					for(Object obj : player.world.loadedEntityList){
 						if(obj instanceof LandVehicle && ((Entity)obj).getEntityId() == packet.entityId){
 							vehicle = (LandVehicle)obj;
-							vehicle.data.fuelStored = packet.fuelInTank;
 							if(vehicle.seats[0] != null && vehicle.seats[0].getControllingPassenger() == player){
 								return;
 							}
@@ -74,7 +73,6 @@ public class VehicleControlPacketHandler {
 	
 	protected static void updatevehicle(LandVehicle vehicle, PacketVehicleControl pkt){
 		vehicle.setPositionRotationAndMotion(pkt.posX, pkt.posY, pkt.posZ, pkt.yaw, pkt.pitch, pkt.roll, pkt.motX, pkt.motY, pkt.motZ, pkt.avelx, pkt.avely, pkt.avelz, pkt.throttle, pkt.steeringYaw);
-		vehicle.data.fuelStored = pkt.fuelInTank;
 		vehicle.data.doors = pkt.doors;
 	}
 	

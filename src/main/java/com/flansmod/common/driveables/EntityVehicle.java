@@ -490,7 +490,7 @@ public class EntityVehicle extends EntityDriveable implements LockableObject {
 				}
 				else
 				{
-					//if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
+					if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
 					{
 						float velocityScale = 0.1F * throttle * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * driveableData.engine.engineSpeed;
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
