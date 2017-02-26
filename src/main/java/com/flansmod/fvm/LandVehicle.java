@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
+import com.flansmod.client.debug.UtilGui;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveablePosition;
@@ -785,6 +786,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
 			if(canThrustCreatively || data.fuelStored > data.getPart("engine").fuelConsumption * throttle){
+				float velocityScale;
 				if(data.hasTracks()){
 					boolean left = wheel.ID == 0 || wheel.ID == 3;
 					
@@ -792,71 +794,86 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 					wheel.motionX *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					wheel.motionZ *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					
-					float velocityScale = 0.04F * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+					velocityScale = 0.04F * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
 					float steeringScale = 0.1F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier);
 					float effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
 					wheel.motionZ += effectiveWheelSpeed * Math.sin(wheel.rotationYaw * 3.14159265F / 180F);
-			
 				}
-				else{
-					if(data.is4WD()){
-						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
-						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-					}
-					if(data.isFWD() && (wheel.ID == 2 || wheel.ID == 3)){
-						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
-						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-					}
-					if(data.isRWD() && (wheel.ID == 0 || wheel.ID == 1)){
-						float velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
-						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-					}
-					//TODO truncate
+				else if(data.is4WD()){
+					velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+					wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+					wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					
-					//Apply steering
+					velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
 					if(wheel.ID == 2 || wheel.ID == 3){
-						float velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
-						if(!data.isRWD()){
-							wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-							wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-						}
-						else{
-							wheel.motionX -= wheels[wheel.ID - 2].getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-							wheel.motionZ += wheels[wheel.ID - 2].getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-						}
+						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 					}
 					else{
 						wheel.motionX *= 0.9F;
 						wheel.motionZ *= 0.9F;
 					}
 				}
+				else if(data.isFWD()){
+					if(wheel.ID == 2 || wheel.ID == 3){
+						velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+						velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
+						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+					}
+					else{
+						wheel.motionX *= 0.9F;
+						wheel.motionZ *= 0.9F;
+					}
+				}
+				else if(data.isRWD()){
+					if(wheel.ID == 0 || wheel.ID == 1){
+						velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
+					}
+					
+					if(wheel.ID == 2 || wheel.ID == 3){
+						velocityScale = 0.01F * ((wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * 8) * (throttle > 0 ? 1 : -1);
+						wheel.motionX = wheels[wheel.ID - 2].motionX;
+						wheel.motionZ = wheels[wheel.ID - 2].motionZ;
+						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
+
+						wheels[wheel.ID - 2].motionX *= 0.9F;
+						wheels[wheel.ID - 2].motionZ *= 0.9F;
+					}
+					//This is surely wrong.
+				}
+				else{
+					//
+				}
 			}
 			
-			/*if(data.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox()))
-			{
+			/*if(data.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox())){
 				wheel.motionY += data.buoyancy;
 			}*/
 			
 			//UtilGui.byId(6, "Fuel: " + data.fuelStored);
-			//UtilGui.byId(wheel.ID + 1, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
+			UtilGui.byId(wheel.ID + 1, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
 			wheel.move(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
 			
 			//Pull wheels towards car
 			Pos pos = data.wheelPos[wheel.ID];
 			Vector3f targetWheelPos = axes.findLocalVectorGlobally(new Vector3f(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ()));
 			Vector3f currentWheelPos = new Vector3f(wheel.posX - posX, wheel.posY - posY, wheel.posZ - posZ);
-			
-			Vector3f dPos = ((Vector3f)Vector3f.sub(targetWheelPos, currentWheelPos, null).scale(data.wheelSpringStrength));
 				
+			Vector3f dPos = ((Vector3f)Vector3f.sub(targetWheelPos, currentWheelPos, null).scale(data.wheelSpringStrength));
+					
 			if(dPos.length() > 0.001F){
 				wheel.move(MoverType.SELF, dPos.x, dPos.y, dPos.z);
 				dPos.scale(0.5F);
 				Vector3f.sub(amountToMoveCar, dPos, amountToMoveCar);
 			}
+			UtilGui.byId(7 + wheel.ID, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
 			//UtilGui.byId(7 + wheel.ID, "Vehicle Movement Call; " + amountToMoveCar.toString());
 		}
 
