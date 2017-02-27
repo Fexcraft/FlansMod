@@ -837,7 +837,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 					}
 					
 					if(wheel.ID == 2 || wheel.ID == 3){
-						velocityScale = 0.01F * ((wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * 8) * (throttle > 0 ? 1 : -1);
+						velocityScale = 0.01F * ((wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * 16) * (throttle > 0 ? 1 : -1);
 						wheel.motionX = wheels[wheel.ID - 2].motionX;
 						wheel.motionZ = wheels[wheel.ID - 2].motionZ;
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
@@ -1204,7 +1204,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public ItemStack getPickedResult(RayTraceResult target){
-		ItemStack stack = data.itemstack;
+		ItemStack stack = data.newStack();
 		stack.setItemDamage(0);
 		stack.setTagCompound(data.write(new NBTTagCompound()));
 		return stack;
