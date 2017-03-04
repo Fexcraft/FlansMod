@@ -119,7 +119,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		driver = seatID == 0;
 		if(vehicle != null){
 			seatInfo = vehicle.getSeatInfo(seatID);
-			Print.debug(seatInfo.x + " " + seatInfo.y + " " + seatInfo.z);
+			Print.debug(seatInfo.pos.toString());
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			playerPosX = prevPlayerPosX = posX = vehicle.posX;
 			playerPosY = prevPlayerPosY = posY = vehicle.posY;
@@ -151,7 +151,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			foundvehicle = true;
 			vehicle.seats[seatID] = this;
 			seatInfo = vehicle.getSeatInfo(seatID);
-			Print.debug(seatInfo.x + " " + seatInfo.y + " " + seatInfo.z);
+			Print.debug(seatInfo.pos.toString());
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			prevLooking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			playerPosX = prevPlayerPosX = posX = vehicle.posX;
@@ -229,7 +229,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		prevPlayerRoll = playerRoll;
 
 		//Get the position of this seat on the vehicle axes
-		Vector3f localPosition = new Vector3f(seatInfo.x / 16F, seatInfo.y / 16F, seatInfo.z / 16F);
+		Vector3f localPosition = new Vector3f(seatInfo.pos.to16FloatX(), seatInfo.pos.to16FloatY(), seatInfo.pos.to16FloatZ());
 		
 		//Rotate the offset vector by the turret yaw
 		if(vehicle != null && vehicle.seats != null && vehicle.seats[0] != null && vehicle.seats[0].looking != null){

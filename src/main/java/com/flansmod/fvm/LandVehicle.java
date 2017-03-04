@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
-import com.flansmod.client.debug.UtilGui;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveablePosition;
@@ -858,7 +857,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			}*/
 			
 			//UtilGui.byId(6, "Fuel: " + data.fuelStored);
-			UtilGui.byId(wheel.ID + 1, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
+			//UtilGui.byId(wheel.ID + 1, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
 			wheel.move(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
 			
 			//Pull wheels towards car
@@ -873,10 +872,10 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				dPos.scale(0.5F);
 				Vector3f.sub(amountToMoveCar, dPos, amountToMoveCar);
 			}
-			UtilGui.byId(7 + wheel.ID, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
+			//UtilGui.byId(7 + wheel.ID, "Wheel Movement Call; " + wheel.motionX + ", " + wheel.motionY + ", " + wheel.motionZ);
 			//UtilGui.byId(7 + wheel.ID, "Vehicle Movement Call; " + amountToMoveCar.toString());
 		}
-
+		
 		//UtilGui.byId(0, "Vehicle Movement Call; " + amountToMoveCar.toString());
 		move(MoverType.SELF, amountToMoveCar.x, amountToMoveCar.y, amountToMoveCar.z);
 		//UtilGui.byId(5, "Throttle: " + throttle);
@@ -1301,7 +1300,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	public Seat getSeatInfo(int id){
 		Pos s = data.seats.get(id).pos;
-		return new Seat(s.x, s.y, s.z);
+		return new Seat(id, s.x, s.y, s.z);
 	}
 	
 }
