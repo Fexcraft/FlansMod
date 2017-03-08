@@ -15,20 +15,20 @@ import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 import com.flansmod.fvm.packets.PacketVehicleControl;
-import com.google.gson.JsonObject;
-
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.fvm.data.LoadedIn;
 import net.fexcraft.mod.fvm.data.VehicleType;
+import net.fexcraft.mod.fvm.items.VehicleItem;
+import net.fexcraft.mod.fvm.util.FvmPerms;
 import net.fexcraft.mod.fvm.util.FvmResources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
 import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
+import net.fexcraft.mod.lib.perms.PermManager;
+import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Pos;
-import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
@@ -137,7 +137,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	public void writeSpawnData(ByteBuf buffer){
-		ByteBufUtils.writeUTF8String(buffer, data.toString());
+		ByteBufUtils.writeTag(buffer, data.write(null));
 		
 		buffer.writeFloat(axes.getYaw());
 		buffer.writeFloat(axes.getPitch());
@@ -147,8 +147,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	@Override
 	public void readSpawnData(ByteBuf buffer){
 		try{
-			JsonObject obj = JsonUtil.getFromString(ByteBufUtils.readUTF8String(buffer)).getAsJsonObject();
-			data = new VehicleType(LoadedIn.ENTITY, obj);
+			data = new VehicleType(LoadedIn.ENTITY, ByteBufUtils.readTag(buffer));
 			FvmResources.loadVehicleModel(data);
 			
 			initType(data, true);
@@ -981,11 +980,26 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			return true;
 		}
 		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
-			ItemStack vehicleStack = new ItemStack(Registry.getItem("fvm:vehicle_item"));
-			vehicleStack.setItemDamage(0);
-			vehicleStack.setTagCompound(data.write(new NBTTagCompound()));
-			entityDropItem(vehicleStack, 0.5F);
-	 		setDead();
+			if(data.isLocked){
+				Print.chat(damagesource.getEntity(), "Vehicle is locked. Unlock to remove it.");
+				return false;
+			}
+			else{
+				PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getEntity());
+				ItemStack stack = new ItemStack(VehicleItem.defaultItem(), 1, 0);
+				stack.setTagCompound(data.write(new NBTTagCompound()));
+				if(pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) || pp.hasPermission(FvmPerms.permBreak(stack))){
+					entityDropItem(stack, 0.5F);
+			 		setDead();
+			 		Print.debug(stack.toString());
+			 		return true;
+				}
+				else{
+					Print.chat(damagesource.getEntity(), "No permission to break this vehicle/type.");
+			 		Print.debug(stack.toString());
+					return false;
+				}
+			}
 		}
 		return true;
 	}
