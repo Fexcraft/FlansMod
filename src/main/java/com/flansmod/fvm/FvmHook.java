@@ -8,7 +8,6 @@ import com.flansmod.fvm.packets.SeatUpdatePacketHandler;
 import com.flansmod.fvm.packets.VehicleControlPacketHandler;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,9 +35,9 @@ public class FvmHook {
 	}
 
 	public static void registerRenders(){
-		RenderingRegistry.registerEntityRenderingHandler(LandVehicle.class, RenderVehicle::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
-		RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
+		net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(LandVehicle.class, RenderVehicle::new);
+		net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(EntitySeat.class, RenderNull::new);		
+		net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(EntityWheel.class, RenderNull::new);
 	}
 	
 }

@@ -125,12 +125,9 @@ public class FlansMod {
 
 		//Force Minecraft to reload all resources in order to load content pack resources.
 		proxy.forceReload();
-
-		proxy.registerRenderers();
+		
 		fvm = Loader.isModLoaded("fvm");
-		if(fvm){
-			FvmHook.registerRenders();
-		}
+		proxy.registerRenderers();
 
 		Util.log("Preinitializing complete.");
 	}
