@@ -16,6 +16,7 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 import com.flansmod.fvm.packets.PacketVehicleControl;
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.fvm.FVM;
 import net.fexcraft.mod.fvm.data.LoadedIn;
 import net.fexcraft.mod.fvm.data.VehicleType;
 import net.fexcraft.mod.fvm.items.VehicleItem;
@@ -446,7 +447,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				{
 					if(world.isRemote)
 					{
-						//FlansMod.proxy.openDriveableMenu((EntityPlayer)seats[0].getControllingPassenger(), world, this);
+						((EntityPlayer)seats[0].getControllingPassenger()).openGui(FVM.INSTANCE, 356, world, getPosition().getX(), getPosition().getY(), getPosition().getZ());
 						//open inventory
 					}
 					return true;
