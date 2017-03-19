@@ -35,8 +35,8 @@ import com.flansmod.common.vector.Vector3f;
 import com.flansmod.fvm.packets.FvmPacketSeatUpdate;
 import com.google.common.collect.Lists;
 
-public class EntitySeat extends Entity implements IControllable, IEntityAdditionalSpawnData
-{
+public class EntitySeat extends Entity implements IControllable, IEntityAdditionalSpawnData {
+	
 	/** Set this to true when the client has found the parent vehicle and connected them */
 	@SideOnly(Side.CLIENT)
 	public boolean foundvehicle;
@@ -205,9 +205,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 		}
 
-		if(this.getControllingPassenger() instanceof EntityPlayer){
+		/*if(this.getControllingPassenger() instanceof EntityPlayer){
 			pressKey(9, (EntityPlayer)this.getControllingPassenger());
-		}
+		}*/
 		
 		//prevLooking = looking.clone();
 	}
@@ -750,6 +750,10 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float f) {
 		return !(world.isRemote && !foundvehicle) && vehicle.attackEntityFrom(source, f);
+	}
+
+	public int getSeatId(){
+		return seatID;
 	}
 	
 }

@@ -165,6 +165,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		
 		camera = new EntityCamera(world, this);
 		world.spawnEntity(camera);
+		
 	}
 	
 	protected void initType(VehicleType type, boolean clientSide){
@@ -185,11 +186,12 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		stepHeight = type.wheelStepHeight;
 		yOffset = 10F / 16F;//TODO check dis
 		
+		data.scripts.onCreated(this);
 	}
 
 	@Override
 	protected void entityInit(){
-		//
+		
 	}
 
 	@Override
@@ -208,13 +210,13 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		else{
 			data.read(tag);
 		}
+		
 		initType(data, false);
 		
 		prevRotationYaw = tag.getFloat("RotationYaw");
 		prevRotationPitch = tag.getFloat("RotationPitch");
 		prevRotationRoll = tag.getFloat("RotationRoll");
 		axes = new RotatedAxes(prevRotationYaw, prevRotationPitch, prevRotationRoll);
-		
 	}
 	
 	protected boolean canSit(int seat){
@@ -263,6 +265,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				wheel.setDead();
 			}
 		}
+		data.scripts.onRemoved(this);
 	}
 	
 	@Override
@@ -370,6 +373,12 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		if(data.isLocked){
 			Print.chat(entityplayer, "Vehicle is locked.");
 			return true;
+		}
+		
+		if(data.scripts.size() > 0){
+			if(data.scripts.onInteract(this, entityplayer)){
+				return true;
+			}
 		}
 		
 		//TODO Item interaction
@@ -945,6 +954,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			FlansMod.getNewPacketHandler().sendToAllAround(new PacketVehicleControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 		}
 		
+		//Behavior Scripts
+		data.scripts.onUpdate(this);
 	}
 	
 	private float averageAngles(float a, float b){
