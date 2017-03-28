@@ -18,6 +18,10 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.lib.api.common.LockableObject;
+import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -41,7 +45,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class EntityDriveable extends Entity implements IControllable, IEntityAdditionalSpawnData {
+public abstract class EntityDriveable extends Entity implements IControllable, IEntityAdditionalSpawnData, LockableObject {
 	
 	public boolean syncFromServer = true;
 	/** Ticks since last server update. Use to smoothly transition to new position */
@@ -1060,4 +1064,62 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		return seat != 0 || !FlansModClient.controlModeMouse;
 	}
 	
+	@Override
+	public boolean isLocked(){
+		return driveableData.isLocked;
+	}
+
+	@Override
+	public boolean unlock(World world, EntityPlayer entity, ItemStack stack, KeyItem item){
+		if(!stack.hasTagCompound()){
+			Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+			return false;
+		}
+		else{
+			if(item.getCode(stack).equals(driveableData.lock_code)){
+				driveableData.isLocked = false;
+				Print.chat(entity, "Vehicle is now unlocked.");
+				return true;
+			}
+			else if(item.getType(stack) == KeyType.ADMIN){
+				driveableData.isLocked = true;
+				Print.chat(entity, "[SU] Vehicle is now unlocked.");
+				return true;
+			}
+			else{
+				Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
+		if(!getDriveableType().hasLock){
+			Print.chat(entity, "This vehicle doesn't allow locking.");
+			return false;
+		}
+		else{
+			if(!stack.hasTagCompound()){
+				Print.chat(entity, "[ERROR] Key don't has a NBT Tag Compound!");
+				return false;
+			}
+			else{
+				if(item.getCode(stack).equals(driveableData.lock_code)){
+					driveableData.isLocked = true;
+					Print.chat(entity, "Vehicle is now locked.");
+					return true;
+				}
+				else if(item.getType(stack) == KeyType.ADMIN){
+					driveableData.isLocked = true;
+					Print.chat(entity, "[SU] Vehicle is now locked.");
+					return true;
+				}
+				else{
+					Print.chat(entity, "Wrong key.");
+					return false;
+				}
+			}
+		}
+	}
 }

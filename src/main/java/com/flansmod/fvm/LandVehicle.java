@@ -135,6 +135,15 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		rotateYaw(placer.rotationYaw + 90F);
 		initType(data, false);
 	}
+	
+	//This one allows you to deal with spawning from the constructor
+		public LandVehicle(World world, double x, double y, double z, int placer, VehicleType data){
+			this(world, data);
+			stepHeight = 1.0F;
+			setPosition(x, y, z);
+			rotateYaw((placer * 90f) + 90F);
+			initType(data, false);
+		}
 
 	@Override
 	public void writeSpawnData(ByteBuf buffer){
@@ -627,6 +636,10 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		boolean canThrust = driverIsCreative() || data.fuelStored > 0;
 
 		//If there's no player in the driveable or it cannot thrust, slow the plane and turn off mouse held actions
+		if(seats == null || seats.length == 0){
+			this.setDead();
+			return;
+		}
 		if((seats[0] != null && seats[0].getControllingPassenger() == null) || !canThrust && data.maxThrottle != 0 && data.maxNegativeThrottle != 0){
 			throttle *= 0.98F;
 			rightMouseHeld = leftMouseHeld = false;

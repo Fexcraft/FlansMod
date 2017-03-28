@@ -64,7 +64,7 @@ public class FlansMod {
 	public static boolean DEBUG = false;
 	public static boolean fvm = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F1.8-EX";
+	public static final String VERSION = "5.F2.0-EX";
 	public static final String NAME = "Flan's Mod Minus";
 	@Mod.Instance("flansmod")
 	public static FlansMod INSTANCE;
