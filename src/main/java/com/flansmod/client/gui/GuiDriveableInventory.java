@@ -17,7 +17,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 
 public class GuiDriveableInventory extends GuiContainer
 {
-	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/planeInventory.png");
+	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/driveable_inventory.png");
 
 	public ContainerDriveableInventory container;
 	public InventoryPlayer inventory;
