@@ -57,7 +57,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 		    GL11.glRotatef(vehicle.prevRotationPitch + dPitch * f1, 0.0F, 0.0F, 1.0F);
 			GL11.glRotatef(vehicle.prevRotationRoll + dRoll * f1, 1.0F, 0.0F, 0.0F);
 			//GL11.glRotatef(180F, 0.0F, 1.0F, 0.0F);
-        	GL11.glRotatef(180f, 0f, 0f, 1f);
+        	GL11.glRotatef(180f, 0f, 0f, 1f);//<->//
 			
 			float modelScale = vehicle.data.scale;
 			GL11.glPushMatrix();
@@ -69,7 +69,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 					if(vehicle.data.parts.size() > 0){
 						for(String key : vehicle.data.parts.keySet()){
 							PartType part = vehicle.data.parts.get(key);
-							Minecraft.getMinecraft().renderEngine.bindTexture(part.textures.get(vehicle.data.current_texture));
+							part.bindTexture();
 							part.translate(vehicle.data.registryname);
 							part.getModel().render(vehicle.data, key, vehicle);
 							part.translateR(vehicle.data.registryname);
