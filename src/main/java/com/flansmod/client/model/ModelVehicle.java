@@ -1,13 +1,29 @@
 package com.flansmod.client.model;
 
+import org.lwjgl.opengl.GL11;
+
 import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.blocks.CrateBlock;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.UpgradeType;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.VehicleType;
+import com.flansmod.common.util.fni.Pos;
+import com.flansmod.common.util.fni.RGB;
 import com.flansmod.common.vector.Vector3f;
+
+import net.fexcraft.mod.lib.api.item.IItem;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumBlockRenderType;
 
 //Extensible ModelVehicle class for rendering vehicle models
 public class ModelVehicle extends ModelDriveable
@@ -37,13 +53,18 @@ public class ModelVehicle extends ModelDriveable
 	public ModelRendererTurbo drillHeadModel[] = new ModelRendererTurbo[0]; 		//Drill head. Rotates around
 	public Vector3f drillHeadOrigin = new Vector3f();								//this point
 	
+	
+	/*public ModelRendererTurbo primaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo secondaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorOpenModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorCloseModel[] = new ModelRendererTurbo[0];*/
+	
 	public int animFrame = 0;
 
 	
-	@Override
-	public void render(EntityDriveable driveable, float f1)
+	public void render(RenderVehicle render, EntityDriveable driveable, float f1)
 	{
-		render(0.0625F, (EntityVehicle)driveable, f1);
+		render(0.0625F, render, (EntityVehicle)driveable, f1);
 	}
 	
 	@Override
@@ -74,17 +95,17 @@ public class ModelVehicle extends ModelDriveable
 		renderPart(steeringWheelModel);
 	}
 	
-	public void render(float f5, EntityVehicle vehicle, float f)
-	{
+	public void render(float f5, RenderVehicle render, EntityVehicle vehicle, float f){
+		
 		boolean rotateWheels = vehicle.getVehicleType().rotateWheels;
 		animFrame = vehicle.animFrame;
 
 		//Rendering the body
-		if(vehicle.isPartIntact(EnumDriveablePart.core))
-		{
-			for (ModelRendererTurbo aBodyModel : bodyModel) {
+		if(vehicle.isPartIntact(EnumDriveablePart.core)){
+			
+			for (ModelRendererTurbo aBodyModel : bodyModel){
 				aBodyModel.render(f5, oldRotateOrder);
-			}
+			};
 			for (ModelRendererTurbo aBodyDoorOpenModel : bodyDoorOpenModel) {
 				if (vehicle.varDoor)
 					aBodyDoorOpenModel.render(f5, oldRotateOrder);
@@ -93,6 +114,32 @@ public class ModelVehicle extends ModelDriveable
 				if (!vehicle.varDoor)
 					aBodyDoorCloseModel.render(f5, oldRotateOrder);
 			}
+			
+			//PAINT START
+			if(vehicle.driveableData.hasColor){
+				vehicle.driveableData.primary_color.glColorApply();
+				for(ModelRendererTurbo model : primaryPaintBodyModel) {
+					model.render(f5, oldRotateOrder);
+				};
+				for(ModelRendererTurbo model : primaryPaintBodyDoorOpenModel) {
+					if(vehicle.varDoor){
+						model.render(f5, oldRotateOrder);
+					}
+				};
+				for(ModelRendererTurbo model : primaryPaintBodyDoorCloseModel) {
+					if(!vehicle.varDoor){
+						model.render(f5, oldRotateOrder);
+					}
+				};
+				RGB.glColorReset();
+				vehicle.driveableData.secondary_color.glColorApply();
+				for (ModelRendererTurbo model : secondaryPaintBodyModel) {
+					model.render(f5, oldRotateOrder);
+				};
+				RGB.glColorReset();
+			}
+			//PAINT END
+			
 			for (ModelRendererTurbo aSteeringWheelModel : steeringWheelModel) {
 				aSteeringWheelModel.rotateAngleX = vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aSteeringWheelModel.render(f5, oldRotateOrder);
@@ -100,54 +147,47 @@ public class ModelVehicle extends ModelDriveable
 		}
 		
 		//Wheels
-		if(vehicle.isPartIntact(EnumDriveablePart.backLeftWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.backLeftWheel)){
 			for (ModelRendererTurbo aLeftBackWheelModel : leftBackWheelModel) {
 				aLeftBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aLeftBackWheelModel.render(f5, oldRotateOrder);
 			}
 		}
-		if(vehicle.isPartIntact(EnumDriveablePart.backRightWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.backRightWheel)){
 			for (ModelRendererTurbo aRightBackWheelModel : rightBackWheelModel) {
 				aRightBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aRightBackWheelModel.render(f5, oldRotateOrder);
 			}
 		}
-		if(vehicle.isPartIntact(EnumDriveablePart.frontLeftWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.frontLeftWheel)){
 			for (ModelRendererTurbo aLeftFrontWheelModel : leftFrontWheelModel) {
 				aLeftFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aLeftFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aLeftFrontWheelModel.render(f5, oldRotateOrder);
 			}
 		}
-		if(vehicle.isPartIntact(EnumDriveablePart.frontRightWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.frontRightWheel)){
 			for (ModelRendererTurbo aRightFrontWheelModel : rightFrontWheelModel) {
 				aRightFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aRightFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aRightFrontWheelModel.render(f5, oldRotateOrder);
 			}
 		}
-		if(vehicle.isPartIntact(EnumDriveablePart.frontWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.frontWheel)){
 			for (ModelRendererTurbo aFrontWheelModel : frontWheelModel) {
 				aFrontWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aFrontWheelModel.rotateAngleY = -vehicle.wheelsYaw * 3.14159265F / 180F * 3F;
 				aFrontWheelModel.render(f5, oldRotateOrder);
 			}
 		}
-		if(vehicle.isPartIntact(EnumDriveablePart.backWheel))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.backWheel)){
 			for (ModelRendererTurbo aBackWheelModel : backWheelModel) {
 				aBackWheelModel.rotateAngleZ = rotateWheels ? -vehicle.wheelsAngle : 0;
 				aBackWheelModel.render(f5, oldRotateOrder);
 			}
 		}
 
-		if(vehicle.isPartIntact(EnumDriveablePart.leftTrack))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.leftTrack)){
 			for (ModelRendererTurbo aLeftTrackModel : leftTrackModel) {
 				aLeftTrackModel.render(f5, oldRotateOrder);
 			}
@@ -168,8 +208,7 @@ public class ModelVehicle extends ModelDriveable
 
 		}
 
-		if(vehicle.isPartIntact(EnumDriveablePart.rightTrack))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.rightTrack)){
 			for (ModelRendererTurbo aRightTrackModel : rightTrackModel) {
 				aRightTrackModel.render(f5, oldRotateOrder);
 			}
@@ -188,9 +227,7 @@ public class ModelVehicle extends ModelDriveable
 				}
 			}
 		}
-
-		if(vehicle.isPartIntact(EnumDriveablePart.trailer))
-		{
+		if(vehicle.isPartIntact(EnumDriveablePart.trailer)){
 			for (ModelRendererTurbo aTrailerModel : trailerModel) {
 				aTrailerModel.render(f5, oldRotateOrder);
 			}
@@ -232,6 +269,59 @@ public class ModelVehicle extends ModelDriveable
 				}
 			}
 		}
+		
+		for(UpgradeType type : vehicle.driveableData.upgrades){
+			GlStateManager.pushMatrix();
+			Pos pos = type.offset.get(vehicle.driveableData.type);
+			GL11.glTranslatef(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ());
+			render.bindTexture(type.getTexture(vehicle.driveableData));
+			((ModelUpgradePart)type.getModel()).render(f5, render, vehicle, f);
+			GlStateManager.popMatrix();
+		}
+		
+		if(vehicle.driveableData.cargo.length > 0){
+			DriveableType type = vehicle.getVehicleType();
+			for(int i = 0; i < vehicle.driveableData.cargo.length; i++){
+				if(i >= type.cargopos.size()){
+					break;
+				}
+				IBlockState state = getBlockToRender(i, vehicle);
+				if(state.getRenderType() != EnumBlockRenderType.INVISIBLE){
+		            GlStateManager.pushMatrix();
+		            render.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		            //GlStateManager.scale(0.75F, 0.75F, 0.75F);
+		            GlStateManager.translate(pos(type.cargopos.get(i).xCoord) + 0.5, pos(type.cargopos.get(i).yCoord), pos(type.cargopos.get(i).zCoord) + 0.5);
+		            GlStateManager.pushMatrix();
+		            //TODO GL11.glScalef(0.5f, 0.5f, 0.5f);
+		            Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(state, vehicle.getBrightness(Minecraft.getMinecraft().getRenderPartialTicks()));
+		            //TODO GL11.glScalef(1f, 1f, 1f);
+		            GlStateManager.popMatrix();
+		            GlStateManager.popMatrix();
+		            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		            render.bindTexture(vehicle);
+		        }
+			}
+		}
+	}
+	
+	private static float pos(double d){
+		return (float)(d / 16f);
+	}
+	
+	private static IBlockState getBlockToRender(int index, EntityVehicle vehicle){
+		if(vehicle.driveableData.cargo[index] != null){
+			return Blocks.AIR.getDefaultState();
+		}
+		else if(vehicle.driveableData.cargo[index].getItem() instanceof ItemBlock == false){
+			return CrateBlock.instance.getDefaultState();
+		}
+		else if(vehicle.driveableData.cargo[index].getItem() instanceof IItem){
+			return Blocks.BEDROCK.getDefaultState();
+		}
+		else{
+			ItemStack stack = vehicle.driveableData.cargo[index];
+			return ((ItemBlock)stack.getItem()).block.getStateFromMeta(stack.getMetadata());
+		}
 	}
 		
 	/** Render the tank turret
@@ -242,7 +332,7 @@ public class ModelVehicle extends ModelDriveable
 		
 		//Render main turret barrel
 		{
-			float yaw = vehicle.seats[0].looking.getYaw();
+			//float yaw = vehicle.seats[0].looking.getYaw();
 			float pitch = vehicle.seats[0].looking.getPitch();
 
 			for (ModelRendererTurbo aTurretModel : turretModel) {

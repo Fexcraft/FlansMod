@@ -154,47 +154,33 @@ public class ContainerDriveableInventory extends Container
 	}
 	
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slotID)
-	{
+	public ItemStack transferStackInSlot(EntityPlayer player, int index){
 		ItemStack stack = null;
-		Slot currentSlot = (Slot)inventorySlots.get(slotID);
-
-		if(currentSlot != null && currentSlot.getHasStack())
-		{
+		Slot currentSlot = (Slot)inventorySlots.get(index);
+		if(currentSlot != null && currentSlot.getHasStack()){
 			ItemStack slotStack = currentSlot.getStack();
 			stack = slotStack.copy();
-
-			if(slotID >= numItems)
-			{
-				if(!mergeItemStack(slotStack, 0, numItems, false))
-				{
+			if(index >= numItems){
+				if(!mergeItemStack(slotStack, 0, numItems, false)){
 					return null;
 				}
 			}
-			else {
-				if(!mergeItemStack(slotStack, numItems, inventorySlots.size(), true))
-				{
+			else{
+				if(!mergeItemStack(slotStack, numItems, inventorySlots.size(), true)){
 					return null;
 				}
 			}
-
-			if (slotStack.stackSize == 0)
-			{
+			if(slotStack.stackSize == 0){
 				currentSlot.putStack(null);
 			}
-			else
-			{
+			else{
 				currentSlot.onSlotChanged();
 			}
-
-			if (slotStack.stackSize == stack.stackSize)
-			{
+			if (slotStack.stackSize == stack.stackSize){
 				return null;
 			}
-
 			currentSlot.onPickupFromSlot(player, slotStack);
 		}
-
 		return stack;
 	}
 }

@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class GuiDriveableFuel extends GuiContainer
 {
-	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/planeFuel.png");
+	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/driveable_fuel.png");
 
 	public World world;
 	public InventoryPlayer inventory;

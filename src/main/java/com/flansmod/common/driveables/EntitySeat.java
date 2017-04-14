@@ -1,9 +1,6 @@
 package com.flansmod.common.driveables;
 
 import java.util.List;
-
-import javax.annotation.Nullable;
-
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
@@ -28,19 +25,12 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
-import com.flansmod.common.guns.EnumFireMode;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemShootable;
-import com.flansmod.common.guns.ShootableType;
-import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
-import com.flansmod.common.network.packets.PacketSeatRemoval;
 import com.flansmod.common.network.packets.PacketSeatUpdate;
-import com.flansmod.common.tools.ItemTool;
 import com.flansmod.common.util.Config;
-import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
 import com.google.common.collect.Lists;
 
@@ -49,7 +39,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	/** Set this to true when the client has found the parent driveable and connected them */
 	@SideOnly(Side.CLIENT)
 	public boolean foundDriveable;
-	public boolean dismount, exists;
 	private int driveableID;
 	private int seatID;
 	public EntityDriveable driveable;
@@ -98,8 +87,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		looking = new RotatedAxes();
 		playerLooking = new RotatedAxes();
 		prevPlayerLooking = new RotatedAxes();
-		dismount = false;
-		exists = true;
         this.passenger = null;
 	}
 		
@@ -126,8 +113,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public void onUpdate()
-	{
+	public void onUpdate(){
 		super.onUpdate();
 		//prevPosX = posX;
 		//prevPosY = posY;
@@ -135,11 +121,11 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		
 		
 		//If on the client and the driveable parent has yet to be found, search for it
-		if(worldObj.isRemote && !foundDriveable)
-		{
+		if(worldObj.isRemote && !foundDriveable){
 			driveable = (EntityDriveable)worldObj.getEntityByID(driveableID);
-			if(driveable == null)
+			if(driveable == null){
 				return;
+			}
 			foundDriveable = true;
 			driveable.seats[seatID] = this;
 			seatInfo = driveable.getDriveableType().seats[seatID];
@@ -148,7 +134,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			playerPosX = prevPlayerPosX = posX = driveable.posX;
 			playerPosY = prevPlayerPosY = posY = driveable.posY;
 			playerPosZ = prevPlayerPosZ = posZ = driveable.posZ;
-			setPosition(posX, posY, posZ);
+			//setPosition(posX, posY, posZ);
 		}		
 		//Update gun delay ticker
 		if(gunDelay > 0){
@@ -168,12 +154,12 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//updatePosition();
 		
 		if (playYawSound == true && yawSoundDelay == 0 && seatInfo.traverseSounds == true){
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.yawSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.yawSound, false);
 			yawSoundDelay = seatInfo.yawSoundLength;
 		}
 		
 		if (playPitchSound == true && pitchSoundDelay == 0 && seatInfo.traverseSounds == true){
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.pitchSound, false);
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, seatInfo.pitchSound, false);
 			pitchSoundDelay = seatInfo.pitchSoundLength;
 		}
 		
@@ -206,11 +192,12 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	/** Set the position to be that of the driveable plus the local position, rotated */
-	public void updatePosition()
-	{
+	public void updatePosition(){
+		
 		//If we haven't found our driveable, give up
-		if(worldObj.isRemote && !foundDriveable)
+		if(worldObj.isRemote && !foundDriveable){
 			return;
+		}
 		
 		prevPlayerPosX = playerPosX;
 		prevPlayerPosY = playerPosY;
@@ -224,8 +211,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		Vector3f localPosition = new Vector3f(seatInfo.x / 16F, seatInfo.y / 16F, seatInfo.z / 16F);
 		
 		//Rotate the offset vector by the turret yaw
-		if(driveable != null && driveable.seats != null && driveable.seats[0] != null && driveable.seats[0].looking != null)
-		{
+		if(driveable != null && driveable.seats != null && driveable.seats[0] != null && driveable.seats[0].looking != null){
 			RotatedAxes yawOnlyLooking = new RotatedAxes(driveable.seats[0].looking.getYaw(), 0F, 0F);
 			Vector3f rotatedOffset = yawOnlyLooking.findLocalVectorGlobally(seatInfo.rotatedOffset);
 			Vector3f.add(localPosition, new Vector3f(rotatedOffset.x, 0F, rotatedOffset.z), localPosition);
@@ -239,8 +225,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//Set the absol
 		setPosition(driveable.posX + relativePosition.x, driveable.posY + relativePosition.y, driveable.posZ + relativePosition.z);
 		
-		if(this.getControllingPassenger() != null)
-		{
+		if(this.getControllingPassenger() != null){
 	    	//DriveableType type = driveable.getDriveableType();
 			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, this.getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, this.getControllingPassenger().getEyeHeight(), 0);
 			//driveable.rotate(0, this.getControllingPassenger().getYOffset(), 0).toVec3();
@@ -249,10 +234,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			playerPosY = posY + yOffset.yCoord;
 			playerPosZ = posZ + yOffset.zCoord;
 			
-			this.getControllingPassenger().lastTickPosX = this.getControllingPassenger().prevPosX = prevPlayerPosX;
-			this.getControllingPassenger().lastTickPosY = this.getControllingPassenger().prevPosY = prevPlayerPosY;
-			this.getControllingPassenger().lastTickPosZ = this.getControllingPassenger().prevPosZ = prevPlayerPosZ;
-			this.getControllingPassenger().setPosition(playerPosX, playerPosY, playerPosZ);
+			this.updatePassenger();
 
 			//Calculate the local look axes globally
 			RotatedAxes globalLookAxes = driveable.axes.findLocalAxesGlobally(playerLooking);
@@ -266,8 +248,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			if(dYaw < -180)
 				prevPlayerYaw -= 360F;
 			
-			if(this.getControllingPassenger() instanceof EntityPlayer)
-			{
+			if(this.getControllingPassenger() instanceof EntityPlayer){
 				this.getControllingPassenger().prevRotationYaw = prevPlayerYaw;
 				this.getControllingPassenger().prevRotationPitch = prevPlayerPitch;
 				
@@ -276,11 +257,46 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 			
 			//If the entity is a player, roll its view accordingly
-			if(worldObj.isRemote)
-			{
+			if(worldObj.isRemote){
 				playerRoll = -globalLookAxes.getRoll();
-			}		
+			}
 		}
+	}
+	
+	@Override
+    public void updatePassenger(Entity passengerr){
+		if(passengerr == null){
+			return;
+		}
+		if(passenger instanceof EntityPlayer == false){
+			passenger.dismountRidingEntity();
+		}
+		passenger.rotationYaw = playerYaw;
+		passenger.rotationPitch = playerPitch;
+		passenger.prevRotationYaw = prevPlayerYaw;
+		passenger.prevRotationPitch = prevPlayerPitch;
+		passenger.lastTickPosX = passenger.prevPosX = prevPlayerPosX;
+		passenger.lastTickPosY = passenger.prevPosY = prevPlayerPosY;
+		passenger.lastTickPosZ = passenger.prevPosZ = prevPlayerPosZ;
+		
+		passenger.setPosition(playerPosX, playerPosY, playerPosZ);
+		
+		//DEBUG
+		/*if(world.isRemote){
+			UtilGui.n0 = "PC: " + passenger.getPositionVector().toString();
+			UtilGui.n2 = "DC: " + this.driveable.getPositionVector().toString();
+			UtilGui.n4 = "SC: " + this.getPositionVector().toString();
+		}
+		else{
+			UtilGui.n1 = "PS: " + passenger.getPositionVector().toString();
+			UtilGui.n3 = "DS: " + this.driveable.getPositionVector().toString();
+			UtilGui.n5 = "SS: " + this.getPositionVector().toString();
+		}*/
+		
+    }
+	
+	public void updatePassenger(){
+		this.updatePassenger(passenger);
 	}
 		
 	@Override
@@ -302,15 +318,18 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound tags) 
-	{
-		//Do not read. Spawn with driveable
+	protected void readEntityFromNBT(NBTTagCompound tags){
+		//
+	}
+	
+	@Override
+	public boolean isPassenger(Entity entity){
+		return passenger.equals(entity);
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound tags) 
-	{
-		//Do not write. Spawn with driveable
+	protected void writeEntityToNBT(NBTTagCompound tags){
+		//
 	}
 	
 	@Override
@@ -566,76 +585,18 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		
 		//Exit key pressed
-		if(key == 6 && this.getControllingPassenger() != null){
-			//this.getControllingPassenger().startRiding(null);
-			this.removeSeatPassenger();
+		if(key == 6){
+			this.getControllingPassenger().dismountRidingEntity();
 		}
 				
-		if(key == 9) //Shoot
-		{
-			//Get the gun from the plane type and the ammo from the data
-			GunType gun = seatInfo.gunType;
-			
-			minigunSpeed += 0.1F;
-			
-			if(gun != null && gun.mode != EnumFireMode.MINIGUN || minigunSpeed > 2F)
-			{
-				if(gunDelay <= 0 && Config.bulletsEnabled)
-				{
-	
-					ItemStack bulletItemStack = driveable.getDriveableData().ammo[seatInfo.gunnerID];
-					//Check that neither is null and that the bullet item is actually a bullet
-					if(gun != null && bulletItemStack != null && bulletItemStack.getItem() instanceof ItemShootable)
-					{
-						ShootableType bullet = ((ItemShootable)bulletItemStack.getItem()).type;
-						if(gun.isAmmo(bullet))
-						{
-							//Gun origin
-							Vector3f gunOrigin = Vector3f.add(driveable.axes.findLocalVectorGlobally(seatInfo.gunOrigin), new Vector3f(driveable.posX, driveable.posY, driveable.posZ), null);
-							//Calculate the look axes globally
-							//RotatedAxes globalLookAxes = driveable.axes.findLocalAxesGlobally(looking);
-							Vector3f shootVec = driveable.axes.findLocalVectorGlobally(looking.getXAxis());
-							//Calculate the origin of the bullets
-							Vector3f yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0F, (float)player.getMountedYOffset(), 0F));						
-							//Spawn a new bullet item
-							worldObj.spawnEntityInWorld(((ItemShootable)bulletItemStack.getItem()).getEntity(worldObj, 
-									Vector3f.add(yOffset, new Vector3f(gunOrigin.x, gunOrigin.y, gunOrigin.z), null), 
-									shootVec, 
-									(EntityLivingBase)this.getControllingPassenger(), 
-									bullet.bulletSpread * gun.bulletSpread, 
-									gun.damage, 
-									gun.bulletSpeed <= 0.0f ? 5.0f : gun.bulletSpeed, // TODO : Fix nasty hack 
-									driveable.getDriveableType()));
-							
-							//Play the shoot sound
-							if(soundDelay <= 0)
-							{
-								PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, gun.shootSound, false);
-								soundDelay = gun.shootSoundLength;
-							}
-							//Get the bullet item damage and increment it
-							int damage = bulletItemStack.getItemDamage();
-							bulletItemStack.setItemDamage(damage + 1);	
-							//If the bullet item is completely damaged (empty)
-							if(damage + 1 == bulletItemStack.getMaxDamage())
-							{
-								//Set the damage to 0 and consume one ammo item (unless in creative)
-								bulletItemStack.setItemDamage(0);
-								if(!((EntityPlayer)this.getControllingPassenger()).capabilities.isCreativeMode)
-									driveable.getDriveableData().decrStackSize(3 + seatID, 1);
-							}
-							//Reset the shoot delay
-							gunDelay = gun.shootDelay;
-						}
-					}
-				}
-			}
+		if(key == 9){
+			//Shoot
 		}
 		return false;
 	}
 	
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand){
+	public boolean processInitialInteract(EntityPlayer entityplayer, ItemStack stack, EnumHand hand){
 		if(isDead || worldObj.isRemote){
 			return false;
 		}
@@ -644,7 +605,10 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		}
 		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItem(hand);
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
+		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables){
+			return true;
+		}*/
+		if(currentItem != null && currentItem.getItem() instanceof ItemKey){
 			return true;
 		}
 		if(currentItem != null && currentItem.getItem() instanceof ItemLead){
@@ -675,7 +639,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public Entity getControllingEntity() {
+	public Entity getControllingEntity(){
 		return passenger;
 	}
 	
@@ -695,57 +659,30 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	
 	@Override
 	public void addPassenger(Entity passenger){
+		if(driveable.driveableData.isLocked && this.driver){
+			Print.chat(passenger, "Vehicle is locked. Unlock to drive it.");
+			passenger.dismountRidingEntity();
+			return;
+		}
 		if(passenger.getRidingEntity() != this){
             throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
         }
         else{
-            /*if(!this.worldObj.isRemote && passenger instanceof EntityPlayer && !(this.getControllingPassenger() instanceof EntityPlayer)){
-                this.passengers.add(0, passenger);
-            }
-            else{
-                this.passengers.add(passenger);
-            }*/
         	this.passenger = passenger;
         }
-		dismount = false;
-		Print.spam(1, "AP => " + Util.getTime() + " " + (worldObj.isRemote ? "[CLIENT]" : "[SERVER]"));
-	}
-	
-	public void removeSeatPassenger(){
-		if(!worldObj.isRemote){
-			this.getControllingPassenger().dismountRidingEntity();
-			Print.spam(1, "DMKP");
-		}
+		//Print.debug("AP => " + new Date().getTime() + " " + (worldObj.isRemote ? "[CLIENT]" : "[SERVER]"));
 	}
 	
 	@Override
 	public void removePassenger(Entity entity){
 		if(worldObj.isRemote){
-			if(!dismount){
-				if(!passenger.isRiding()){
-					//super.removePassenger(entity);
-					//passenger.startRiding(this);
-					passenger = null;
-					Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] RIDER -> RIDING == NULL;");
-				}
-				else{
-					Print.spam(1, "Received 'removePassenger(<ENT>)' call, but ignoring it since it wasn't sent from the server.");
-					dismount = true;
-					passenger.startRiding(this);
-					Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] ERR;");
-				}
-			}
-			else{
-				//super.removePassenger(entity);
-				passenger = null;
-				Print.spam(1, "RM => " + Util.getTime() + " [CLIENT] OK");
-			}
+			passenger = null;
+			//Print.debug("RM => " + new Date().getTime() + " [CLIENT] OK");
 		}
 		else{
-			//super.removePassenger(entity);
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketSeatDismount(passenger.getEntityId()), Config.getTargetPoint(this));
 			passenger = null;
-			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatDismount(this));//TODO ranged packet maybe?
-			Print.spam(1, "RM => " + Util.getTime() + " [SERVER]");
+			//Print.debug("RM => " + new Date().getTime() + " [SERVER]");
 		}
 	}
 
@@ -754,46 +691,17 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		return isDead;
 	}
 	
-	public void remove(){
-		this.exists = false;
-		this.setDead();
-	}
-	
 	@Override
 	public void setDead(){
 		if(worldObj.isRemote){
-			if(exists){
-				this.isDead = false;
-				//
-				Print.spam(1, "Received 'setDead()' call, but ignoring it since it wasn't sent from the server.");
-				Print.spam(1, "DD => " + Util.getTime() + " [CLIENT] ERR;");
-			}
-			else{
-				this.isDead = true;
-				Print.spam(1, "DD => " + Util.getTime() + " [CLIENT] OK;");
-			}
+			this.isDead = true;
+			//Print.debug("DD => " + new Date().getTime() + " [CLIENT] OK;");
 		}
 		else{
 			this.isDead = true;
-			FlansMod.getNewPacketHandler().sendToAll(new PacketSeatRemoval(this));//TODO ranged packet maybe?
-			Print.spam(1, "DD => " + Util.getTime() + " [SERVER]");
+			//Print.debug("DD => " + new Date().getTime() + " [SERVER]");
 		}
 	}
-	
-	@Override
-    public void updatePassenger(Entity passengerr){
-		if(passenger instanceof EntityPlayer){
-			passenger.rotationYaw = playerYaw;
-			passenger.rotationPitch = playerPitch;
-			passenger.prevRotationYaw = prevPlayerYaw;
-			passenger.prevRotationPitch = prevPlayerPitch;
-		}
-		passenger.lastTickPosX = passenger.prevPosX = prevPlayerPosX;
-		passenger.lastTickPosY = passenger.prevPosY = prevPlayerPosY;
-		passenger.lastTickPosZ = passenger.prevPosZ = prevPlayerPosZ;
-		
-		//passenger.setPosition(playerPosX, playerPosY, playerPosZ);
-    }
 	
 	@Override
 	public ItemStack getPickedResult(RayTraceResult target)
@@ -834,15 +742,14 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 
 	@Override
-	public void readSpawnData(ByteBuf data) 
-	{
+	public void readSpawnData(ByteBuf data) {
 		driveableID = data.readInt();
-		if(worldObj.getEntityByID(driveableID) instanceof EntityDriveable)
+		if(worldObj.getEntityByID(driveableID) instanceof EntityDriveable){
 			driveable = (EntityDriveable)worldObj.getEntityByID(driveableID);
+		}
 		seatID = data.readInt();
 		driver = seatID == 0;
-		if(driveable != null)
-		{
+		if(driveable != null){
 			seatInfo = driveable.getDriveableType().seats[seatID];
 			looking.setAngles((seatInfo.minYaw + seatInfo.maxYaw) / 2, 0F, 0F);
 			playerPosX = prevPlayerPosX = posX = driveable.posX;
@@ -853,8 +760,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		
 	}
 
-	public float getMinigunSpeed() 
-	{
+	public float getMinigunSpeed(){
 		return minigunSpeed;
 	}
+	
 }

@@ -3,43 +3,18 @@ package com.flansmod.common;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.flansmod.common.driveables.ContainerDriveableInventory;
-import com.flansmod.common.driveables.ContainerDriveableMenu;
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.mechas.ContainerMechaInventory;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.guns.ContainerGunModTable;
-import com.flansmod.common.guns.boxes.ContainerGunBox;
-import com.flansmod.common.guns.boxes.GunBoxType;
-import com.flansmod.common.network.PacketBreakSound;
-import com.flansmod.common.paintjob.ContainerPaintjobTable;
-import com.flansmod.common.paintjob.TileEntityPaintjobTable;
-import com.flansmod.common.parts.EnumPartCategory;
-import com.flansmod.common.parts.ItemPart;
-import com.flansmod.common.parts.PartType;
-import com.flansmod.common.teams.ArmourBoxType;
-import com.flansmod.common.types.EnumType;
-import com.flansmod.common.types.InfoType;
 import com.flansmod.common.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CommonProxy {
+	
 	protected static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
 
 	/** Returns the list of content pack files, and on the client, adds the content pack resources and models to the classpath */
@@ -57,96 +32,54 @@ public class CommonProxy {
 		return contentPacks;
 	}
 	
-	public void addMissingJSONs(HashMap<Integer, InfoType> types)
-	{
-		
-	}
-	
 	/** A ton of client only methods follow */
-	public void load()
-	{
+	public void load(){
+		
 	}
 	
-	public void forceReload()
-	{
+	public void forceReload(){
+		
 	}
 		
-	public void registerRenderers()
-	{
+	public void registerRenderers(){
+		
 	}
 		
-	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType)
-	{
+	public void doTutorialStuff(EntityPlayer player, EntityDriveable entityType){
+		
 	}
 	
-	public void changeControlMode(EntityPlayer player)
-	{
+	public void changeControlMode(EntityPlayer player){
+		
 	}
 
-	public boolean mouseControlEnabled()
-	{
+	public boolean mouseControlEnabled(){
 		return false;
 	}
 	
-	public void openDriveableMenu(EntityPlayer player, World world, EntityDriveable driveable)
-	{
+	public void openDriveableMenu(EntityPlayer player, World world, EntityDriveable driveable){
+		
 	}
 	
-	public <T> T loadModel(String s, String shortName, Class<T> typeClass)
-	{
+	public <T> T loadModel(String s, String shortName, Class<T> typeClass){
 		return null;
 	}
 	
-	public void loadSound(String contentPack, String type, String sound)
-	{
+	public void loadSound(String contentPack, String type, String sound){
+		
 	}
 	
-	public boolean isThePlayer(EntityPlayer player)
-	{
+	public boolean isThePlayer(EntityPlayer player){
 		return false;
-	}
-	
-	public void buyGun(GunBoxType type, InfoType gun)
-	{
-	}
-	
-	/** Gets the client GUI element from ClientProxy */
-	public Object getClientGui(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		return null;
-	}
-
-	/** Gets the container for the specified GUI */
-	public Container getServerGui(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		switch(ID) 
-		{	
-		case 0 : return null; //Driveable crafting. No server side
-		case 1 : return null; //Driveable repair. No server side
-		case 2: return new ContainerGunModTable(player.inventory, world);
-		case 3: return new ContainerDriveableMenu(player.inventory, world);
-		case 4: return new ContainerDriveableMenu(player.inventory, world, true, ((EntitySeat)player.getRidingEntity()).driveable);
-		case 5: return new ContainerGunBox(player.inventory);
-		//Plane inventory screens
-		case 6: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 0);
-		case 7: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 1);
-		case 8: return new ContainerDriveableMenu(player.inventory, world, true, ((EntitySeat)player.getRidingEntity()).driveable);
-		case 9: return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 2);
-		case 10: return new ContainerMechaInventory(player.inventory, world, (EntityMecha)((EntitySeat)player.getRidingEntity()).driveable);
-		case 11 : return null; //Armour box. No server side
-		case 12 : return new ContainerDriveableInventory(player.inventory, world, ((EntitySeat)player.getRidingEntity()).driveable, 3);
-		case 13: return new ContainerPaintjobTable(player.inventory, world, (TileEntityPaintjobTable)world.getTileEntity(new BlockPos(x, y, z)));
-		}
-		return null;
 	}
 	
 	/** Play a block break sound here */
 	public void playBlockBreakSound(int x, int y, int z, Block blockHit)
 	{
-		FlansMod.packetHandler.sendToAll(new PacketBreakSound(x, y, z, blockHit));
+		//TODO FlansMod.packetHandler.sendToAll(new PacketBreakSound(x, y, z, blockHit));
 	}
 		
-	public void craftDriveable(EntityPlayer player, DriveableType type)
+	/*public void craftDriveable(EntityPlayer player, DriveableType type)
 	{
 		//Create a temporary copy of the player inventory for backup purposes
 		InventoryPlayer temporaryInventory = new InventoryPlayer(null);
@@ -168,23 +101,23 @@ public class CommonProxy {
 				if(stackInSlot != null && stackInSlot.getItem() == recipeStack.getItem() && stackInSlot.getItemDamage() == recipeStack.getItemDamage())
 				{
 					//Work out the amount to take from the stack
-					int amountFound = Math.min(stackInSlot.stackSize, recipeStack.stackSize - totalAmountFound);
+					int amountFound = Math.min(stackInSlot.getCount(), recipeStack.getCount() - totalAmountFound);
 					//Take it
-					stackInSlot.stackSize -= amountFound;
+					stackInSlot.shrink(amountFound);
 					//Check for empty stacks
-					if(stackInSlot.stackSize <= 0)
+					if(stackInSlot.getCount() <= 0)
 						stackInSlot = null;
 					//Put the modified stack back in the inventory
 					player.inventory.setInventorySlotContents(n, stackInSlot);
 					//Increase the amount found counter
 					totalAmountFound += amountFound;
 					//If we have enough, stop looking
-					if(totalAmountFound == recipeStack.stackSize)
+					if(totalAmountFound == recipeStack.getCount())
 						break;
 				}
 			}
 			//If we didn't find enough, give the stack a red outline
-			if(totalAmountFound < recipeStack.stackSize)
+			if(totalAmountFound < recipeStack.getCount())
 			{
 				//For some reason, the player sent a craft packet, despite being unable to
 				canCraft = false;
@@ -218,7 +151,7 @@ public class CommonProxy {
 					//If we already have engines of this type, add these ones to the stack
 					if(engines.containsKey(partType))
 					{
-						engines.get(partType).stackSize += stackInSlot.stackSize;
+						engines.get(partType).grow(stackInSlot.getCount());
 					}
 					//Else, make this the first stack
 					else engines.put(partType, stackInSlot);
@@ -232,7 +165,7 @@ public class CommonProxy {
 		for(PartType part : engines.keySet())
 		{
 			//If this engine outperforms the currently selected best one and there are enough of them, swap
-			if(part.engineSpeed > bestEngineSpeed && engines.get(part).stackSize >= type.numEngines())
+			if(part.engineSpeed > bestEngineSpeed && engines.get(part).getCount() >= type.numEngines())
 			{
 				bestEngineSpeed = part.engineSpeed;
 				bestEngineStack = engines.get(part);
@@ -256,11 +189,11 @@ public class CommonProxy {
 			if(stackInSlot != null && stackInSlot.getItem() == bestEngineStack.getItem())
 			{
 				//Work out the amount to take from the stack
-				int amountFound = Math.min(stackInSlot.stackSize, type.numEngines() - numEnginesAcquired);
+				int amountFound = Math.min(stackInSlot.getCount(), type.numEngines() - numEnginesAcquired);
 				//Take it
-				stackInSlot.stackSize -= amountFound;
+				stackInSlot.shrink(amountFound);
 				//Check for empty stacks
-				if(stackInSlot.stackSize <= 0)
+				if(stackInSlot.getCount() <= 0)
 					stackInSlot = null;
 				//Put the modified stack back in the inventory
 				player.inventory.setInventorySlotContents(n, stackInSlot);
@@ -286,9 +219,9 @@ public class CommonProxy {
 		if(!player.inventory.addItemStackToInventory(driveableStack))
 			//player.dropPlayerItemWithRandomChoice(driveableStack, false);
 			player.dropItem(driveableStack, false);
-	}
+	}*/
 
-	public void repairDriveable(EntityPlayer driver, EntityDriveable driving, DriveablePart part) 
+	/*public void repairDriveable(EntityPlayer driver, EntityDriveable driving, DriveablePart part) 
 	{
 		//If any of this parts parent parts are broken, then it cannot be repaired
 		for(EnumDriveablePart parent : part.type.getParents())
@@ -320,22 +253,22 @@ public class CommonProxy {
 				if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 				{
 					//Work out the amount to take from the stack
-					int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+					int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 					//Take it
-					stackInSlot.stackSize -= amountFound;
+					stackInSlot.shrink(amountFound);
 					//Check for empty stacks
-					if(stackInSlot.stackSize <= 0)
+					if(stackInSlot.getCount() <= 0)
 						stackInSlot = null;
 					//Put the modified stack back in the inventory
 					temporaryInventory.setInventorySlotContents(m, stackInSlot);
 					//Increase the amount found counter
 					totalAmountFound += amountFound;
 					//If we have enough, stop looking
-					if(totalAmountFound == stackNeeded.stackSize)
+					if(totalAmountFound == stackNeeded.getCount())
 						break;
 				}
 			}
-			if(totalAmountFound < stackNeeded.stackSize)
+			if(totalAmountFound < stackNeeded.getCount())
 				canRepair = false;
 		}
 		
@@ -347,7 +280,7 @@ public class CommonProxy {
 			part.dead = false;
 			driving.checkParts();
 		}
-	}
+	}*/
 	
 	public boolean isScreenOpen()
 	{
@@ -363,9 +296,5 @@ public class CommonProxy {
 	{
 		return false;
 	}
-
-	public void buyArmour(String shortName, int piece, ArmourBoxType type) 
-	{
-
-	}
+	
 }

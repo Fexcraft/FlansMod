@@ -180,7 +180,7 @@ public class ModelPoolObjEntry extends ModelPoolEntry
 							finalPhase++;
 					} while(finalPhase < 1);
 					
-					float d = MathHelper.sqrt_double(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+					float d = MathHelper.sqrt_float(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
 					
 					normal[0]/= d;
 					normal[1]/= d;

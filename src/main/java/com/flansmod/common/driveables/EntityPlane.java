@@ -1,30 +1,41 @@
 package com.flansmod.common.driveables;
 
-import javax.annotation.Nullable;
+import net.fexcraft.mod.lib.util.cls.Print;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.network.PacketPlaneControl;
-import com.flansmod.common.network.PacketPlaySound;
+import com.flansmod.common.cmds.TextureCommand;
+import com.flansmod.common.data.DriveableData;
+import com.flansmod.common.data.DriveableType;
+import com.flansmod.common.data.PlaneType;
+import com.flansmod.common.data.player.IPlayerData;
+import com.flansmod.common.data.player.PlayerHandler;
+import com.flansmod.common.items.ItemKey;
+import com.flansmod.common.items.ItemUpgrade;
+import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableControl;
 import com.flansmod.common.network.packets.PacketDriveableKey;
-import com.flansmod.common.tools.ItemTool;
+import com.flansmod.common.network.packets.PacketDriveableSync;
+import com.flansmod.common.network.packets.PacketDriveableTexture;
+import com.flansmod.common.network.packets.PacketPlaneControl;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
 import com.flansmod.common.vector.Vector3f;
 
-import net.fexcraft.mod.lib.util.cls.MathHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-
-public class EntityPlane extends EntityDriveable
-{
+public class EntityPlane extends EntityDriveable {
+	
 	/** The flap positions, used for renderering and for controlling the plane rotations */
 	public float flapsYaw, flapsPitchLeft, flapsPitchRight;	
 	/** Position of looping engine sound */
@@ -42,13 +53,11 @@ public class EntityPlane extends EntityDriveable
 	/** Current plane mode */
 	public EnumPlaneMode mode;
 	
-	public EntityPlane(World world)
-	{
+	public EntityPlane(World world){
 		super(world);
 	}
 
-	public EntityPlane(World world, double x, double y, double z, PlaneType type, DriveableData data)
-	{
+	public EntityPlane(World world, double x, double y, double z, PlaneType type, DriveableData data){
 		super(world, type, data);
 		setPosition(x, y, z);
 		prevPosX = x;
@@ -57,23 +66,20 @@ public class EntityPlane extends EntityDriveable
 		initType(type, false);
 	}
 
-	public EntityPlane(World world, double x, double y, double z, EntityPlayer placer, PlaneType type, DriveableData data)
-	{
+	public EntityPlane(World world, double x, double y, double z, EntityPlayer placer, PlaneType type, DriveableData data){
 		this(world, x, y, z, type, data);
 		rotateYaw(placer.rotationYaw + 90F);
 		rotatePitch(type.restingPitch);
 	}
 	
 	@Override
-	public void initType(DriveableType type, boolean clientSide)
-	{
+	public void initType(DriveableType type, boolean clientSide){
 		super.initType(type, clientSide);
 		mode = (((PlaneType)type).mode == EnumPlaneMode.HELI ? EnumPlaneMode.HELI : EnumPlaneMode.PLANE);
 	}
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound tag)
-	{
+	protected void writeEntityToNBT(NBTTagCompound tag){
 		super.writeEntityToNBT(tag);
 		tag.setTag("Pos", this.newDoubleNBTList(this.posX, this.posY + 1D, this.posZ));
 		tag.setBoolean("VarGear", varGear);
@@ -82,8 +88,7 @@ public class EntityPlane extends EntityDriveable
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound tag)
-	{
+	protected void readEntityFromNBT(NBTTagCompound tag){
 		super.readEntityFromNBT(tag);
 		varGear = tag.getBoolean("VarGear");
 		varDoor = tag.getBoolean("VarDoor");
@@ -96,8 +101,7 @@ public class EntityPlane extends EntityDriveable
 	 * @param deltaX 
 	 */
 	@Override
-	public void onMouseMoved(int deltaX, int deltaY)
-	{
+	public void onMouseMoved(int deltaX, int deltaY){
 		if(!FMLCommonHandler.instance().getSide().isClient())
 			return;
 		if(!FlansMod.proxy.mouseControlEnabled())
@@ -113,36 +117,82 @@ public class EntityPlane extends EntityDriveable
 	}
 	
 	@Override
-	public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, float roll, double motX, double motY, double motZ, float velYaw, float velPitch, float velRoll, float throt, float steeringYaw)
-	{
+	public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, float roll, double motX, double motY, double motZ, float velYaw, float velPitch, float velRoll, float throt, float steeringYaw){
 		super.setPositionRotationAndMotion(x, y, z, yaw, pitch, roll, motX, motY, motZ, velYaw, velPitch, velRoll, throt, steeringYaw);
 		flapsYaw = steeringYaw;
 	}
 		
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, @Nullable ItemStack stack, EnumHand hand)
-	{
-		if(isDead)
+	public boolean processInitialInteract(EntityPlayer entityplayer, ItemStack stack, EnumHand hand){
+		if(isDead || worldObj.isRemote){
 			return false;
-		if(worldObj.isRemote)
-			return false;
+		}
 		
-		//If they are using a repair tool, don't put them in
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healDriveables)
+		if(currentItem != null && currentItem.getItem() instanceof ItemKey){
+			if(this.isLocked()){
+				this.unlock(worldObj, entityplayer, currentItem, (ItemKey)currentItem.getItem());
+			}
+			else{
+				this.lock(worldObj, entityplayer, currentItem, (ItemKey)currentItem.getItem());
+			}
 			return true;
+		}
+		if(driveableData.isLocked){
+			Print.chat(entityplayer, "Vehicle is locked.");
+			return true;
+		}
+		if(currentItem != null && currentItem.getItem() instanceof ItemDye){
+			if(entityplayer.isSneaking()){
+				if(driveableData.hasColor){
+					driveableData.secondary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+					currentItem.stackSize--;
+				}
+			}
+			else{
+				if(driveableData.hasColor){
+					driveableData.primary_color.fromDyeColor(EnumDyeColor.byDyeDamage(currentItem.getMetadata()));
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableColor(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+					currentItem.stackSize--;
+				}
+			}
+			return true;
+		}
+		if(currentItem != null && currentItem.getItem() instanceof ItemUpgrade){
+			if(((ItemUpgrade)currentItem.getItem()).type.canInstallUpgrade(driveableData)){
+				driveableData.upgrades.add(((ItemUpgrade)currentItem.getItem()).type);
+				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableSync(this));
+				Print.chat(entityplayer, "Upgrade installed.");
+			}
+			else{
+				Print.chat(entityplayer, "Upgrade can not be applied to this vehicle.");
+			}
+			return true;
+		}
+		if(currentItem != null && currentItem.getItem() == Items.IRON_INGOT){
+			if(!getDriveableType().allowURL){
+				Print.chat(entityplayer, "This vehicle doesn't allow custom remote Textures.");
+			}
+			else{
+				IPlayerData data = PlayerHandler.getData(entityplayer);
+				if(Util.isNull(data.getTextureURL())){
+					Print.chat(entityplayer, "No Texture URL in clipboard.");
+					Print.chat(entityplayer, "try: /" + TextureCommand.NAME);
+				}
+				else{
+					driveableData.texture_url = data.getTextureURL();
+					Print.chat(entityplayer, "Texture applied.");
+					FlansMod.getNewPacketHandler().sendToAllAround(new PacketDriveableTexture(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
+				}
+			}
+			return true;
+		}
 		
 		PlaneType type = this.getPlaneType();
 		//Check each seat in order to see if the player can sit in it
-		for(int i = 0; i <= type.numPassengers; i++)
-		{
-			if(seats[i].processInitialInteract(entityplayer, stack, hand))
-			{
-				if(i == 0)
-				{
-					bombDelay = type.planeBombDelay;
-					FlansMod.proxy.doTutorialStuff(entityplayer, this);
-				}
+		for(int i = 0; i <= type.numPassengers; i++){
+			if(seats[i].processInitialInteract(entityplayer, stack, hand)){
 				return true;
 			}
 		}
@@ -150,18 +200,15 @@ public class EntityPlane extends EntityDriveable
 	}
 
 	@Override
-	public boolean pressKey(int key, EntityPlayer player)
-	{
+	public boolean pressKey(int key, EntityPlayer player){
 		PlaneType type = this.getPlaneType();
 		//Send keys which require server side updates to the server
-		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9))
-		{
+		if(worldObj.isRemote && (key == 6 || key == 8 || key == 9)){
 			FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			return true;
 		}
 		boolean canThrust = ((seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode) || getDriveableData().fuelInTank > 0) && hasWorkingProp();
-		switch(key)
-		{
+		switch(key){
 			case 0 : //Accelerate : Increase the throttle, up to 1.
 			{
 				if(canThrust || throttle < 0F)
@@ -208,7 +255,9 @@ public class EntityPlane extends EntityDriveable
 			}
 			case 6 : //Exit : Get out
 			{
-				seats[0].removeSeatPassenger();
+				if(seats[0].getControllingPassenger() != null){
+					seats[0].getControllingPassenger().dismountRidingEntity();
+				}
 		  		return true;
 			}
 			case 7 : //Inventory : Check to see if this plane allows in-flight inventory editing or if the plane is on the ground
@@ -246,7 +295,7 @@ public class EntityPlane extends EntityDriveable
 				if(toggleTimer <= 0)
 				{
 					varGear = !varGear;
-					player.addChatMessage(new TextComponentString("Landing gear " + (varGear ? "down" : "up")));
+					Print.chat(player, "Landing gear " + (varGear ? "down" : "up"));
 					toggleTimer = 10;
 					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
 				}
@@ -257,8 +306,9 @@ public class EntityPlane extends EntityDriveable
 				if(toggleTimer <= 0)
 				{
 					varDoor = !varDoor;
-					if(type.hasDoor)
-						player.addChatMessage(new TextComponentString("Doors " + (varDoor ? "open" : "closed")));
+					if(type.hasDoor){
+						Print.chat(player, "Doors " + (varDoor ? "open" : "closed"));
+					}
 					toggleTimer = 10;
 					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
 				}
@@ -271,14 +321,14 @@ public class EntityPlane extends EntityDriveable
 					if(type.hasWing)
 					{
 						varWing = !varWing;
-						player.addChatMessage(new TextComponentString("Switching mode"));
+						Print.chat(player, "Switching mode");
 					}
 					if(type.mode == EnumPlaneMode.VTOL)
 					{
 						if(mode == EnumPlaneMode.HELI)
 							mode = EnumPlaneMode.PLANE;
 						else mode = EnumPlaneMode.HELI;
-						player.addChatMessage(new TextComponentString(mode == EnumPlaneMode.HELI ? "Entering hover mode" : "Entering plane mode"));
+						Print.chat(player, mode == EnumPlaneMode.HELI ? "Entering hover mode" : "Entering plane mode");
 					}
 					toggleTimer = 10;
 					FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableControl(this));
@@ -299,31 +349,26 @@ public class EntityPlane extends EntityDriveable
 	}
 
 	@Override
-	public void updateKeyHeldState(int key, boolean held)
-	{
+	public void updateKeyHeldState(int key, boolean held){
 		super.updateKeyHeldState(key, held);
 		//On the server. For semi-auto weapons, shoot!
-		if(!worldObj.isRemote)
-		{
-			switch(key)
-			{
-			case 9 : //Left Mouse
-			case 8 : //Right Mouse
+		if(!worldObj.isRemote){
+			switch(key){
+				case 9 : //Left Mouse
+				case 8 : //Right Mouse
 			}
 		}
 	}
 	
 	@Override
-	public void onUpdate()
-	{
+	public void onUpdate(){
 		super.onUpdate();
 
 		//Get plane type
 		PlaneType type = getPlaneType();
 		DriveableData data = getDriveableData();
-		if(type == null)
-		{
-			Util.log("Plane type null. Not ticking plane");
+		if(type == null){
+			Print.log("Plane type null. Not ticking plane");
 			return;
 		}
 
@@ -332,26 +377,28 @@ public class EntityPlane extends EntityDriveable
 
 		//Despawning
 		ticksSinceUsed++;
-		if(!worldObj.isRemote && seats[0].getControllingPassenger() != null)
+		if(!worldObj.isRemote && seats[0].getControllingPassenger() != null){
 			ticksSinceUsed = 0;
-		if(!worldObj.isRemote && Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20)
-		{
+		}
+		if(!worldObj.isRemote && Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20){
 			setDead();
 		}
 		
 		//Shooting, inventories, etc.
 		//Decrement bomb and gun timers
-		if(bombDelay > 0)
+		if(bombDelay > 0){
 			bombDelay--;
-		if(gunDelay > 0)
+		}
+		if(gunDelay > 0){
 			gunDelay--;
-		if(toggleTimer > 0)
+		}
+		if(toggleTimer > 0){
 			toggleTimer--;
+		}
 		
 		//Aesthetics
 		//Rotate the propellers
-		if(hasEnoughFuel())
-		{
+		if(hasEnoughFuel()){
 			propAngle += (Math.pow(throttle, 0.4))*1.5;	
 		}
 		
@@ -375,17 +422,15 @@ public class EntityPlane extends EntityDriveable
 			flapsPitchLeft = -20;
 		
 		//Player is not driving this. Update its position from server update packets 
-		if(worldObj.isRemote && !thePlayerIsDrivingThis)
-		{
+		if(worldObj.isRemote && !thePlayerIsDrivingThis){
 			//The driveable is currently moving towards its server position. Continue doing so.
-			if (serverPositionTransitionTicker > 0)
-			{
+			if(serverPositionTransitionTicker > 0){
 				double x = posX + (serverPosX - posX) / serverPositionTransitionTicker;
 				double y = posY + (serverPosY - posY) / serverPositionTransitionTicker;
 				double z = posZ + (serverPosZ - posZ) / serverPositionTransitionTicker;
-				double dYaw = MathHelper.wrapAngleTo180_double(serverYaw - axes.getYaw());
-				double dPitch = MathHelper.wrapAngleTo180_double(serverPitch - axes.getPitch());
-				double dRoll = MathHelper.wrapAngleTo180_double(serverRoll - axes.getRoll());
+				double dYaw = MathHelper.wrapDegrees(serverYaw - axes.getYaw());
+				double dPitch = MathHelper.wrapDegrees(serverPitch - axes.getPitch());
+				double dRoll = MathHelper.wrapDegrees(serverRoll - axes.getRoll());
 				rotationYaw = (float)(axes.getYaw() + dYaw / serverPositionTransitionTicker);
 				rotationPitch = (float)(axes.getPitch() + dPitch / serverPositionTransitionTicker);
 				float rotationRoll = (float)(axes.getRoll() + dRoll / serverPositionTransitionTicker);
@@ -404,8 +449,9 @@ public class EntityPlane extends EntityDriveable
 		//With a player default to 0.5 for helicopters (hover speed)
 		//And default to the range 0.25 ~ 0.5 for planes (taxi speed ~ take off speed)
 		float throttlePull = 0.99F;
-		if(seats[0] != null && seats[0].getControllingPassenger() != null && mode == EnumPlaneMode.HELI && canThrust())
+		if(seats[0] != null && seats[0].getControllingPassenger() != null && mode == EnumPlaneMode.HELI && canThrust()){
 			throttle = (throttle - 0.5F) * throttlePull + 0.5F;
+		}
 
 		//Get the speed of the plane
 		float lastTickSpeed = (float)getSpeedXYZ();
@@ -413,8 +459,9 @@ public class EntityPlane extends EntityDriveable
 		//Alter angles
 		//Sensitivity function
 		float sensitivityAdjust = (throttle > 0.5F ? 1.5F - throttle : 4F * throttle - 1F); 
-		if(sensitivityAdjust < 0F)
+		if(sensitivityAdjust < 0F){
 			sensitivityAdjust = 0F;
+		}
 		//Scalar
 		sensitivityAdjust *= 0.125F;
 		
@@ -449,15 +496,14 @@ public class EntityPlane extends EntityDriveable
 		axes.rotateLocalPitch(pitch);
 		axes.rotateLocalRoll(-roll);
 		
-		if(worldObj.isRemote && !FlansMod.proxy.mouseControlEnabled())
-		{
+		if(worldObj.isRemote && !FlansMod.proxy.mouseControlEnabled()){
 			//axes.rotateGlobalRoll(-axes.getRoll() * 0.1F);
 		}
 		
 		//Some constants
 		float g = 0.98F / 10F;
 		float drag = 1F - (0.05F * type.drag);
-		//float wobbleFactor = 0F;//.005F;
+		float wobbleFactor = 0F;//.005F;
 		
 		float throttleScaled = 0.01F * (type.maxThrottle + (data.engine == null ? 0 : data.engine.engineSpeed));
 		
@@ -598,7 +644,7 @@ public class EntityPlane extends EntityDriveable
 		for(EntityWheel wheel : wheels)
 		{
 			if(wheel != null && worldObj != null)
-			if(type.floatOnWater && worldObj.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox()))
+			if(type.floatOnWater && worldObj.containsAnyLiquid(wheel.getEntityBoundingBox()))
 			{
 				motionY += type.buoyancy;
 			}
@@ -691,15 +737,13 @@ public class EntityPlane extends EntityDriveable
 				
 		//Sounds
 		//Starting sound
-		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel())
-		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.startSound, false);
+		if(throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel()){
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.startSound, false);
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
-		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel())
-		{
-			PacketPlaySound.sendSoundPacket(posX, posY, posZ, Config.soundRange, dimension, type.engineSound, false);
+		if(throttle > 0.2F && soundPosition == 0 && hasEnoughFuel()){
+			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.engineSound, false);
 			soundPosition = type.engineSoundLength;
 		}
 
@@ -707,16 +751,15 @@ public class EntityPlane extends EntityDriveable
 		if(soundPosition > 0)
 			soundPosition--;
 		
-		for(EntitySeat seat : seats)
-		{
-			if(seat != null)
+		for(EntitySeat seat : seats){
+			if(seat != null){
 				seat.updatePosition();
+			}
 		}
 		
 		//Calculate movement on the client and then send position, rotation etc to the server
-		if(thePlayerIsDrivingThis)
-		{
-			FlansMod.getPacketHandler().sendToServer(new PacketPlaneControl(this));
+		if(thePlayerIsDrivingThis){
+			FlansMod.getNewPacketHandler().sendToServer(new PacketPlaneControl(this));
 			serverPosX = posX;
 			serverPosY = posY;
 			serverPosZ = posZ;
@@ -724,35 +767,33 @@ public class EntityPlane extends EntityDriveable
 		}
 		
 		//If this is the server, send position updates to everyone, having received them from the driver
-		//float updateSpeed = 0.01F;
+		float updateSpeed = 0.01F;
 		if(!worldObj.isRemote)// && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed))
 		{
-			FlansMod.getPacketHandler().sendToAllAround(new PacketPlaneControl(this), posX, posY, posZ, Config.driveableUpdateRange, dimension);
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketPlaneControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 		}
 	}
 
-	public boolean canThrust() 
-	{
+	public boolean canThrust() {
 		return (seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode) || driveableData.fuelInTank > 0;
 	}
 
 	@Override
-	public void setDead()
-	{
+	public void setDead(){
 		super.setDead();
-		for(EntityWheel wheel : wheels)
-			if(wheel != null)
+		for(EntityWheel wheel : wheels){
+			if(wheel != null){
 				wheel.setDead();
+			}
+		}
 	}
 
 	@Override
-	public boolean gearDown()
-	{
+	public boolean gearDown(){
 		return varGear;
 	}
 	
-	private boolean hasWorkingProp()
-	{
+	private boolean hasWorkingProp(){
 		PlaneType type = getPlaneType();
 		if(type.mode == EnumPlaneMode.HELI || type.mode == EnumPlaneMode.VTOL)
 			for(Propeller prop : type.heliPropellers)
@@ -765,15 +806,13 @@ public class EntityPlane extends EntityDriveable
 		return false;
 	}
 
-	public boolean attackEntityFrom(DamageSource damagesource, float i, boolean doDamage)
-	{
+	public boolean attackEntityFrom(DamageSource damagesource, float i, boolean doDamage){
 		if(worldObj.isRemote || isDead)
 			return true;
 
 		PlaneType type = PlaneType.getPlane(driveableType);
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
-		{
+		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();
 			planeStack.setTagCompound(tags);
@@ -785,42 +824,37 @@ public class EntityPlane extends EntityDriveable
 	}
   
 	@Override
-	public boolean canHitPart(EnumDriveablePart part)
-	{
+	public boolean canHitPart(EnumDriveablePart part){
 		return varGear || (part != EnumDriveablePart.coreWheel && part != EnumDriveablePart.leftWingWheel && part != EnumDriveablePart.rightWingWheel && part != EnumDriveablePart.tailWheel);
 	}
 
 	@Override
-	public boolean attackEntityFrom(DamageSource damagesource, float i)
-	{
+	public boolean attackEntityFrom(DamageSource damagesource, float i){
 		return attackEntityFrom(damagesource, i, true);
 	}
 		
-	public PlaneType getPlaneType()
-	{
+	public PlaneType getPlaneType(){
 		return PlaneType.getPlane(driveableType);
 	}
 
 	@Override
-	protected void dropItemsOnPartDeath(Vector3f midpoint, DriveablePart part) 
-	{
+	protected void dropItemsOnPartDeath(Vector3f midpoint, DriveablePart part){
+		
 	}
 
 	@Override
-	public String getBombInventoryName() 
-	{
+	public String getBombInventoryName(){
 		return "Bombs";
 	}
 	
 	@Override
-	public String getMissileInventoryName() 
-	{
+	public String getMissileInventoryName() {
 		return "Missiles";
 	}
 	
 	@Override
-	public boolean hasMouseControlMode()
-	{
+	public boolean hasMouseControlMode(){
 		return true;
 	}
+	
 }

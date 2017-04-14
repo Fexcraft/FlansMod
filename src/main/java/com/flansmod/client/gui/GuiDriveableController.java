@@ -89,7 +89,7 @@ public class GuiDriveableController extends GuiScreen
 		if(i == 1)
 		{
 			mc.displayGuiScreen(null);
-			mc.displayInGameMenu();		
+			mc.displayInGameMenu();
 		}
 		if(i == 59)
 		{
@@ -200,14 +200,14 @@ public class GuiDriveableController extends GuiScreen
 			{
 				plane.pressKey(7, player);
 			}
-			if(FlansMod.proxy.keyDown(KeyInputHandler.bombKey.getKeyCode()))
+			/*if(FlansMod.proxy.keyDown(KeyInputHandler.bombKey.getKeyCode()))
 			{
 				plane.pressKey(8, player);
 			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.gunKey.getKeyCode()))
 			{
 				plane.pressKey(9, player);
-			}				
+			}*/			
 			if(FlansMod.proxy.keyDown(KeyInputHandler.controlSwitchKey.getKeyCode()))
 			{
 				plane.pressKey(10, player);

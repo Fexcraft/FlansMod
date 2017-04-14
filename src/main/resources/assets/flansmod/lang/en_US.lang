@@ -1,8 +1,7 @@
-itemGroup.tabFlan0=Flan's Mod Guns
-itemGroup.tabFlan1=Flan's Mod Vehicles
-itemGroup.tabFlan2=Flan's Mod Parts
-itemGroup.tabFlan3=Flan's Mod Team Stuff
-itemGroup.tabFlan4=Flan's Mod Mechas
+itemGroup.tabFlan0=Flan's Mod Minus - Guns
+itemGroup.tabFlan1=Flan's Mod Minus - Vehicles
+itemGroup.tabFlan2=Flan's Mod Minus - Parts
+itemGroup.tabFlan3=Flan's Mod Minus - Other
 tile.flansmod:flansWorkbench.0.name=Vehicle Crafting Table
 tile.flansmod:flansWorkbench.1.name=Gun Modification Table
 tile.flansmod:flansWorkbench.2.name=Part Crafting Table
@@ -16,3 +15,4 @@ tile.flansmod:teamsSpawner.1.name=Player Spawner
 tile.flansmod:teamsSpawner.2.name=Vehicle Spawner
 item.flansmod:rainbowPaintcan.name=Rainbow Paint Can (for Custom Paintjobs)
 tile.flansmod:paintjobTable.name=Paintjob Table
+tile.flansmod:crate.name=Placeholder Crate

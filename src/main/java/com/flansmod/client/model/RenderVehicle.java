@@ -2,17 +2,10 @@ package com.flansmod.client.model;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveablePosition;
-import com.flansmod.common.driveables.DriveableType;
-import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityVehicle;
-import com.flansmod.common.driveables.EnumDriveablePart;
-import com.flansmod.common.driveables.VehicleType;
-import com.flansmod.common.guns.Paintjob;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -28,21 +21,29 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderVehicle extends Render implements IRenderFactory //implements IItemRenderer
-{
-	public RenderVehicle(RenderManager renderManager) 
-	{
+public class RenderVehicle extends Render implements IRenderFactory {
+	
+	public RenderVehicle(RenderManager renderManager) {
 		super(renderManager);
 		shadowSize = 0.5F;
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-    public void render(EntityVehicle vehicle, double d, double d1, double d2, float f, float f1)
-    {
-    	bindEntityTexture(vehicle);
+	public void bindTexture(Entity ent){
+		super.bindEntityTexture(ent);
+	}
+	
+	public void bindTexture(ResourceLocation rs){
+		super.bindTexture(rs);
+	}
+	
+    public void render(EntityVehicle vehicle, double d, double d1, double d2, float f, float f1){
     	VehicleType type = vehicle.getVehicleType();
-        GL11.glPushMatrix();
-        {
+    	if(type == null){
+    		return;
+    	}
+    	bindEntityTexture(vehicle);
+        GL11.glPushMatrix();{
 	        GL11.glTranslatef((float)d, (float)d1, (float)d2);
 	        float dYaw = (vehicle.axes.getYaw() - vehicle.prevRotationYaw);
 	        for(; dYaw > 180F; dYaw -= 360F) {}
@@ -59,16 +60,14 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 			GL11.glRotatef(180F, 0.0F, 1.0F, 0.0F);
 	
 			float modelScale = type.modelScale;
-			GL11.glPushMatrix();
-			{
+			GL11.glPushMatrix();{
 				GL11.glScalef(modelScale, modelScale, modelScale);
 				ModelVehicle modVehicle = (ModelVehicle)type.model;
 				if(modVehicle != null)
-					modVehicle.render(vehicle, f1);
+					modVehicle.render(this, vehicle, f1);
 				
 				GL11.glPushMatrix();
-				if(type.turretOrigin != null && vehicle.isPartIntact(EnumDriveablePart.turret) && vehicle.seats != null && vehicle.seats[0] != null)
-				{
+				if(type.turretOrigin != null && vehicle.seats != null && vehicle.seats[0] != null){
 					dYaw = (vehicle.seats[0].looking.getYaw() - vehicle.seats[0].prevLooking.getYaw());
 					for(; dYaw > 180F; dYaw -= 360F) {}
 					for(; dYaw <= -180F; dYaw += 360F) {}
@@ -78,30 +77,18 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 					GL11.glRotatef(-yaw, 0.0F, 1.0F, 0.0F);
 					GL11.glTranslatef(-type.turretOrigin.x, -type.turretOrigin.y, -type.turretOrigin.z);
 					
-					if(modVehicle != null)
+					if(modVehicle != null){
 						modVehicle.renderTurret(0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, vehicle, f1);
+					}
 					
-					if(FlansMod.DEBUG)
-					{					
+					if(FlansMod.DEBUG){					
 						GL11.glTranslatef(type.turretOrigin.x, type.turretOrigin.y, type.turretOrigin.z);
 						GL11.glRotatef(-vehicle.seats[0].looking.getPitch(), 0.0F, 0.0F, 1.0F);
 						GL11.glTranslatef(-type.turretOrigin.x, -type.turretOrigin.y, -type.turretOrigin.z);
-						
-						//Render shoot points
-						GL11.glColor4f(0F, 0F, 1F, 0.3F);
-						for(DriveablePosition point : type.shootPointsPrimary)			
-							if(point.part == EnumDriveablePart.turret)
-								renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
-						
-						GL11.glColor4f(0F, 1F, 0F, 0.3F);
-						for(DriveablePosition point : type.shootPointsSecondary)	
-							if(point.part == EnumDriveablePart.turret)
-								renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
 					}
 				}
 				GL11.glPopMatrix();
-				if(modVehicle != null)
-				{
+				if(modVehicle != null){
 					GL11.glPushMatrix();
 					
 					GL11.glTranslatef(modVehicle.drillHeadOrigin.x, modVehicle.drillHeadOrigin.y, modVehicle.drillHeadOrigin.z);
@@ -114,35 +101,20 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 			}
 			GL11.glPopMatrix();
 			
-			if(FlansMod.DEBUG)
-			{
+			if(FlansMod.DEBUG){
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				GL11.glColor4f(1F, 0F, 0F, 0.3F);
 				GL11.glScalef(1F, 1F, 1F);
-				for(DriveablePart part : vehicle.getDriveableData().parts.values())
-				{
-					if(part.box == null)
+				for(DriveablePart part : vehicle.getDriveableData().parts.values()){
+					if(part.box == null){
 						continue;
+					}
 					
 					renderOffsetAABB(new AxisAlignedBB(part.box.x, part.box.y, part.box.z, (part.box.x + part.box.w), (part.box.y + part.box.h), (part.box.z + part.box.d)), 0, 0, 0);
 				}
-				//GL11.glColor4f(0F, 1F, 0F, 0.3F);
-				//if(type.barrelPosition != null)
-				//	renderAABB(AxisAlignedBB.getBoundingBox(type.barrelPosition.x - 0.25F, type.barrelPosition.y - 0.25F, type.barrelPosition.z - 0.25F, type.barrelPosition.x + 0.25F, type.barrelPosition.y + 0.25F, type.barrelPosition.z + 0.25F));
 				
-				//Render shoot points
-				GL11.glColor4f(0F, 0F, 1F, 0.3F);
-				for(DriveablePosition point : type.shootPointsPrimary)			
-					if(point.part != EnumDriveablePart.turret)
-						renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
-				
-				GL11.glColor4f(0F, 1F, 0F, 0.3F);
-				for(DriveablePosition point : type.shootPointsSecondary)	
-					if(point.part != EnumDriveablePart.turret)
-						renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
-
 				
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -154,87 +126,26 @@ public class RenderVehicle extends Render implements IRenderFactory //implements
 	}
 
 	@Override
-	public void doRender(Entity entity, double d, double d1, double d2, float f, float f1)
-	{
-		//render((EntityVehicle)entity, d, d1, d2, f, f1);
+	protected ResourceLocation getEntityTexture(Entity entity){
+		EntityVehicle vehicle = (EntityVehicle)entity;
+		/*if(!vehicle.driveableData.allowURL){
+			/*DriveableType type = ((EntityDriveable)entity).getDriveableType();
+			Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
+			return FlansModResourceHandler.getPaintjobTexture(paintjob);*/
+			/*DriveableType type = ((EntityDriveable)entity).getDriveableType();
+			return type.textures.get(type.paintjob);
+    	}
+    	else{
+    		if(vehicle.driveableData.texture_url == null || vehicle.driveableData.texture_url.length() < 4){
+    			DriveableType type = ((EntityDriveable)entity).getDriveableType();
+    			return type.textures.get(type.paintjob);
+    		}
+    		else{
+    			return RemoteTextureRenderHelper.get(vehicle.driveableData.texture_url);
+    		}
+    	}*/
+		return vehicle.getDriveableType().getTexture(vehicle.getDriveableData());
 	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity) 
-	{
-		DriveableType type = ((EntityDriveable)entity).getDriveableType();
-		Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-		return FlansModResourceHandler.getPaintjobTexture(paintjob);
-	}
-	
-	/*@Override
-	public boolean handleRenderType(ItemStack item, ItemRenderType type) 
-	{
-		switch(type)
-		{
-		case EQUIPPED : case EQUIPPED_FIRST_PERSON : case ENTITY : return Minecraft.getMinecraft().gameSettings.fancyGraphics && item != null && item.getItem() instanceof ItemVehicle && ((ItemVehicle)item.getItem()).type.model != null;
-		default : break;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) 
-	{
-		return false;
-	}
-
-	@Override
-	public void renderItem(ItemRenderType type, ItemStack item, Object... data) 
-	{
-		GL11.glPushMatrix();
-		if(item != null && item.getItem() instanceof ItemVehicle)
-		{
-			VehicleType vehicleType = ((ItemVehicle)item.getItem()).type;
-			if(vehicleType.model != null)
-			{
-				float scale = 1F;
-				switch(type)
-				{
-				case ENTITY:
-				{
-					scale = 1.5F;
-					//GL11.glRotatef(((EntityItem)data[1]).ticksExisted, 0F, 1F, 0F);
-					break;
-				}
-				case INVENTORY:
-				{
-					scale = 0.70F;
-					GL11.glTranslatef(0F, -0.05F, 0F);
-					break;
-				}
-				case EQUIPPED:
-				{
-					GL11.glRotatef(0F, 0F, 0F, 1F);
-					GL11.glRotatef(270F, 1F, 0F, 0F);
-					GL11.glRotatef(270F, 0F, 1F, 0F);
-					GL11.glTranslatef(0F, 0.25F, 0F);
-					scale = 0.5F;
-					break;
-				}
-				case EQUIPPED_FIRST_PERSON:
-				{
-					//GL11.glRotatef(25F, 0F, 0F, 1F); 
-					GL11.glRotatef(45F, 0F, 1F, 0F);
-					GL11.glTranslatef(-0.5F, 0.5F, -0.5F);
-					break;
-				}
-				default : break;
-				}
-				
-				GL11.glScalef(scale / vehicleType.cameraDistance, scale / vehicleType.cameraDistance, scale / vehicleType.cameraDistance);
-				Minecraft.getMinecraft().renderEngine.bindTexture(FlansModResourceHandler.getTexture(vehicleType));
-				ModelDriveable model = vehicleType.model;
-				model.render(vehicleType);
-			}
-		}
-		GL11.glPopMatrix();
-	}*/
 	
 	@SubscribeEvent
 	public void renderWorld(RenderWorldLastEvent event)

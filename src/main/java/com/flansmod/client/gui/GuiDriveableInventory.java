@@ -5,12 +5,6 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.ContainerDriveableInventory;
-import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.network.PacketDriveableGUI;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -18,9 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import com.flansmod.common.driveables.ContainerDriveableInventory;
+import com.flansmod.common.driveables.EntityDriveable;
+
 public class GuiDriveableInventory extends GuiContainer
 {
-	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/planeInventory.png");
+	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/driveable_inventory.png");
 
 	public ContainerDriveableInventory container;
 	public InventoryPlayer inventory;
@@ -63,29 +60,6 @@ public class GuiDriveableInventory extends GuiContainer
 			{
 				if(slotsDone >= 3 + scroll)
 					continue;
-				if(driveable.getDriveableType().seats[i].gunType != null)
-				{
-					if(slotsDone >= scroll)
-					{
-						fontRendererObj.drawString(driveable.getDriveableType().seats[i].gunName, 53, 29 + 19 * (slotsDone - scroll), 0x000000);
-						drawStack(new ItemStack(driveable.getDriveableType().seats[i].gunType.getItem()), 10, 25 + 19 * (slotsDone - scroll));
-					}
-					slotsDone++;
-				}
-			}
-			for(int i = 0; i < driveable.getDriveableType().pilotGuns.size(); i++)
-			{
-				if(slotsDone >= 3 + scroll)
-					continue;
-				if(driveable.getDriveableType().pilotGuns.get(i).type != null)
-				{
-					if(slotsDone >= scroll)
-					{
-						fontRendererObj.drawString("Driver's gun " + (i + 1), 53, 29 + 19 * (slotsDone - scroll), 0x000000);
-						drawStack(new ItemStack(driveable.getDriveableType().pilotGuns.get(i).type.getItem()), 10, 25 + 19 * (slotsDone - scroll));
-					}
-					slotsDone++;
-				}
 			}
 		}
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -174,13 +148,13 @@ public class GuiDriveableInventory extends GuiContainer
 		}
 		if(m > 161 && m < 171 && n > 5 && n < 15)
 		{
-			if(driveable instanceof EntityMecha)
+			/*if(driveable instanceof EntityMecha)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
+				//FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableGUI(4));
 				(inventory.player).openGui(FlansMod.INSTANCE, 10, world, driveable.chunkCoordX, driveable.chunkCoordY, driveable.chunkCoordZ);
 			}
-			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, driveable));
+			else*/
+			mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, driveable));
 		}
 	}
 	

@@ -5,14 +5,9 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
-import com.flansmod.common.driveables.mechas.EntityMecha;
-import com.flansmod.common.network.PacketDriveableGUI;
-import com.flansmod.common.util.Ticker;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -68,7 +63,7 @@ public class GuiDriveableRepair extends GuiScreen
 	@Override
 	protected void actionPerformed(GuiButton button)
 	{
-		FlansMod.proxy.repairDriveable(driver, driving, partsToDraw.get(button.id));
+		//FlansMod.proxy.repairDriveable(driver, driving, partsToDraw.get(button.id));
 	}
 
 	private void updateButtons()
@@ -145,7 +140,7 @@ public class GuiDriveableRepair extends GuiScreen
 				InventoryPlayer temporaryInventory = new InventoryPlayer(null);
 				temporaryInventory.copyInventory(driver.inventory);
 				
-				ArrayList<ItemStack> stacksNeeded = driving.getDriveableType().getItemsRequired(part, driving.getDriveableData().engine);
+				/*ArrayList<ItemStack> stacksNeeded = driving.getDriveableType().getItemsRequired(part, driving.getDriveableData().engine);
 				//Draw the stacks that should be in each slot
 				for(int n = 0; n < 7; n++)
 				{
@@ -167,30 +162,30 @@ public class GuiDriveableRepair extends GuiScreen
 							if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 							{
 								//Work out the amount to take from the stack
-								int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+								int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 								//Take it
-								stackInSlot.stackSize -= amountFound;
+								stackInSlot.shrink(amountFound);
 								//Check for empty stacks
-								if(stackInSlot.stackSize <= 0)
+								if(stackInSlot.getCount() <= 0)
 									stackInSlot = null;
 								//Put the modified stack back in the inventory
 								temporaryInventory.setInventorySlotContents(m, stackInSlot);
 								//Increase the amount found counter
 								totalAmountFound += amountFound;
 								//If we have enough, stop looking
-								if(totalAmountFound == stackNeeded.stackSize)
+								if(totalAmountFound == stackNeeded.getCount())
 									break;
 							}
 						}
 						//If we did not find enough in the inventory
-						if(totalAmountFound < stackNeeded.stackSize)
+						if(totalAmountFound < stackNeeded.getCount())
 						{
 							mc.renderEngine.bindTexture(texture);
 							drawTexturedModalRect(guiOriginX + 67 + 18 * n, guiOriginY + y + 22, 202, 0, 16, 16);
 						}
 						drawSlotInventory(stacksNeeded.get(stackNum), guiOriginX + 67 + 18 * n, guiOriginY + y + 22);
 					}
-				}
+				}*/
 			}
 			
 			//Increase the render y value for the next part
@@ -206,13 +201,13 @@ public class GuiDriveableRepair extends GuiScreen
 		int m = i - guiOriginX;
 		int n = j - guiOriginY;
 		if(m > 185 && m < 195 && n > 5 && n < 15)
-			if(driving instanceof EntityMecha)
+			/*if(driving instanceof EntityMecha)
 			{
-				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
-				(driver).openGui(FlansMod.INSTANCE, 10, driver.worldObj, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
+				//TODO FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
+				(driver).openGui(FlansMod.INSTANCE, 10, driver.world, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
 			}
-			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.worldObj, driving));
+			else*/
+			mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.worldObj, driving));
 	}
 
 	/** Item stack renderering method */

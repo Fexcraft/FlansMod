@@ -3,9 +3,10 @@ package com.flansmod.client.model;
 import java.util.HashMap;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.driveables.DriveableType;
+import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
 
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.model.ModelBase;
 
 public class ModelDriveable extends ModelBase 
@@ -17,6 +18,11 @@ public class ModelDriveable extends ModelBase
 	public ModelRendererTurbo bodyModel[] = new ModelRendererTurbo[0];
 	public ModelRendererTurbo bodyDoorOpenModel[] = new ModelRendererTurbo[0];
 	public ModelRendererTurbo bodyDoorCloseModel[] = new ModelRendererTurbo[0];
+	
+	public ModelRendererTurbo primaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo secondaryPaintBodyModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorOpenModel[] = new ModelRendererTurbo[0];
+	public ModelRendererTurbo primaryPaintBodyDoorCloseModel[] = new ModelRendererTurbo[0];
 	
 	/** Set to true to use the old rotation order (ZYX) rather than (YZX) */
 	public boolean oldRotateOrder = false;
@@ -31,6 +37,13 @@ public class ModelDriveable extends ModelBase
 	{
 		renderPart(bodyModel);
 		renderPart(bodyDoorCloseModel);
+		//
+		renderPart(primaryPaintBodyModel);
+		//Print.spam(1, "CHECK");
+		renderPart(secondaryPaintBodyModel);
+		renderPart(primaryPaintBodyDoorOpenModel);
+		renderPart(primaryPaintBodyDoorCloseModel);
+		//
 		for(ModelRendererTurbo[][] gun : gunModels.values())
 			for(ModelRendererTurbo[] gunPart : gun)
 				renderPart(gunPart);
@@ -64,6 +77,12 @@ public class ModelDriveable extends ModelBase
 		flip(bodyModel);
 		flip(bodyDoorOpenModel);
 		flip(bodyDoorCloseModel);
+		//
+		flip(primaryPaintBodyModel);
+		flip(secondaryPaintBodyModel);
+		flip(primaryPaintBodyDoorOpenModel);
+		flip(primaryPaintBodyDoorCloseModel);
+		//
 		for(ModelRendererTurbo[][] modsOfMods : gunModels.values())
 		{
 			for(ModelRendererTurbo[] mods : modsOfMods)
@@ -88,6 +107,12 @@ public class ModelDriveable extends ModelBase
 		translate(bodyModel, x, y, z);
 		translate(bodyDoorOpenModel, x, y, z);
 		translate(bodyDoorCloseModel, x, y, z);
+		//
+		translate(primaryPaintBodyModel, x, y, z);
+		translate(secondaryPaintBodyModel, x, y, z);
+		translate(primaryPaintBodyDoorOpenModel, x, y, z);
+		translate(primaryPaintBodyDoorCloseModel, x, y, z);
+		//
 		for(ModelRendererTurbo[][] modsOfMods : gunModels.values())
 		{
 			for(ModelRendererTurbo[] mods : modsOfMods)

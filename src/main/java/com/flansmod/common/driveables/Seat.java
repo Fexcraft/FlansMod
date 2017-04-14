@@ -1,6 +1,5 @@
 package com.flansmod.common.driveables;
 
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.vector.Vector3f;
 
 public class Seat 
@@ -14,8 +13,6 @@ public class Seat
 	public float minYaw = -360F, maxYaw = 360F;
 	/** Limits for the look vector of the seat. Range is -90 to 90, but don't go beyond +/-89 or the view will mess up at the poles */
 	public float minPitch = -89F, maxPitch = 89F;
-	/** The gun this seat requires. As of 1.6.2, seats and planes will require specific guns as opposed to being completely open to anything */
-	public GunType gunType;
 	/** The name of the gun model this seat is connected to. Gun model names are specified in the model files */
 	public String gunName;
 	/** The part of the driveable this seat is connected to. */
@@ -62,11 +59,6 @@ public class Seat
 			maxYaw = Float.parseFloat(split[7]);
 			minPitch = Float.parseFloat(split[8]);
 			maxPitch = Float.parseFloat(split[9]);
-			if(split.length > 10)
-			{
-				gunType = GunType.getGun(split[10]);
-				gunName = split[11];
-			}
 		}
 	}
 	

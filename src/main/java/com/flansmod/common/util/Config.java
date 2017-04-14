@@ -5,7 +5,9 @@ import java.io.File;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class Config {
 	
@@ -18,7 +20,7 @@ public class Config {
 	
 	public static boolean explosions, vehiclesBreakBlocks, vehiclesNeedFuel, canBreakGuns, canBreakGlass;
 	public static boolean bombsEnabled, bulletsEnabled, shellsEnabled, forceAdventureMode, overrideHunger;
-	public static int weaponDrops, planeLife, vehicleLife;
+	public static int weaponDrops, planeLife, vehicleLife, maxVehicleKeys;
 	
 	public static final float soundRange = 50F;
 	public static final float driveableUpdateRange = 200F;
@@ -48,6 +50,7 @@ public class Config {
 		vehiclesNeedFuel = JsonUtil.getIfExists(object, "vehiclesNeedFuel", true);
 		planeLife = JsonUtil.getIfExists(object, "planeLife", 0).intValue();
 		vehicleLife = JsonUtil.getIfExists(object, "vehicleLife", 0).intValue();
+		maxVehicleKeys = JsonUtil.getIfExists(object, "maxVehicleKeys", 3).intValue();
 		JsonUtil.write(file, object);
 	}
 
@@ -66,6 +69,11 @@ public class Config {
 		}
 		JsonUtil.write(file, object);
 		Util.log("Config Saved.");
+	}
+
+
+	public static TargetPoint getTargetPoint(Entity entity){
+		return new TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, driveableUpdateRange);
 	}
 	
 }

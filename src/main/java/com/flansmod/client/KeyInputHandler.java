@@ -3,22 +3,14 @@ package com.flansmod.client;
 import org.lwjgl.input.Keyboard;
 
 import com.flansmod.api.IControllable;
-import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.PlayerData;
-import com.flansmod.common.PlayerHandler;
-import com.flansmod.common.guns.GunType;
-import com.flansmod.common.guns.ItemGun;
-import com.flansmod.common.network.PacketReload;
-import com.flansmod.common.network.PacketRequestDebug;
 
+import net.fexcraft.mod.lib.util.cls.Print;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
@@ -26,46 +18,30 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(value = Side.CLIENT)
-public class KeyInputHandler
-{  
-	//public static KeyBinding accelerateKey = new KeyBinding("Accelerate Key", Keyboard.KEY_W, "Flan's Mod");
-	//public static KeyBinding decelerateKey = new KeyBinding("Decelerate Key", Keyboard.KEY_S, "Flan's Mod");
-	//public static KeyBinding leftKey = new KeyBinding("Left Key", Keyboard.KEY_A, "Flan's Mod");
-	//public static KeyBinding rightKey = new KeyBinding("Right Key", Keyboard.KEY_D, "Flan's Mod");
-	//public static KeyBinding upKey = new KeyBinding("Up Key", Keyboard.KEY_SPACE, "Flan's Mod");
-	public static KeyBinding downKey = new KeyBinding("Down key", Keyboard.KEY_LCONTROL, "Flan's Mod");
-	//public static KeyBinding exitKey = new KeyBinding("Exit Key", Keyboard.KEY_LSHIFT, "Flan's Mod");
-	public static KeyBinding inventoryKey = new KeyBinding("Inventory key", Keyboard.KEY_R, "Flan's Mod");
-	public static KeyBinding bombKey = new KeyBinding("Bomb Key", Keyboard.KEY_V, "Flan's Mod");
-	public static KeyBinding gunKey = new KeyBinding("Gun Key", Keyboard.KEY_B, "Flan's Mod");
-	public static KeyBinding controlSwitchKey = new KeyBinding("Control Switch key", Keyboard.KEY_C, "Flan's Mod");
-	public static KeyBinding reloadKey = new KeyBinding("Reload key", Keyboard.KEY_R, "Flan's Mod");
-	//public static KeyBinding teamsMenuKey = new KeyBinding("Teams Menu Key", Keyboard.KEY_G, "Flan's Mod");
-	//public static KeyBinding teamsScoresKey = new KeyBinding("Teams Scores Key", Keyboard.KEY_H, "Flan's Mod");
-	public static KeyBinding leftRollKey = new KeyBinding("Roll Left Key", Keyboard.KEY_Z, "Flan's Mod");
-	public static KeyBinding rightRollKey = new KeyBinding("Roll Right Key", Keyboard.KEY_X, "Flan's Mod");
-	public static KeyBinding gearKey = new KeyBinding("Gear Up / Down Key", Keyboard.KEY_L, "Flan's Mod");
-	public static KeyBinding doorKey = new KeyBinding("Door Open / Close Key", Keyboard.KEY_K, "Flan's Mod");
-	public static KeyBinding modeKey = new KeyBinding("Mode Switch Key", Keyboard.KEY_J, "Flan's Mod");
-	//public static KeyBinding trimKey = new KeyBinding("Trim Key", Keyboard.KEY_O, "Flan's Mod");
-	public static KeyBinding debugKey = new KeyBinding("Debug Key", Keyboard.KEY_F10, "Flan's Mod");
-	public static KeyBinding reloadModelsKey = new KeyBinding("Reload Models Key", Keyboard.KEY_F9, "Flan's Mod");
-	//public static KeyBinding zoomKey = new KeyBinding("Zoom Key", 2 - 100, "Flan's Mod");
+public class KeyInputHandler{
+	
+	private static final String name = FlansMod.NAME;
+	public static KeyBinding downKey          = new KeyBinding("Down key",              Keyboard.KEY_LCONTROL, name);
+	public static KeyBinding inventoryKey     = new KeyBinding("Inventory key",         Keyboard.KEY_R, name);
+	//public static KeyBinding bombKey          = new KeyBinding("Bomb Key",              Keyboard.KEY_V, name);
+	//public static KeyBinding gunKey           = new KeyBinding("Gun Key",               Keyboard.KEY_B, name);
+	public static KeyBinding controlSwitchKey = new KeyBinding("Control Switch key",    Keyboard.KEY_C, name);
+	public static KeyBinding reloadKey        = new KeyBinding("Reload key",            Keyboard.KEY_R, name);
+	public static KeyBinding leftRollKey      = new KeyBinding("Roll Left Key",         Keyboard.KEY_Z, name);
+	public static KeyBinding rightRollKey     = new KeyBinding("Roll Right Key",        Keyboard.KEY_X, name);
+	public static KeyBinding gearKey          = new KeyBinding("Gear Up / Down Key",    Keyboard.KEY_L, name);
+	public static KeyBinding doorKey          = new KeyBinding("Door Open / Close Key", Keyboard.KEY_K, name);
+	public static KeyBinding modeKey          = new KeyBinding("Mode Switch Key",       Keyboard.KEY_J, name);
+	public static KeyBinding debugKey         = new KeyBinding("Debug Key",             Keyboard.KEY_F10, name);
+	public static KeyBinding reloadModelsKey  = new KeyBinding("Reload Models Key",     Keyboard.KEY_F9, name);
 
 	Minecraft mc;
 	
-	public KeyInputHandler()
-	{
-		//ClientRegistry.registerKeyBinding(accelerateKey);
-		//ClientRegistry.registerKeyBinding(decelerateKey);
-		//ClientRegistry.registerKeyBinding(leftKey);
-		//ClientRegistry.registerKeyBinding(rightKey);
-		//ClientRegistry.registerKeyBinding(upKey);
+	public KeyInputHandler(){
 		ClientRegistry.registerKeyBinding(downKey);
-		//ClientRegistry.registerKeyBinding(exitKey);
 		ClientRegistry.registerKeyBinding(inventoryKey);
-		ClientRegistry.registerKeyBinding(bombKey);
-		ClientRegistry.registerKeyBinding(gunKey);
+		//ClientRegistry.registerKeyBinding(bombKey);
+		//ClientRegistry.registerKeyBinding(gunKey);
 		ClientRegistry.registerKeyBinding(controlSwitchKey);
 		ClientRegistry.registerKeyBinding(reloadKey);
 		ClientRegistry.registerKeyBinding(leftRollKey);
@@ -73,38 +49,28 @@ public class KeyInputHandler
 		ClientRegistry.registerKeyBinding(gearKey);
 		ClientRegistry.registerKeyBinding(doorKey);
 		ClientRegistry.registerKeyBinding(modeKey);
-		//ClientRegistry.registerKeyBinding(trimKey);
 		ClientRegistry.registerKeyBinding(debugKey);
 		ClientRegistry.registerKeyBinding(reloadModelsKey);
-		//ClientRegistry.registerKeyBinding(zoomKey);
-		
 		mc = Minecraft.getMinecraft();
 	}
 
-	public void CheckKeyInput(KeyInputEvent event)
-	{
-		if(FMLClientHandler.instance().isGUIOpen(GuiChat.class) || mc.currentScreen != null)
+	public void checkKeyInput(KeyInputEvent event){
+		if(FMLClientHandler.instance().isGUIOpen(GuiChat.class) || mc.currentScreen != null){
 			return;
+		}
 		
-		EntityPlayer player = mc.thePlayer;
-		Entity ridingEntity = player.getRidingEntity();
 		
-		//Handle universal keys
-		if(reloadKey.isPressed())
-		{
+		/*//Handle universal keys
+		if(reloadKey.isPressed()){
 			PlayerData data = PlayerHandler.getPlayerData(player, Side.CLIENT);
 			ItemStack stack = player.getHeldItemMainhand();
-			
-			if(data.shootTimeRight <= 0.0f)
-			{
-				if(stack != null && stack.getItem() instanceof ItemGun)
-				{
+			if(data.shootTimeRight <= 0.0f){
+				if(stack != null && stack.getItem() instanceof ItemGun){
 					ItemGun item = (ItemGun)stack.getItem();
 					GunType type = item.getInfoType();
 					
-					if(item.CanReload(stack, player.inventory))
-					{
-						FlansMod.getPacketHandler().sendToServer(new PacketReload(EnumHandSide.RIGHT, true));
+					if(item.CanReload(stack, player.inventory)){
+						//TODO FlansMod.getPacketHandler().sendToServer(new PacketReload(EnumHandSide.RIGHT, true));
 	
 						//Set player shoot delay to be the reload delay
 						//Set both gun delays to avoid reloading two guns at once
@@ -121,22 +87,25 @@ public class KeyInputHandler
 					}
 				}
 			}
-		}
-		if(debugKey.isPressed())
-		{
-			if(FlansMod.DEBUG)
+		}*/
+		/*if(debugKey.isPressed()){
+			if(FlansMod.DEBUG){
 				FlansMod.DEBUG = false;
-			else
-			{
-				FlansMod.packetHandler.sendToServer(new PacketRequestDebug());
 			}
-		}
-		if(reloadModelsKey.isPressed())
-		{
+			else{
+				//FlansMod.packetHandler.sendToServer(new PacketRequestDebug());
+				JsonObject obj = JsonUtil.getJsonForPacket("flansmod_debug");
+				obj.addProperty("task", "debug");
+				PacketHandler.getInstance().sendToServer(new PacketJsonObject(obj));
+			}
+		}*/
+
+		EntityPlayer player = mc.thePlayer;
+		if(reloadModelsKey.isPressed()){
+			Print.chat(player, "Reloading resources.");
 			FlansModClient.reloadModels(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT));
 		}
-		
-		//Handle driving keys
+		Entity ridingEntity = player.getRidingEntity();
 		if(ridingEntity instanceof IControllable){
 			IControllable riding = (IControllable)ridingEntity;
 			if(mc.gameSettings.keyBindForward.isPressed()){
@@ -163,12 +132,12 @@ public class KeyInputHandler
 			if(mc.gameSettings.keyBindInventory.isPressed() || inventoryKey.isPressed()){
 				riding.pressKey(7, player);
 			}
-			if(bombKey.isPressed()){
+			/*if(bombKey.isPressed()){
 				riding.pressKey(8, player);
 			}
 			if(gunKey.isPressed()){
 				riding.pressKey(9, player);
-			}
+			}*/
 			if(controlSwitchKey.isPressed()){
 				riding.pressKey(10, player);
 			}
@@ -187,19 +156,6 @@ public class KeyInputHandler
 			if(modeKey.isPressed()){
 				riding.pressKey(15, player);
 			}
-			//if(trimKey.isPressed())
-			//	riding.pressKey(16, player);
-			
-			/*
-			for(KeyBinding key : mc.gameSettings.keyBindings )
-			{
-				if(key.isPressed())
-				{
-					key.pressed = true;
-					key.pressTime = 1;
-				}
-			}
-			*/
 		}
 	}
 }

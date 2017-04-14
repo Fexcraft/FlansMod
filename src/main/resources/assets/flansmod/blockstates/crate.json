@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "normal": { "model": "flansmod:crate" },
+        "facing=north": { "model": "flansmod:crate" },
+        "facing=south": { "model": "flansmod:crate" },
+        "facing=west":  { "model": "flansmod:crate" },
+        "facing=east":  { "model": "flansmod:crate" }
+    }
+}

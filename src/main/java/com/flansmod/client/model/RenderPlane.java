@@ -2,17 +2,11 @@ package com.flansmod.client.model;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.data.PlaneType;
 import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveablePosition;
-import com.flansmod.common.driveables.DriveableType;
-import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityPlane;
-import com.flansmod.common.driveables.PlaneType;
 import com.flansmod.common.driveables.Propeller;
-import com.flansmod.common.guns.Paintjob;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -109,12 +103,13 @@ public class RenderPlane extends Render implements IRenderFactory //implements I
 			
 			//Render shoot points
 			GL11.glColor4f(1F, 0F, 1F, 0.3F);
-			for(DriveablePosition point : type.shootPointsPrimary)			
+			/*for(DriveablePosition point : type.shootPointsPrimary)			
 				renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
 			
 			GL11.glColor4f(0F, 1F, 0F, 0.3F);
 			for(DriveablePosition point : type.shootPointsSecondary)			
 				renderOffsetAABB(new AxisAlignedBB(point.position.x - 0.25F, point.position.y - 0.25F, point.position.z - 0.25F, point.position.x + 0.25F, point.position.y + 0.25F, point.position.z + 0.25F), 0, 0, 0);
+			*/
 			
 			//GL11.glColor4f(0F, 0F, 0F, 0.3F);	
 			//if(type.bombPosition != null)
@@ -141,11 +136,9 @@ public class RenderPlane extends Render implements IRenderFactory //implements I
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity) 
-	{
-		DriveableType type = ((EntityDriveable)entity).getDriveableType();
-		Paintjob paintjob = type.getPaintjob(((EntityDriveable)entity).getDriveableData().paintjobID);
-		return FlansModResourceHandler.getPaintjobTexture(paintjob);
+	protected ResourceLocation getEntityTexture(Entity entity){
+		EntityPlane plane = (EntityPlane)entity;
+		return plane.getDriveableType().getTexture(plane.getDriveableData());
 	}
 
 	/*@Override
