@@ -46,7 +46,7 @@ public class ClientEventHandler {
 	}
 	
 	@SubscribeEvent
-	public void addInfo(RenderGameOverlayEvent event){
+	public void addDebugInfo(RenderGameOverlayEvent event){
 		Minecraft mc = Minecraft.getMinecraft();
 		//DEBUG vehicles
 		if(mc.player.getRidingEntity() instanceof EntitySeat){
@@ -59,8 +59,9 @@ public class ClientEventHandler {
 		else if(mc.player.getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
 			com.flansmod.fvm.LandVehicle ent = ((com.flansmod.fvm.EntitySeat)mc.player.getRidingEntity()).vehicle;
 			mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+			mc.fontRendererObj.drawString("Gear: " + (ent.data.parts.containsKey("gearbox") ? ent.data.current_gear : "auto"), 2, 12, 0xffffff);
 			if(Static.dev()){
-				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 22, 0xffffff);
 			}
 		}
 	}

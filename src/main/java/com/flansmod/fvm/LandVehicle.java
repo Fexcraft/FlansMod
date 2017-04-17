@@ -18,6 +18,7 @@ import com.flansmod.fvm.packets.PacketVehicleControl;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.fvm.FVM;
 import net.fexcraft.mod.fvm.data.LoadedIn;
+import net.fexcraft.mod.fvm.data.PartType;
 import net.fexcraft.mod.fvm.data.VehicleType;
 import net.fexcraft.mod.fvm.items.VehicleItem;
 import net.fexcraft.mod.fvm.util.FvmPerms;
@@ -97,6 +98,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	public float wheelsAngle;
 	/** Delayer for door button */
 	public int toggleTimer = 0;
+	public long gear_cooldown;
 	
 	
 	public LandVehicle(World world){
@@ -404,6 +406,29 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		return false;
 	}
 	
+	private static float modifyThrottle(float throttle, VehicleType data){
+		if(data.hasPartType("gearbox") && !data.parts.get("gearbox").automatic_gearbox){
+			if(data.current_gear == 0){
+				return throttle -= 0.05f;
+			}
+			PartType gear = data.parts.get("gearbox");
+			throttle += 0.01F;
+			if(throttle > gear.gears.get(data.current_gear)){
+				throttle = gear.gears.get(data.current_gear);
+			}
+			if(throttle > 1F){
+				throttle = 1F;
+			}
+		}
+		else{
+			throttle += 0.01F;
+			if(throttle > 1F){
+				throttle = 1F;
+			}
+		}
+		return throttle;
+	}
+	
 	@Override
 	public boolean pressKey(int key, EntityPlayer player){
 		try{
@@ -411,25 +436,19 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				return false;
 			}
 			//Send keys which require server side updates to the server
-			if(world.isRemote && (key == 6 || key == 8 || key == 9)){
+			if(world.isRemote && (key == 6 || key == 8 || key == 9 || key == 16 || key == 17)){
 				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 				return true;
 			}
 			switch(key){
 				case 0 : //Accelerate : Increase the throttle, up to 1.
 				{
-					throttle += 0.01F;
-					if(throttle > 1F)
-						throttle = 1F;
+					throttle = modifyThrottle(throttle, data);
 					return true;
 				}
 				case 1 : //Decelerate : Decrease the throttle, down to -1, or 0 if the vehicle cannot reverse
 				{
-					throttle -= 0.01F;
-					if(throttle < -1F)
-						throttle = -1F;
-					if(throttle < 0F && data.maxNegativeThrottle == 0F)
-						throttle = 0F;
+					throttle = -modifyThrottle(-throttle, data);
 					return true;
 				}
 				case 2 : //Left : Yaw the wheels left
@@ -507,13 +526,30 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				{
 					return true;
 				}
-				case 16 : // Trim Button
+				case 16:
 				{
-					//applyTorque(new Vector3f(axes.getRoll() / 10, 0F, 0F));
+					if(data.hasPartType("gearbox") && !data.parts.get("gearbox").automatic_gearbox){
+						PartType gearbox = data.parts.get("gearbox");
+						if(this.gear_cooldown == 0){
+							if(gearbox.gears.containsKey(data.current_gear + 1)){
+								data.current_gear += 1;
+								this.gear_cooldown = gearbox.gear_cooldown;
+							}
+						}
+					}
 					return true;
 				}
-				case 17 : //Park
+				case 17:
 				{
+					if(data.hasPartType("gearbox") && !data.parts.get("gearbox").automatic_gearbox){
+						PartType gearbox = data.parts.get("gearbox");
+						if(this.gear_cooldown == 0){
+							if(gearbox.gears.containsKey(data.current_gear - 1)){
+								data.current_gear -= 1;
+								this.gear_cooldown = gearbox.gear_cooldown;
+							}
+						}
+					}
 					break;
 				}
 			}
@@ -574,6 +610,11 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
         			wheels[i] = new EntityWheel(world, this, i);
     				world.spawnEntity(wheels[i]);
         		}
+        	}
+        }
+        else{
+        	if(gear_cooldown > 0){
+        		gear_cooldown--;
         	}
         }
         

@@ -34,6 +34,8 @@ public class KeyInputHandler{
 	public static KeyBinding modeKey          = new KeyBinding("Mode Switch Key",       Keyboard.KEY_J, name);
 	public static KeyBinding debugKey         = new KeyBinding("Debug Key",             Keyboard.KEY_F10, name);
 	public static KeyBinding reloadModelsKey  = new KeyBinding("Reload Models Key",     Keyboard.KEY_F9, name);
+	public static KeyBinding gearUp           = new KeyBinding("Geabox +",              Keyboard.KEY_G, name);
+	public static KeyBinding gearDown         = new KeyBinding("Geabox -",              Keyboard.KEY_H, name);
 
 	Minecraft mc;
 	
@@ -51,6 +53,8 @@ public class KeyInputHandler{
 		ClientRegistry.registerKeyBinding(modeKey);
 		ClientRegistry.registerKeyBinding(debugKey);
 		ClientRegistry.registerKeyBinding(reloadModelsKey);
+		ClientRegistry.registerKeyBinding(gearUp);
+		ClientRegistry.registerKeyBinding(gearDown);
 		mc = Minecraft.getMinecraft();
 	}
 
@@ -155,6 +159,12 @@ public class KeyInputHandler{
 			}
 			if(modeKey.isPressed()){
 				riding.pressKey(15, player);
+			}
+			if(gearUp.isPressed()){
+				riding.pressKey(16, player);
+			}
+			if(gearDown.isPressed()){
+				riding.pressKey(17, player);
 			}
 		}
 	}
