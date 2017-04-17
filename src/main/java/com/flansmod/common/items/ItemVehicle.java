@@ -102,7 +102,7 @@ public class ItemVehicle extends ItemMapBase {
 		PartType part = PartType.getPart(tags.getString("Engine"));
 		if(part == null){
 			part = PartType.defaultEngines.get(EnumType.vehicle);
-			tags.setString("Engine", part.name);
+			tags.setString("Engine", part.registryname);
 		}
 		lines.add(part.name);
 		if(!tags.hasKey("Minus")){

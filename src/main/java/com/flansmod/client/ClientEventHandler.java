@@ -1,50 +1,29 @@
 package com.flansmod.client;
 
+import com.flansmod.common.driveables.EntityDriveable;
+import com.flansmod.common.driveables.EntitySeat;
+
+import net.fexcraft.mod.lib.util.common.Static;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 /** All handled events for the client should go through here and be passed on. Makes it easier to see which events are being handled by the mod */
 public class ClientEventHandler {
+	
 	private KeyInputHandler keyInputHandler = new KeyInputHandler();
-
-	/** List for storing replacement EntityItemCustomRenderers. Stops concurrent modifications and messing up the entity list. */
-	//private LinkedList<EntityItemCustomRender> replacementItemEntities = new LinkedList<>();
-
-	@SubscribeEvent
-	public void renderTick(TickEvent.RenderTickEvent event)
-	{
-		switch(event.phase)
-		{
-			case START :
-			{
-				FlansModClient.UpdateCameraZoom(event.renderTickTime);
-				break;
-			}
-			case END :
-			{
-				
-				break;
-			}
-		}	
-	}
 	
 	@SubscribeEvent
-	public void clientTick(TickEvent.ClientTickEvent event)
-	{
-		switch(event.phase)
-		{
-			case START :
-			{
-				//Handle all packets received since last tick
-				//FlansMod.getPacketHandler().handleClientPackets();
-				FlansModClient.UpdateFlashlights(Minecraft.getMinecraft());
+	public void clientTick(TickEvent.ClientTickEvent event){
+		switch(event.phase){
+			case START :{
 				break;
 			}
-			case END :
-			{
+			case END :{
 		    	//InstantBulletRenderer.UpdateAllTrails();
 				FlansModClient.tick();
 				break;
@@ -64,6 +43,32 @@ public class ClientEventHandler {
 	@SubscribeEvent
 	public void checkKeyInput(KeyInputEvent event){
 		keyInputHandler.checkKeyInput(event);
+	}
+	
+	@SubscribeEvent
+	public void addInfo(RenderGameOverlayEvent event){
+		Minecraft mc = Minecraft.getMinecraft();
+		//DEBUG vehicles
+		if(mc.player.getRidingEntity() instanceof EntitySeat){
+			EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;;
+			mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+			if(Static.dev()){
+				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+			}
+		}
+		else if(mc.player.getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
+			com.flansmod.fvm.LandVehicle ent = ((com.flansmod.fvm.EntitySeat)mc.player.getRidingEntity()).vehicle;
+			mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+			if(Static.dev()){
+				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+			}
+		}
+	}
+	
+	public static float calculateSpeed(Entity ent){
+		double dX = ent.posX - ent.prevPosX, dY = ent.posY - ent.prevPosY, dZ = ent.posZ - ent.prevPosZ;
+		float speed = (float)Math.sqrt(dX * dX + dY * dY + dZ * dZ) * 1000F / 16F; 
+		return speed = (int)(speed * 10F) / 10F;
 	}
 
 }

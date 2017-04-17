@@ -39,7 +39,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-
 public class EntityVehicle extends EntityDriveable {
 	
 	/** Weapon delays */

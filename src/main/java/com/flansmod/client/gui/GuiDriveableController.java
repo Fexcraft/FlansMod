@@ -52,14 +52,14 @@ public class GuiDriveableController extends GuiScreen
 		}
 		
 		int dWheel = Mouse.getDWheel();
-		if(dWheel != 0)
-		{
+		if(dWheel != 0){
 			player.inventory.changeCurrentItem(dWheel);
 		}
 		
 		//Right mouse. Fires shells, drops bombs. Is not a holding thing
-		if(Mouse.isButtonDown(1))
+		if(Mouse.isButtonDown(1)){
 			plane.pressKey(8, player);
+		}
 		
 		if(!leftMouseHeld&& Mouse.isButtonDown(0)) //Left mouse, for MGs. Is a holding thing
 		{
