@@ -1,5 +1,6 @@
 package com.flansmod.client;
 
+import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 
@@ -56,12 +57,13 @@ public class ClientEventHandler {
 				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
 			}
 		}
-		else if(mc.player.getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
-			com.flansmod.fvm.LandVehicle ent = ((com.flansmod.fvm.EntitySeat)mc.player.getRidingEntity()).vehicle;
-			mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
-			mc.fontRendererObj.drawString("Gear: " + (ent.data.parts.containsKey("gearbox") ? ent.data.current_gear : "auto"), 2, 12, 0xffffff);
-			if(Static.dev()){
-				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 22, 0xffffff);
+		else if(FlansMod.fvm){
+			if(mc.player.getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
+				com.flansmod.fvm.LandVehicle ent = ((com.flansmod.fvm.EntitySeat)mc.player.getRidingEntity()).vehicle;
+				mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+				if(Static.dev()){
+					mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+				}
 			}
 		}
 	}
