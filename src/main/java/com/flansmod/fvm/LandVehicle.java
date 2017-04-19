@@ -8,7 +8,6 @@ import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveablePosition;
-import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.util.Config;
@@ -18,14 +17,12 @@ import com.flansmod.fvm.packets.PacketVehicleControl;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.fvm.FVM;
 import net.fexcraft.mod.fvm.data.LoadedIn;
-import net.fexcraft.mod.fvm.data.PartType;
 import net.fexcraft.mod.fvm.data.VehicleType;
 import net.fexcraft.mod.fvm.items.VehicleItem;
 import net.fexcraft.mod.fvm.util.FvmPerms;
 import net.fexcraft.mod.fvm.util.FvmResources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
-import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
 import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -371,7 +368,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		}
 		
 		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof ItemKey){
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof KeyItem){
 			if(this.isLocked()){
 				this.unlock(world, entityplayer, currentItem, (KeyItem)currentItem.getItem());
 			}
@@ -1036,21 +1033,40 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			return false;
 		}
 		else{
-			if(item.getCode(stack).equals(data.lock_code)){
-				data.isLocked = false;
-				Print.chat(entity, "Vehicle is now unlocked.");
-				return true;
-			}
-			else if(item.getType(stack) == KeyType.ADMIN){
-				data.isLocked = true;
-				Print.chat(entity, "[SU] Vehicle is now unlocked.");
-				return true;
-			}
-			else{
-				Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
-				return false;
+			switch(item.getType(stack)){
+				case PRIVATE:
+					if(entity.getGameProfile().getId().toString().equals(item.getCreator(stack).toString())){
+						Print.chat(entity, "This key can only be used by the Owner;");
+						return false;
+					}
+					else{
+						if(item.getCode(stack).equals(data.lock_code)){
+							data.isLocked = false;
+							Print.chat(entity, "Vehicle is now unlocked.");
+							return true;
+						}
+						else{
+							Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							return false;
+						}
+					}
+				case COMMON:
+					if(item.getCode(stack).equals(data.lock_code)){
+						data.isLocked = false;
+						Print.chat(entity, "Vehicle is now unlocked.");
+						return true;
+					}
+					else{
+						Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+						return false;
+					}
+				case ADMIN:
+					data.isLocked = false;
+					Print.chat(entity, "[SU] Vehicle is now unlocked.");
+					return true;
 			}
 		}
+		return false;
 	}
 
 	@Override
@@ -1065,22 +1081,41 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				return false;
 			}
 			else{
-				if(item.getCode(stack).equals(data.lock_code)){
-					data.isLocked = true;
-					Print.chat(entity, "Vehicle is now locked.");
-					return true;
-				}
-				else if(item.getType(stack) == KeyType.ADMIN){
-					data.isLocked = true;
-					Print.chat(entity, "[SU] Vehicle is now locked.");
-					return true;
-				}
-				else{
-					Print.chat(entity, "Wrong key.");
-					return false;
+				switch(item.getType(stack)){
+					case PRIVATE:
+						if(entity.getGameProfile().getId().toString().equals(item.getCreator(stack).toString())){
+							Print.chat(entity, "This key can only be used by the Owner;");
+							return false;
+						}
+						else{
+							if(item.getCode(stack).equals(data.lock_code)){
+								data.isLocked = true;
+								Print.chat(entity, "Vehicle is now locked.");
+								return true;
+							}
+							else{
+								Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+								return false;
+							}
+						}
+					case COMMON:
+						if(item.getCode(stack).equals(data.lock_code)){
+							data.isLocked = true;
+							Print.chat(entity, "Vehicle is now locked.");
+							return true;
+						}
+						else{
+							Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							return false;
+						}
+					case ADMIN:
+						data.isLocked = true;
+						Print.chat(entity, "[SU] Vehicle is now locked.");
+						return true;
 				}
 			}
 		}
+		return false;
 	}
 		
 	public void checkForCollisions(){

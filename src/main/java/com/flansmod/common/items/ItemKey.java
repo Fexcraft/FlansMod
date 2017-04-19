@@ -7,7 +7,6 @@ import com.flansmod.common.FlansMod;
 
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
-import net.fexcraft.mod.lib.network.Network;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.creativetab.CreativeTabs;
@@ -61,7 +60,13 @@ public class ItemKey extends KeyItem {
 		if(itemstack.getTagCompound() != null){
 			NBTTagCompound nbt = itemstack.getTagCompound();
 			String creator = nbt.getString("KeyCreator");
-			String name = Network.getMinecraftServer().getPlayerProfileCache().getProfileByUUID(UUID.fromString(creator)).getName();
+			String name = "<null>";
+			try{
+				Static.getServer().getPlayerProfileCache().getProfileByUUID(UUID.fromString(creator)).getName();
+			}
+			catch(Exception e){
+				name = e.getMessage();
+			}
 			KeyType type = KeyType.fromString(nbt.getString("KeyType"));
 			list.add("Key Type: " + type.toText() + " (FlansMod Car Key)");
 			list.add("Code: " + getCode(type, nbt.getString("KeyCode")));

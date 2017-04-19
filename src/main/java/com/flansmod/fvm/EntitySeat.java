@@ -26,7 +26,6 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
-import com.flansmod.common.items.ItemKey;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
@@ -627,7 +626,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healvehicles){
 			return true;
 		}*/
-		if(currentItem != null && currentItem.getItem() instanceof ItemKey){
+		if(vehicle.data.isLocked){
+			Print.chat(entityplayer, "Vehicle is Locked.");
 			return true;
 		}
 		if(currentItem != null && currentItem.getItem() instanceof ItemLead){
@@ -678,11 +678,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	
 	@Override
 	public void addPassenger(Entity passenger){
-		if(vehicle.getData().isLocked && this.driver){
-			Print.chat(passenger, "Vehicle is locked. Unlock to drive it.");
-			passenger.dismountRidingEntity();
-			return;
-		}
 		if(passenger.getRidingEntity() != this){
             throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
         }

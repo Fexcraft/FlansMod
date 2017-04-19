@@ -20,7 +20,6 @@ import com.flansmod.common.vector.Vector3f;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
-import net.fexcraft.mod.lib.api.item.KeyItem.KeyType;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -1076,26 +1075,45 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 			return false;
 		}
 		else{
-			if(item.getCode(stack).equals(driveableData.lock_code)){
-				driveableData.isLocked = false;
-				Print.chat(entity, "Vehicle is now unlocked.");
-				return true;
-			}
-			else if(item.getType(stack) == KeyType.ADMIN){
-				driveableData.isLocked = true;
-				Print.chat(entity, "[SU] Vehicle is now unlocked.");
-				return true;
-			}
-			else{
-				Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
-				return false;
+			switch(item.getType(stack)){
+				case PRIVATE:
+					if(entity.getGameProfile().getId().toString().equals(item.getCreator(stack).toString())){
+						Print.chat(entity, "This key can only be used by the Owner;");
+						return false;
+					}
+					else{
+						if(item.getCode(stack).equals(driveableData.lock_code)){
+							driveableData.isLocked = false;
+							Print.chat(entity, "Vehicle is now unlocked.");
+							return true;
+						}
+						else{
+							Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							return false;
+						}
+					}
+				case COMMON:
+					if(item.getCode(stack).equals(driveableData.lock_code)){
+						driveableData.isLocked = false;
+						Print.chat(entity, "Vehicle is now unlocked.");
+						return true;
+					}
+					else{
+						Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+						return false;
+					}
+				case ADMIN:
+					driveableData.isLocked = false;
+					Print.chat(entity, "[SU] Vehicle is now unlocked.");
+					return true;
 			}
 		}
+		return false;
 	}
 
 	@Override
 	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
-		if(!getDriveableType().hasLock){
+		if(!driveableData.hasLock){
 			Print.chat(entity, "This vehicle doesn't allow locking.");
 			return false;
 		}
@@ -1105,21 +1123,41 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				return false;
 			}
 			else{
-				if(item.getCode(stack).equals(driveableData.lock_code)){
-					driveableData.isLocked = true;
-					Print.chat(entity, "Vehicle is now locked.");
-					return true;
-				}
-				else if(item.getType(stack) == KeyType.ADMIN){
-					driveableData.isLocked = true;
-					Print.chat(entity, "[SU] Vehicle is now locked.");
-					return true;
-				}
-				else{
-					Print.chat(entity, "Wrong key.");
-					return false;
+				switch(item.getType(stack)){
+					case PRIVATE:
+						if(entity.getGameProfile().getId().toString().equals(item.getCreator(stack).toString())){
+							Print.chat(entity, "This key can only be used by the Owner;");
+							return false;
+						}
+						else{
+							if(item.getCode(stack).equals(driveableData.lock_code)){
+								driveableData.isLocked = true;
+								Print.chat(entity, "Vehicle is now locked.");
+								return true;
+							}
+							else{
+								Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+								return false;
+							}
+						}
+					case COMMON:
+						if(item.getCode(stack).equals(driveableData.lock_code)){
+							driveableData.isLocked = true;
+							Print.chat(entity, "Vehicle is now locked.");
+							return true;
+						}
+						else{
+							Print.chat(entity, "Wrong key.\n[V:" + driveableData.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							return false;
+						}
+					case ADMIN:
+						driveableData.isLocked = true;
+						Print.chat(entity, "[SU] Vehicle is now locked.");
+						return true;
 				}
 			}
 		}
+		return false;
 	}
+	
 }
