@@ -50,16 +50,16 @@ public class KeyCommand extends CommandBase {
 			return;
 		}
 		if(args.length < 1){
-			Print.chat(sender, "No Arguments speficied.");
-			Print.chat(sender, "/" + NAME + " ?");
+			Print.chat(sender, "&8No Arguments speficied.");
+			Print.chat(sender, "&7/" + NAME + " ?");
 		}
 		else if(args[0].equals("help") || args[0].equals("?")){
-			Print.chat(sender, "Availavble subcommads:");
-			Print.chat(sender, "/" + NAME + " help");
-			Print.chat(sender, "/" + NAME + " universal");
-			Print.chat(sender, "/" + NAME + " get <one/all>");
-			Print.chat(sender, "/" + NAME + " viewcode");
-			Print.chat(sender, "/" + NAME + " togglelock");
+			Print.chat(sender, "&8Availavble subcommads:");
+			Print.chat(sender, "&7/" + NAME + " help");
+			Print.chat(sender, "&7/" + NAME + " universal");
+			Print.chat(sender, "&7/" + NAME + " get <one/all>");
+			Print.chat(sender, "&7/" + NAME + " viewcode");
+			Print.chat(sender, "&7/" + NAME + " togglelock");
 		}
 		else if(args[0].equals("universal")){
 			if(Static.isOp(sender.getName())){
@@ -71,8 +71,8 @@ public class KeyCommand extends CommandBase {
 		}
 		else if(args[0].equals("get")){
 			if(args.length < 2){
-				Print.chat(sender, "Missing argument.");
-				Print.chat(sender, "try: /" + NAME + " get <one/all>");
+				Print.chat(sender, "M&8issing argument.");
+				Print.chat(sender, "&7try: /" + NAME + " get <one/all>");
 			}
 			else if(args[1].equals("one")){
 				givePlayerKey((EntityPlayer)sender, false, 1);
@@ -81,8 +81,8 @@ public class KeyCommand extends CommandBase {
 				givePlayerKey((EntityPlayer)sender, false, Config.maxVehicleKeys);
 			}
 			else{
-				Print.chat(sender, "Invalid argument.");
-				Print.chat(sender, "try: /" + NAME + " get <one/all>");
+				Print.chat(sender, "&8Invalid argument.");
+				Print.chat(sender, "&7try: /" + NAME + " get <one/all>");
 			}
 		}
 		else if(args[0].equals("viewcode")){
@@ -93,7 +93,7 @@ public class KeyCommand extends CommandBase {
 			if(sender.getCommandSenderEntity().getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
 				code = ((com.flansmod.fvm.EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).vehicle.data.lock_code;
 			}
-			Print.chat(sender, "CODE: " + code);
+			Print.chat(sender, "&7CODE: &9" + code);
 		}
 		else if(args[0].equals("togglelock")){
 			boolean bool = false;
@@ -103,15 +103,15 @@ public class KeyCommand extends CommandBase {
 			if(sender.getCommandSenderEntity().getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
 				bool = ((com.flansmod.fvm.EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).vehicle.data.hasLock = !((com.flansmod.fvm.EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).vehicle.data.hasLock;
 			}
-			Print.chat(sender, "Can be locked: " + bool);
+			Print.chat(sender, "&7Can be locked: " + bool);
 		}
 		else{
-			Print.chat(sender, "Wrong argument.");
-			Print.chat(sender, "/" + NAME + " ?");
+			Print.chat(sender, "&8Wrong argument.");
+			Print.chat(sender, "&7/" + NAME + " ?");
 		}
 	}
 
-	private void givePlayerKey(EntityPlayer sender, boolean universal, int i){
+	private static void givePlayerKey(EntityPlayer sender, boolean universal, int i){
 		if(sender.getRidingEntity() instanceof EntitySeat){
 			EntityDriveable driveable = ((EntitySeat)sender.getRidingEntity()).driveable;
 			if(!driveable.driveableData.hasLock){

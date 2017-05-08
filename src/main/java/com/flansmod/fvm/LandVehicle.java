@@ -1005,7 +1005,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getEntity());
 				ItemStack stack = new ItemStack(VehicleItem.defaultItem(), 1, 0);
 				stack.setTagCompound(data.write(new NBTTagCompound()));
-				if(pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) || pp.hasPermission(FvmPerms.permBreak(stack))){
+				boolean brk = pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
+				if(brk){
 					entityDropItem(stack, 0.5F);
 			 		setDead();
 			 		Print.debug(stack.toString());

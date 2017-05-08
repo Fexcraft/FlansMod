@@ -20,7 +20,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderVehicle extends Render implements IRenderFactory {
+public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory {
 	
 	public RenderVehicle(RenderManager renderManager) {
 		super(renderManager);
@@ -28,7 +28,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-	public void bindTexture(Entity ent){
+	public void bindTexture(LandVehicle ent){
 		super.bindEntityTexture(ent);
 	}
 	
@@ -65,7 +65,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 				GL11.glScalef(modelScale, modelScale, modelScale);
 				VehicleModel modVehicle = (VehicleModel)vehicle.data.getModel();
 				if(modVehicle != null){
-					modVehicle.render(vehicle.data);
+					modVehicle.render(vehicle.data, vehicle, -1);
 					if(vehicle.data.parts.size() > 0){
 						for(String key : vehicle.data.parts.keySet()){
 							PartType part = vehicle.data.parts.get(key);
@@ -76,6 +76,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 						}
 					}
 				}
+				
 			}
 			GL11.glPopMatrix();
 			
@@ -102,8 +103,8 @@ public class RenderVehicle extends Render implements IRenderFactory {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity){
-		return ((LandVehicle)entity).data.getTexture();
+	protected ResourceLocation getEntityTexture(LandVehicle entity){
+		return entity.data.getTexture();
 	}
 	
 	@SubscribeEvent
