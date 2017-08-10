@@ -107,6 +107,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		if(world.isRemote){
 			setRenderDistanceWeight(200D);
 		}
+		this.posY += 2.5d;
 	}
 	
 	public EntityDriveable(World world, DriveableType t, DriveableData d)

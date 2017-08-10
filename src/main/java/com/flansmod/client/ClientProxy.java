@@ -29,7 +29,7 @@ import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
 import com.flansmod.common.util.Util;
-import com.flansmod.fvm.FvmHook;
+import com.flansmod.fvtm.FvtmHook;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -161,8 +161,8 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
-		if(FlansMod.fvm){
-			FvmHook.registerRenders();
+		if(FlansMod.FVTM){
+			FvtmHook.registerRenders();
 		}
 	}
 	

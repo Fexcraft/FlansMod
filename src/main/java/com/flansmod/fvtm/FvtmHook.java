@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author Ferdinand (FEX___96)
  *
  */
-public class FvmHook {
+public class FvtmHook {
 
 	public static void registerEntities(){
 		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvm_vehicle"), LandVehicle.class, "fvm_vehicle", 96, FlansMod.INSTANCE, 256, 5, false);

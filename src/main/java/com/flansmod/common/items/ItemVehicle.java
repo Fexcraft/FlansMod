@@ -139,7 +139,7 @@ public class ItemVehicle extends ItemMapBase {
 				lines.add("Spawned Keys: " + nbt.getInteger("SpawnedKeys"));
 			}
 		}
-		lines.add(nbt.toString());
+		//lines.add(nbt.toString());
 	}
 	
 	@Override

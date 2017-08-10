@@ -23,8 +23,6 @@ import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleScript;
 import net.fexcraft.mod.fvtm.util.Resources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
-import net.fexcraft.mod.lib.perms.PermManager;
-import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Pos;
@@ -112,7 +110,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		stepHeight = 1.0F;
 	}
 	
-	public LandVehicle(World world, LandVehicleData type){
+	private LandVehicle(World world, LandVehicleData type){
 		this(world);
 		data = type;
 	}
@@ -135,13 +133,14 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 	
 	//This one allows you to deal with spawning from the constructor
-		public LandVehicle(World world, double x, double y, double z, int placer, LandVehicleData data){
-			this(world, data);
-			stepHeight = 1.0F;
-			setPosition(x, y, z);
-			rotateYaw((placer * 90f) + 90F);
-			initType(data, false);
-		}
+	public LandVehicle(World world, double x, double y, double z, int placer, LandVehicleData data){
+		this(world, data);
+		stepHeight = 1.0F;
+		setPosition(x, y, z);
+		rotateYaw((placer * 90f) + 90F);
+		initType(data, false);
+		Print.debugChat("SPAWNING");
+	}
 
 	@Override
 	public void writeSpawnData(ByteBuf buffer){
@@ -257,6 +256,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public void setDead(){
+		new Exception().printStackTrace();
+		Print.debugChat("SD");
 		super.setDead();
 		if(world.isRemote){
 			camera.setDead();
@@ -556,7 +557,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
         super.onUpdate();
         
         if(!world.isRemote){
-        	for(int i = 0; i < data.getWheelPos().size(); i++){
+        	for(int i = 0; i < data.getFMSeats().size(); i++){
         		if(seats[i] == null || !seats[i].addedToChunk){
         			seats[i] = new EntitySeat(world, this, i);
     				world.spawnEntity(seats[i]);
@@ -946,6 +947,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			}
 		}
 		
+		
 		//Calculate movement on the client and then send position, rotation etc to the server
 		if(thePlayerIsDrivingThis){
 			FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
@@ -1003,7 +1005,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				return false;
 			}
 			else{
-				PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getImmediateSource());
+				//PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getImmediateSource());
 				ItemStack stack = data.getVehicle().getItemStack(data);
 				boolean brk = true;//= pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
 				if(brk){
@@ -1072,7 +1074,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
-		if(!data.isLocked()){
+		if(!data.allowsLocking()){
 			Print.chat(entity, "This vehicle doesn't allow locking.");
 			return false;
 		}

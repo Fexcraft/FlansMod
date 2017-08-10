@@ -57,7 +57,7 @@ public class ClientEventHandler {
 				mc.fontRenderer.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
 			}
 		}
-		else if(FlansMod.fvm){
+		else if(FlansMod.FVTM){
 			if(mc.player.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat){
 				com.flansmod.fvtm.LandVehicle ent = ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).vehicle;
 				mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);

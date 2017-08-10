@@ -3,7 +3,7 @@ package com.flansmod.common.network;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.handlers.*;
 import com.flansmod.common.network.packets.*;
-import com.flansmod.fvm.FvmHook;
+import com.flansmod.fvtm.FvtmHook;
 
 import net.fexcraft.mod.lib.network.PacketHandler.PacketHandlerType;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -40,8 +40,8 @@ public class PacketHandler {
 		instance.registerMessage(DriveableSyncPacketHandler.Client.class,         PacketDriveableSync.class,       id++, Side.CLIENT);
 		instance.registerMessage(DriveableTexturePacketHandler.Client.class,      PacketDriveableTexture.class,    id++, Side.CLIENT);
 		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
-		if(FlansMod.fvm){
-			FvmHook.registerPackets(instance, id);
+		if(FlansMod.FVTM){
+			FvtmHook.registerPackets(instance, id);
 		}
 		
 		net.fexcraft.mod.lib.network.PacketHandler.registerListener(PacketHandlerType.JSON, Side.CLIENT, new JsonPacketHandler.Client());
