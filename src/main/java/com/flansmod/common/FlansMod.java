@@ -13,7 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.cmds.KeyCommand;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.data.DataType;
@@ -28,16 +27,15 @@ import com.flansmod.common.items.ItemPart;
 import com.flansmod.common.network.PacketHandler;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Config;
+import com.flansmod.common.util.CrateBlock;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
-import com.flansmod.fvm.FvmHook;
+import com.flansmod.fvtm.FvmHook;
 
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
-import net.fexcraft.mod.lib.util.registry.Registry;
+import net.fexcraft.mod.lib.util.registry.RegistryUtil.AutoRegisterer;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,7 +53,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = "flansmod", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl;after:fvm", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod {
@@ -64,7 +61,7 @@ public class FlansMod {
 	public static boolean DEBUG = false;
 	public static boolean fvm = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F2.0-EX";
+	public static final String VERSION = "5.F2.4-EX";
 	public static final String NAME = "Flan's Mod Minus";
 	@Mod.Instance("flansmod")
 	public static FlansMod INSTANCE;
@@ -84,11 +81,14 @@ public class FlansMod {
 	
 	public static ItemKey key;
 	private static final String prefix = TextFormatting.BLACK + "[" + TextFormatting.RED + "FM-" + TextFormatting.BLACK + "]" + TextFormatting.GRAY + "";
+	
+	public static AutoRegisterer AUTOREG;
 
 	/** The mod pre-initialiser method */
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		Util.log("Preinitialising Flan's mod.");
+		AUTOREG = new AutoRegisterer(MODID);
 		Config.initalize(new Configuration(event.getSuggestedConfigurationFile()), event.getSuggestedConfigurationFile().getParentFile());
 		com.flansmod.common.data.player.PlayerHandler.initialize();
 		
@@ -104,19 +104,11 @@ public class FlansMod {
 		
 		//Set up mod blocks and items
 		if(event.getSide().isClient()){
-			CrateBlock.instance = new CrateBlock();
+			AUTOREG.addBlock("crate", CrateBlock.INSTANCE, null, 0, null);
 		}
 		
-		Registry.registerAllBlocks(MODID);
-		Registry.registerAllItems(MODID);
-		Registry.registerAllEntities(MODID);
-		
-		key = new ItemKey();
-		
-		rainbowPaintcan = new Item().setCreativeTab(CTabs.parts);
-		rainbowPaintcan.setRegistryName(MODID, "rainbowPaintcan");
-		rainbowPaintcan.setUnlocalizedName(rainbowPaintcan.getRegistryName().toString());
-		GameRegistry.register(rainbowPaintcan);
+		AUTOREG.addItem("key", key = new ItemKey(), 0, null);
+		AUTOREG.addItem("rainbowPaintcan", rainbowPaintcan = new Item().setCreativeTab(CTabs.OTHER), 0, null);
 		
 		//Read content packs
 		readContentPacks(event);
@@ -146,10 +138,10 @@ public class FlansMod {
 		/*for(InfoType type : InfoType.types.values()){
 			type.addRecipe();
 		}*/
-		if(Config.addGunpowderRecipe){
+		/*if(Config.addGunpowderRecipe){
 			ItemStack charcoal = new ItemStack(Items.COAL, 1, 1);
 			GameRegistry.addShapelessRecipe(new ItemStack(Items.GUNPOWDER), charcoal, charcoal, charcoal, new ItemStack(Items.GLOWSTONE_DUST));
-		}
+		}*/
 		Util.log("Loaded recipes.");
 		
 		//Register driveables
@@ -182,7 +174,7 @@ public class FlansMod {
 	public void playerDrops(PlayerDropsEvent event){
 		for(int i = event.getDrops().size() - 1; i >= 0; i--){
 			EntityItem ent = event.getDrops().get(i);
-			DriveableType type = DriveableType.getDriveable(ent.getEntityItem());
+			DriveableType type = DriveableType.getDriveable(ent.getItem());
 			if(type != null && !type.canDrop)
 				event.getDrops().remove(i);
 		}
@@ -190,7 +182,7 @@ public class FlansMod {
 	
 	@SubscribeEvent
 	public void playerDrops(ItemTossEvent event){
-		DriveableType type = DriveableType.getDriveable(event.getEntityItem().getEntityItem());
+		DriveableType type = DriveableType.getDriveable(event.getEntityItem().getItem());
 		if(type != null && !type.canDrop){
 			event.setCanceled(true);
 		}

@@ -1,7 +1,6 @@
-itemGroup.tabFlan0=Flan's Mod Minus - Guns
-itemGroup.tabFlan1=Flan's Mod Minus - Vehicles
-itemGroup.tabFlan2=Flan's Mod Minus - Parts
-itemGroup.tabFlan3=Flan's Mod Minus - Other
+itemGroup.tabFlan0=Flan's Mod Minus - Vehicles
+itemGroup.tabFlan1=Flan's Mod Minus - Parts
+itemGroup.tabFlan2=Flan's Mod Minus - Other
 tile.flansmod:flansWorkbench.0.name=Vehicle Crafting Table
 tile.flansmod:flansWorkbench.1.name=Gun Modification Table
 tile.flansmod:flansWorkbench.2.name=Part Crafting Table

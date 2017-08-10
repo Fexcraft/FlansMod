@@ -9,8 +9,11 @@ import com.flansmod.common.data.PartType;
 import com.flansmod.common.util.CTabs;
 
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,16 +23,15 @@ public class ItemPart extends Item {
 	private static final ArrayList<String> rs = new ArrayList<String>();
 	public PartType type;
 	
-	public ItemPart(PartType type1){
-		super();
-		type = type1;
+	public ItemPart(PartType parttype){
+		this.type = parttype;
 		setMaxStackSize(type.stackSize);
 		if(type.category == EnumPartCategory.FUEL){
 			setMaxDamage(type.fuel);
 			setHasSubtypes(true);
 		}
 		type.item = this;
-		setCreativeTab(CTabs.parts);
+		this.setCreativeTab(CTabs.PARTS);
 		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 	
@@ -53,6 +55,18 @@ public class ItemPart extends Item {
 			rs.add(type.registryname);
 			return new ItemPart(type);
 		}
+	}
+	
+	@Override
+    public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> list){
+    	if(tabs != this.getCreativeTab()){
+    		return;
+    	}
+    	ItemStack stack = new ItemStack(this, 1, 0);
+    	NBTTagCompound tags = new NBTTagCompound();
+    	tags.setString("Type", type.registryname);
+    	stack.setTagCompound(tags);
+        list.add(stack);
 	}
 	
 }

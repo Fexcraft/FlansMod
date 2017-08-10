@@ -43,11 +43,11 @@ public class ItemVehicle extends ItemMapBase {
 	private static final ArrayList<String> rs = new ArrayList<String>();
 	public VehicleType type;
 	
-	public ItemVehicle(VehicleType type1){
+	public ItemVehicle(VehicleType vehicletype){
 		maxStackSize = 1;
-		type = type1;
-		//type.item = this;
-		setCreativeTab(CTabs.vehicles);
+		type = vehicletype;
+		type.item = this;
+		setCreativeTab(CTabs.VEHICLES);
 		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 
@@ -193,6 +193,9 @@ public class ItemVehicle extends ItemMapBase {
     /** Make sure that creatively spawned planes have nbt data */
     @Override
     public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> list){
+    	if(tabs != this.getCreativeTab()){
+    		return;
+    	}
     	ItemStack planeStack = new ItemStack(this, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.registryname);
