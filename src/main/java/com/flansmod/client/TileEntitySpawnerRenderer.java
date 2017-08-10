@@ -1,16 +1,12 @@
 package com.flansmod.client;
 
-import com.flansmod.common.util.Util;
-
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
 
 public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer 
 {
-	@Override
+	/*@Override
 	public void renderTileEntityAt(TileEntity te, double x, double y, double z, float f, int i) 
 	{
 		Tessellator tessellator = Tessellator.getInstance();
@@ -41,7 +37,7 @@ public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer
         	GlStateManager.color(red, green, blue);
         }*/
         
-        GlStateManager.disableTexture2D();        
+        /*GlStateManager.disableTexture2D();        
        
         double inset = 0.0d;
         switch(te.getBlockMetadata())
@@ -56,7 +52,7 @@ public class TileEntitySpawnerRenderer extends TileEntitySpecialRenderer
 
         GlStateManager.enableTexture2D();
 		GlStateManager.color(1.0f, 1.0f, 1.0f);		
-	}
+	}*/
 	
 	private void RenderBox(Tessellator t, VertexBuffer wr, double x0, double x1, double y0, double y1, double z0, double z1)
 	{

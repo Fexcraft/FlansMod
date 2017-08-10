@@ -814,7 +814,7 @@ public class EntityPlane extends EntityDriveable {
 
 		PlaneType type = PlaneType.getPlane(driveableType);
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
+		if(damagesource.damageType.equals("player") && damagesource.getImmediateSource().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
 			ItemStack planeStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			NBTTagCompound tags = new NBTTagCompound();
 			planeStack.setTagCompound(tags);

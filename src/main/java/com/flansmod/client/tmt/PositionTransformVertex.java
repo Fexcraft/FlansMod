@@ -17,7 +17,7 @@ public class PositionTransformVertex extends PositionTextureVertex
 		if(vertex instanceof PositionTransformVertex)
 			neutralVector = ((PositionTransformVertex)vertex).neutralVector;
 		else
-			neutralVector = new Vec3d(vertex.vector3D.xCoord, vertex.vector3D.yCoord, vertex.vector3D.zCoord);
+			neutralVector = new Vec3d(vertex.vector3D.x, vertex.vector3D.y, vertex.vector3D.z);
 	}
 	
 	public PositionTransformVertex(PositionTextureVertex vertex)
@@ -28,14 +28,14 @@ public class PositionTransformVertex extends PositionTextureVertex
 	public PositionTransformVertex(Vec3d vector, float u, float v)
 	{
 		super(vector, u, v);
-		neutralVector = new Vec3d(vector.xCoord, vector.yCoord, vector.zCoord);
+		neutralVector = new Vec3d(vector.x, vector.y, vector.z);
 	}
 	
 	public void setTransformation()
 	{
 		if(transformGroups.size() == 0)
 		{
-			vector3D = new Vec3d(neutralVector.xCoord, neutralVector.yCoord, neutralVector.zCoord);
+			vector3D = new Vec3d(neutralVector.x, neutralVector.y, neutralVector.z);
 			return;
 		}
 		double weight = 0D;
@@ -50,7 +50,7 @@ public class PositionTransformVertex extends PositionTextureVertex
 			double cWeight = group.getWeight() / weight;
 			Vec3d vector = group.doTransformation(this);
 			
-			vector3D = new Vec3d(vector3D.xCoord + cWeight * vector.xCoord, vector3D.yCoord + cWeight * vector.yCoord, vector3D.zCoord + cWeight * vector.zCoord);
+			vector3D = new Vec3d(vector3D.x + cWeight * vector.x, vector3D.y + cWeight * vector.y, vector3D.z + cWeight * vector.z);
 		}
 	}
 	

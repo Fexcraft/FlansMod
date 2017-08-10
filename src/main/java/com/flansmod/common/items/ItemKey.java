@@ -3,12 +3,10 @@ package com.flansmod.common.items;
 import java.util.List;
 import java.util.UUID;
 
-import com.flansmod.common.FlansMod;
-
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
 import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.registry.Registry;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,7 +29,6 @@ public class ItemKey extends KeyItem {
 		this.setMaxStackSize(1);
 		this.setCreativeTab(CreativeTabs.TOOLS);
 		this.setHasSubtypes(true);
-		Registry.registerItemManually(FlansMod.MODID, "key", 0, null, this);
 	}
 	
 	@Override
@@ -56,7 +53,7 @@ public class ItemKey extends KeyItem {
 	}
 	    
 	@Override
-	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean shift){
+	public void addInformation(ItemStack itemstack, World world, List list, ITooltipFlag flag){
 		if(itemstack.getTagCompound() != null){
 			NBTTagCompound nbt = itemstack.getTagCompound();
 			String creator = nbt.getString("KeyCreator");

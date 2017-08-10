@@ -52,17 +52,17 @@ public class ClientEventHandler {
 		//DEBUG vehicles
 		if(mc.player.getRidingEntity() instanceof EntitySeat){
 			EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;;
-			mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+			mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
 			if(Static.dev()){
-				mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+				mc.fontRenderer.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
 			}
 		}
 		else if(FlansMod.fvm){
-			if(mc.player.getRidingEntity() instanceof com.flansmod.fvm.EntitySeat){
-				com.flansmod.fvm.LandVehicle ent = ((com.flansmod.fvm.EntitySeat)mc.player.getRidingEntity()).vehicle;
-				mc.fontRendererObj.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
+			if(mc.player.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat){
+				com.flansmod.fvtm.LandVehicle ent = ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).vehicle;
+				mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
 				if(Static.dev()){
-					mc.fontRendererObj.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
+					mc.fontRenderer.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
 				}
 			}
 		}

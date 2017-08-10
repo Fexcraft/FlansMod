@@ -487,7 +487,7 @@ public class EntityVehicle extends EntityDriveable {
 				}
 				else
 				{
-					if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
+					//if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
 					{
 						float velocityScale = 0.1F * throttle * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * driveableData.engine.engineSpeed;
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
@@ -585,7 +585,6 @@ public class EntityVehicle extends EntityDriveable {
 		for(EntitySeat seat : seats){
 			if(seat != null){
 				seat.updatePosition();
-				Print.debug("SEAT MOVE");
 			}
 		}
 		
@@ -663,12 +662,12 @@ public class EntityVehicle extends EntityDriveable {
 
 	private Vec3d subtract(Vec3d a, Vec3d b)
 	{
-		return new Vec3d(a.xCoord - b.xCoord, a.yCoord - b.yCoord, a.zCoord - b.zCoord);
+		return new Vec3d(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 	
 	private Vec3d crossProduct(Vec3d a, Vec3d b)
 	{
-        return new Vec3d(a.yCoord * b.zCoord - a.zCoord * b.yCoord, a.zCoord * b.xCoord - a.xCoord * b.zCoord, a.xCoord * b.yCoord - a.yCoord * b.xCoord);
+        return new Vec3d(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 	}
 
 	@Override
@@ -685,7 +684,7 @@ public class EntityVehicle extends EntityDriveable {
 
 		VehicleType type = getVehicleType();
 
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
+		if(damagesource.damageType.equals("player") && damagesource.getImmediateSource().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null))
 		{
 			ItemStack vehicleStack = new ItemStack(type.item, 1, driveableData.paintjobID);
 			vehicleStack.setTagCompound(driveableData.writeToNBT(new NBTTagCompound()));

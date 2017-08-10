@@ -85,10 +85,10 @@ public class TexturedPolygon
 		
 				if(invertNormal)
 				{
-					tessellator.setNormal(-(float)Vec32.xCoord, -(float)Vec32.yCoord, -(float)Vec32.zCoord);
+					tessellator.setNormal(-(float)Vec32.x, -(float)Vec32.y, -(float)Vec32.z);
 				} else
 				{
-					tessellator.setNormal((float)Vec32.xCoord, (float)Vec32.yCoord, (float)Vec32.zCoord);
+					tessellator.setNormal((float)Vec32.x, (float)Vec32.y, (float)Vec32.z);
 				}
 			}
 			else
@@ -105,14 +105,14 @@ public class TexturedPolygon
 			{
 				if(invertNormal)
 				{
-					tessellator.setNormal(-(float)iNormals.get(i).xCoord, -(float)iNormals.get(i).yCoord, -(float)iNormals.get(i).zCoord);
+					tessellator.setNormal(-(float)iNormals.get(i).x, -(float)iNormals.get(i).y, -(float)iNormals.get(i).z);
 				}
 				else
 				{
-					tessellator.setNormal((float)iNormals.get(i).xCoord, (float)iNormals.get(i).yCoord, (float)iNormals.get(i).zCoord);
+					tessellator.setNormal((float)iNormals.get(i).x, (float)iNormals.get(i).y, (float)iNormals.get(i).z);
 				}
 			}
-			tessellator.addVertexWithUVW((float)positionTexturevertex.vector3D.xCoord * f, (float)positionTexturevertex.vector3D.yCoord * f, (float)positionTexturevertex.vector3D.zCoord * f, positionTexturevertex.texturePositionX, positionTexturevertex.texturePositionY, positionTexturevertex.texturePositionW);
+			tessellator.addVertexWithUVW((float)positionTexturevertex.vector3D.x * f, (float)positionTexturevertex.vector3D.y * f, (float)positionTexturevertex.vector3D.z * f, positionTexturevertex.texturePositionX, positionTexturevertex.texturePositionY, positionTexturevertex.texturePositionW);
 		}
 
 		tessellator.draw();

@@ -59,13 +59,15 @@ public class Shape2D
 			vecCoord = setVectorRotations(vecCoord, rotX, rotY, rotZ);
 									
 			verts[idx] = new PositionTransformVertex(
-													x + (float)vecCoord.xCoord,
-													y + (float)vecCoord.yCoord,
-													z + (float)vecCoord.zCoord, texU1, texV);
+				x + (float)vecCoord.x,
+				y + (float)vecCoord.y,
+				z + (float)vecCoord.z, texU1, texV
+			);
 			verts[idx + coords.size()] = new PositionTransformVertex(
-													x + (float)vecCoord.xCoord - (float)extrudeVector.xCoord,
-													y + (float)vecCoord.yCoord - (float)extrudeVector.yCoord,
-													z + (float)vecCoord.zCoord - (float)extrudeVector.zCoord, texU2, texV);
+				x + (float)vecCoord.x - (float)extrudeVector.x,
+				y + (float)vecCoord.y - (float)extrudeVector.y,
+				z + (float)vecCoord.z - (float)extrudeVector.z, texU2, texV
+			);
 			
 			vertsTop[idx] = new PositionTransformVertex(verts[idx]);
 			vertsBottom[coords.size() - idx - 1] = new PositionTransformVertex(verts[idx + coords.size()]);
@@ -128,9 +130,9 @@ public class Shape2D
 		float zC = MathHelper.cos(z);
 		float zS = MathHelper.sin(z);
 
-		double xVec = vector.xCoord;
-		double yVec = vector.yCoord;
-		double zVec = vector.zCoord;
+		double xVec = vector.x;
+		double yVec = vector.y;
+		double zVec = vector.z;
 
 		// rotation around x
 		double xy = xC*yVec - xS*zVec;

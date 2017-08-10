@@ -8,11 +8,11 @@ import com.flansmod.common.data.EnumPartCategory;
 import com.flansmod.common.data.UpgradeType;
 import com.flansmod.common.util.CTabs;
 
-import net.fexcraft.mod.lib.util.registry.Registry;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,11 +31,11 @@ public class ItemUpgrade extends Item {
 		}
 		type.item = this;
 		setCreativeTab(CTabs.parts);
-		Registry.registerItemManually(FlansMod.MODID, type.registryname, 0, null, this);
+		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean tooltip){
+	public void addInformation(ItemStack stack, World world, List list, ITooltipFlag tooltip){
 		if(type.compatible.size() > 0){
 			list.add(TextFormatting.DARK_AQUA + "Compatible with:");
 			for(String s : type.compatible){

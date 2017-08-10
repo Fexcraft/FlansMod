@@ -22,7 +22,7 @@ public class PlaneControlPacketHandler {
 			ls.addScheduledTask(new Runnable(){
 				@Override
 				public void run(){
-					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
+					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().player.getName());
 					EntityDriveable driveable = null;
 					for(int i = 0; i < player.world.loadedEntityList.size(); i++){
 						Object obj = player.world.loadedEntityList.get(i);

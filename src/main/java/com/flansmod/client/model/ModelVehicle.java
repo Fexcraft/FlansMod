@@ -3,7 +3,6 @@ package com.flansmod.client.model;
 import org.lwjgl.opengl.GL11;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.blocks.CrateBlock;
 import com.flansmod.common.data.DriveableType;
 import com.flansmod.common.data.UpgradeType;
 import com.flansmod.common.data.VehicleType;
@@ -11,6 +10,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EnumDriveablePart;
+import com.flansmod.common.util.CrateBlock;
 import com.flansmod.common.vector.Vector3f;
 
 import net.fexcraft.mod.lib.api.item.fItem;
@@ -293,7 +293,7 @@ public class ModelVehicle extends ModelDriveable
 		            GlStateManager.translate(pos(type.cargopos.get(i).xCoord) + 0.5, pos(type.cargopos.get(i).yCoord), pos(type.cargopos.get(i).zCoord) + 0.5);
 		            GlStateManager.pushMatrix();
 		            //TODO GL11.glScalef(0.5f, 0.5f, 0.5f);
-		            Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(state, vehicle.getBrightness(Minecraft.getMinecraft().getRenderPartialTicks()));
+		            Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(state, vehicle.getBrightness());
 		            //TODO GL11.glScalef(1f, 1f, 1f);
 		            GlStateManager.popMatrix();
 		            GlStateManager.popMatrix();
@@ -313,14 +313,14 @@ public class ModelVehicle extends ModelDriveable
 			return Blocks.AIR.getDefaultState();
 		}
 		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof ItemBlock == false){
-			return CrateBlock.instance.getDefaultState();
+			return CrateBlock.INSTANCE.getDefaultState();
 		}
 		else if(vehicle.driveableData.cargo.get(index).getItem() instanceof fItem){
 			return Blocks.BEDROCK.getDefaultState();
 		}
 		else{
 			ItemStack stack = vehicle.driveableData.cargo.get(index);
-			return ((ItemBlock)stack.getItem()).block.getStateFromMeta(stack.getMetadata());
+			return ((ItemBlock)stack.getItem()).getBlock().getStateFromMeta(stack.getMetadata());
 		}
 	}
 		

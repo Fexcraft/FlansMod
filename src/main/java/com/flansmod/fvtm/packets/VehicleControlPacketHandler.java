@@ -1,6 +1,6 @@
-package com.flansmod.fvm.packets;
+package com.flansmod.fvtm.packets;
 
-import com.flansmod.fvm.LandVehicle;
+import com.flansmod.fvtm.LandVehicle;
 
 import net.fexcraft.mod.lib.util.common.Static;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,7 @@ public class VehicleControlPacketHandler {
 			ls.addScheduledTask(new Runnable(){
 				@Override
 				public void run(){
-					EntityPlayerMP player = Static.getServer().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
+					EntityPlayerMP player = Static.getServer().getPlayerList().getPlayerByUsername(ctx.getServerHandler().player.getName());
 					LandVehicle vehicle = null;
 					for(int i = 0; i < player.world.loadedEntityList.size(); i++){
 						Object obj = player.world.loadedEntityList.get(i);
@@ -73,7 +73,7 @@ public class VehicleControlPacketHandler {
 	
 	protected static void updatevehicle(LandVehicle vehicle, PacketVehicleControl pkt){
 		vehicle.setPositionRotationAndMotion(pkt.posX, pkt.posY, pkt.posZ, pkt.yaw, pkt.pitch, pkt.roll, pkt.motX, pkt.motY, pkt.motZ, pkt.avelx, pkt.avely, pkt.avelz, pkt.throttle, pkt.steeringYaw);
-		vehicle.data.doors = pkt.doors;
+		vehicle.data.toggleDoors(pkt.doors);
 	}
 	
 }

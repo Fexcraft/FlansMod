@@ -8,10 +8,10 @@ import com.flansmod.common.data.EnumPartCategory;
 import com.flansmod.common.data.PartType;
 import com.flansmod.common.util.CTabs;
 
-import net.fexcraft.mod.lib.util.registry.Registry;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,13 +30,13 @@ public class ItemPart extends Item {
 		}
 		type.item = this;
 		setCreativeTab(CTabs.parts);
-		Registry.registerItemManually(FlansMod.MODID, type.registryname, 0, null, this);
+		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 	
 	@Override
-	public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean par4){
+	public void addInformation(ItemStack stack, World player, List list, ITooltipFlag flag){
 		if(type.category == EnumPartCategory.FUEL){
-			par3List.add("Fuel Stored: " + (type.fuel - par1ItemStack.getItemDamage()) + " / " + type.fuel);
+			list.add("Fuel Stored: " + (type.fuel - stack.getItemDamage()) + " / " + type.fuel);
 		}
 	}
 	

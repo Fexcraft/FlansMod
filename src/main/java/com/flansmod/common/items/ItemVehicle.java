@@ -15,9 +15,9 @@ import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,7 +48,7 @@ public class ItemVehicle extends ItemMapBase {
 		type = type1;
 		//type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		Registry.registerItemManually(FlansMod.MODID, type.registryname, 0, null, this);
+		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 
 	@Override
@@ -92,13 +92,13 @@ public class ItemVehicle extends ItemMapBase {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips){
+	public void addInformation(ItemStack stack, World world, List lines, ITooltipFlag tooltip){
 		if(type.description != null){
 			for(String s : type.description){
 				lines.add(s);
 			}
 		}
-		NBTTagCompound tags = getTagCompound(stack, player.world);
+		NBTTagCompound tags = getTagCompound(stack, world);
 		PartType part = PartType.getPart(tags.getString("Engine"));
 		if(part == null){
 			part = PartType.defaultEngines.get(EnumType.vehicle);
@@ -156,17 +156,17 @@ public class ItemVehicle extends ItemMapBase {
         
         //Result check
         if(movingobjectposition == null){
-            return new ActionResult(EnumActionResult.PASS, entityplayer.getHeldItemMainhand());
+            return new ActionResult(EnumActionResult.PASS, entityplayer.getHeldItem(hand));
         }
         if(movingobjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
             BlockPos pos = movingobjectposition.getBlockPos();
             Block block = world.getBlockState(pos).getBlock();
             if(type.placeableOnLand || block instanceof BlockLiquid){
 	            if(!world.isRemote){
-					world.spawnEntity(new EntityVehicle(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, getData(entityplayer.getHeldItemMainhand(), world)));
+					world.spawnEntity(new EntityVehicle(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 2.5F, (double)pos.getZ() + 0.5F, entityplayer, type, getData(entityplayer.getHeldItem(hand), world)));
 	            }
 				if(!entityplayer.capabilities.isCreativeMode){	
-					entityplayer.getHeldItemMainhand().shrink(1);
+					entityplayer.getHeldItem(hand).shrink(1);
 				}
 			}
 		}
@@ -192,8 +192,8 @@ public class ItemVehicle extends ItemMapBase {
     
     /** Make sure that creatively spawned planes have nbt data */
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
-    	ItemStack planeStack = new ItemStack(item, 1, 0);
+    public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> list){
+    	ItemStack planeStack = new ItemStack(this, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.registryname);
     	if(PartType.defaultEngines.containsKey(EnumType.vehicle)){

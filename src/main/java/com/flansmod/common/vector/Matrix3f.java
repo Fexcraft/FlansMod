@@ -80,7 +80,7 @@ public class Matrix3f
 		for(int i =0;i < 3;i++)
 		{
 			float[] row = {m.matrix[i][0],m.matrix[i][1],m.matrix[i][2]};
-			float[] column = {(float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord};
+			float[] column = {(float)vec.x, (float)vec.y, (float)vec.z};
 			for(int sm = 0; sm < 3; sm++) retVec[i] += row[sm]*column[sm];
     	}
     	

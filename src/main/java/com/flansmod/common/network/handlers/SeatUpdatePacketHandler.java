@@ -25,7 +25,7 @@ public class SeatUpdatePacketHandler {
 			ls.addScheduledTask(new Runnable(){
 				@Override
 				public void run(){
-					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().playerEntity.getName());
+					EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(ctx.getServerHandler().player.getName());
 					EntityDriveable driveable = null;
 					for(Object obj : player.world.loadedEntityList){
 						if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == packet.entityId){

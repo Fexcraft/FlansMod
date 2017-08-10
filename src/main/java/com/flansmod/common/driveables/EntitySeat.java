@@ -230,9 +230,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			Vec3d yOffset = driveable.axes.findLocalVectorGlobally(new Vector3f(0, this.getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, this.getControllingPassenger().getEyeHeight(), 0);
 			//driveable.rotate(0, this.getControllingPassenger().getYOffset(), 0).toVec3();
 			
-			playerPosX = posX + yOffset.xCoord;
-			playerPosY = posY + yOffset.yCoord;
-			playerPosZ = posZ + yOffset.zCoord;
+			playerPosX = posX + yOffset.x;
+			playerPosY = posY + yOffset.y;
+			playerPosZ = posZ + yOffset.z;
 			
 			this.updatePassenger();
 

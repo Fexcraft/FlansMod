@@ -185,7 +185,7 @@ public class RenderPlane extends Render implements IRenderFactory //implements I
 			if(entity instanceof EntityPlane)
 			{
 				EntityPlane plane = (EntityPlane)entity;
-		        int i = plane.getBrightnessForRender(event.getPartialTicks());
+		        int i = plane.getBrightnessForRender();
 
 		        if (plane.isBurning())
 		        {

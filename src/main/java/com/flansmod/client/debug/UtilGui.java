@@ -17,7 +17,7 @@ public class UtilGui {
 				if(n[i] == null){
 					continue;
 				}
-				mc.fontRendererObj.drawStringWithShadow(n[i], 4, 4 + (8 * i), 0x90C3D4);
+				mc.fontRenderer.drawStringWithShadow(n[i], 4, 4 + (8 * i), 0x90C3D4);
 			}
 			return;
 			/*mc.fontRendererObj.drawStringWithShadow(n0, 4, 4, 0x90C3D4);

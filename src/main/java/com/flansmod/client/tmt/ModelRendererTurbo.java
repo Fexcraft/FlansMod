@@ -1846,7 +1846,7 @@ public class ModelRendererTurbo extends ModelRenderer
 			PositionTextureVertex[] verts = faces[i].vertexPositions;
 			for(int j = 0; j < verts.length; j++)
 			{
-				verts[j].vector3D = new Vec3d(verts[j].vector3D.xCoord * (x ? -1 : 1), verts[j].vector3D.yCoord * (y ? -1 : 1), verts[j].vector3D.zCoord * (z ? -1 : 1));	
+				verts[j].vector3D = new Vec3d(verts[j].vector3D.x * (x ? -1 : 1), verts[j].vector3D.y * (y ? -1 : 1), verts[j].vector3D.z * (z ? -1 : 1));	
 
 			}
 			if (x ^ y ^ z)

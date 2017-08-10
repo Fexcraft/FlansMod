@@ -1,11 +1,11 @@
-package com.flansmod.fvm;
+package com.flansmod.fvtm;
 
 import org.lwjgl.opengl.GL11;
 
 import com.flansmod.common.FlansMod;
 
-import net.fexcraft.mod.fvm.data.PartType;
-import net.fexcraft.mod.fvm.models.VehicleModel;
+import net.fexcraft.mod.fvtm.model.vehicle.VehicleModel;
+import net.fexcraft.mod.lib.util.math.Pos;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -59,21 +59,21 @@ public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory
 			//GL11.glRotatef(180F, 0.0F, 1.0F, 0.0F);
         	GL11.glRotatef(180f, 0f, 0f, 1f);//<->//
 			
-			float modelScale = vehicle.data.scale;
+			//float modelScale = vehicle.data.scale;
 			GL11.glPushMatrix();
 			{
-				GL11.glScalef(modelScale, modelScale, modelScale);
-				VehicleModel modVehicle = (VehicleModel)vehicle.data.getModel();
+				//GL11.glScalef(modelScale, modelScale, modelScale);//let the models deal with theyr own scaling.
+				VehicleModel modVehicle = vehicle.data.getVehicle().getModel();
 				if(modVehicle != null){
 					modVehicle.render(vehicle.data, vehicle, -1);
-					if(vehicle.data.parts.size() > 0){
-						for(String key : vehicle.data.parts.keySet()){
-							PartType part = vehicle.data.parts.get(key);
-							part.bindTexture();
-							part.translate(vehicle.data.registryname);
-							part.getModel().render(vehicle.data, key, vehicle);
-							part.translateR(vehicle.data.registryname);
-						}
+					if(vehicle.data.getParts().size() > 0){
+						vehicle.data.getParts().forEach((key, partdata) ->{
+							this.bindTexture(partdata.getTexture());
+							Pos pos = partdata.getPart().getOffsetFor(vehicle.data.getVehicle().getRegistryName());
+							pos.translate();
+							partdata.getPart().getModel().render(vehicle.data, key, vehicle);
+							pos.translateR();
+						});
 					}
 				}
 				
@@ -139,7 +139,7 @@ public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory
 			if(entity instanceof LandVehicle)
 			{
 				LandVehicle vehicle = (LandVehicle)entity;
-		        int i = vehicle.getBrightnessForRender(event.getPartialTicks());
+		        int i = vehicle.getBrightnessForRender();
 
 		        if (vehicle.isBurning())
 		        {

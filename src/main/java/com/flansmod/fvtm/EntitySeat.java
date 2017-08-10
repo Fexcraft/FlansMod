@@ -1,4 +1,4 @@
-package com.flansmod.fvm;
+package com.flansmod.fvtm;
 
 import java.util.List;
 import io.netty.buffer.ByteBuf;
@@ -31,7 +31,7 @@ import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.network.packets.PacketSeatDismount;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.vector.Vector3f;
-import com.flansmod.fvm.packets.FvmPacketSeatUpdate;
+import com.flansmod.fvtm.packets.FvmPacketSeatUpdate;
 import com.google.common.collect.Lists;
 
 public class EntitySeat extends Entity implements IControllable, IEntityAdditionalSpawnData {
@@ -250,9 +250,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			Vec3d yOffset = vehicle.axes.findLocalVectorGlobally(new Vector3f(0, this.getControllingPassenger().getEyeHeight() * 3 / 4, 0)).toVec3().subtract(0, this.getControllingPassenger().getEyeHeight(), 0);
 			//vehicle.rotate(0, this.getControllingPassenger().getYOffset(), 0).toVec3();
 			
-			playerPosX = posX + yOffset.xCoord;
-			playerPosY = posY + yOffset.yCoord;
-			playerPosZ = posZ + yOffset.zCoord;
+			playerPosX = posX + yOffset.x;
+			playerPosY = posY + yOffset.y;
+			playerPosZ = posZ + yOffset.z;
 			
 			this.updatePassenger();
 
@@ -626,7 +626,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		/*if(currentItem != null && currentItem.getItem() instanceof ItemTool && ((ItemTool)currentItem.getItem()).type.healvehicles){
 			return true;
 		}*/
-		if(vehicle.data.isLocked){
+		if(vehicle.data.isLocked()){
 			Print.chat(entityplayer, "Vehicle is Locked.");
 			return true;
 		}
@@ -739,7 +739,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	
 	@Override
 	public float getCameraDistance(){
-		return foundvehicle && seatID == 0 ? vehicle.getData().cameraDistance : 5F;
+		return foundvehicle && seatID == 0 ? vehicle.getData().getVehicle().getFMCameraDistance() : 5F;
 	}
 	
 	@Override

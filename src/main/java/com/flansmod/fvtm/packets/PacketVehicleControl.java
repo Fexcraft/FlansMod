@@ -1,6 +1,6 @@
-package com.flansmod.fvm.packets;
+package com.flansmod.fvtm.packets;
 
-import com.flansmod.fvm.LandVehicle;
+import com.flansmod.fvtm.LandVehicle;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
@@ -35,7 +35,7 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		avelz = vehicle.angularVelocity.z;
 		throttle = vehicle.throttle;
 		steeringYaw = vehicle.wheelsYaw;
-		doors = vehicle.data.doors;
+		doors = vehicle.data.doorsOpen();
 	}
 
 	@Override

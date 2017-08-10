@@ -22,7 +22,7 @@ public class Vector3i extends Vector
 	
 	public Vector3i(Vec3d vec)
 	{
-		this((int)vec.xCoord, (int)vec.yCoord, (int)vec.zCoord);
+		this((int)vec.x, (int)vec.y, (int)vec.z);
 	}
 	
 	public Vector3i(double x, double y, double z) 

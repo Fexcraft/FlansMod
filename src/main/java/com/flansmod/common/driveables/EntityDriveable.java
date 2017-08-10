@@ -748,7 +748,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				else
 				{
 					//The part died!
-					world.createExplosion(this, currentPos.xCoord, currentPos.yCoord, currentPos.zCoord, 1F, false);
+					world.createExplosion(this, currentPos.x, currentPos.y, currentPos.z, 1F, false);
 				}
 			}
 			
@@ -783,7 +783,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	/** Takes a vector (such as the origin of a seat / gun) and translates it from local coordinates to global coordinates */
 	public Vector3f rotate(Vec3d inVec)
 	{
-		return rotate(inVec.xCoord, inVec.yCoord, inVec.zCoord);
+		return rotate(inVec.x, inVec.y, inVec.z);
 	}
 
 	/** Takes a vector (such as the origin of a seat / gun) and translates it from local coordinates to global coordinates */

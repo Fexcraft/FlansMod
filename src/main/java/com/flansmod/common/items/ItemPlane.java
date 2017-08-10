@@ -15,9 +15,9 @@ import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.util.CTabs;
 import com.flansmod.common.util.Util;
 
-import net.fexcraft.mod.lib.util.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -47,7 +47,7 @@ public class ItemPlane extends Item {
 		type = type1;
 		//type.item = this;
 		setCreativeTab(CTabs.vehicles);
-		Registry.registerItemManually(FlansMod.MODID, type.registryname, 0, null, this);
+		FlansMod.AUTOREG.addItem(type.registryname, this, 0, null);
 	}
 
 	@Override
@@ -94,13 +94,13 @@ public class ItemPlane extends Item {
 
 
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List lines, boolean advancedTooltips){
+	public void addInformation(ItemStack stack, World world, List lines, ITooltipFlag flag){
 		if(type.description != null){
 			for(String s : type.description){
 				lines.add(s);
 			}
 		}
-		NBTTagCompound tags = getTagCompound(stack, player.world);
+		NBTTagCompound tags = getTagCompound(stack, world);
 		PartType part = PartType.getPart(tags.getString("Engine"));
 		if(part != null){
 			lines.add(part.name);
@@ -188,8 +188,8 @@ public class ItemPlane extends Item {
     
     /** Make sure that creatively spawned planes have nbt data */
     @Override
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> list){
-    	ItemStack planeStack = new ItemStack(item, 1, 0);
+    public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> list){
+    	ItemStack planeStack = new ItemStack(this, 1, 0);
     	NBTTagCompound tags = new NBTTagCompound();
     	tags.setString("Type", type.registryname);
     	if(PartType.defaultEngines.containsKey(EnumType.plane)){

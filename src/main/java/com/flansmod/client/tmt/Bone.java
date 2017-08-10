@@ -194,9 +194,9 @@ public class Bone
 		if(parentNode != null)
 		{
 			Vec3d vector = parentNode.setOffset(x, y, z);
-			offsetX = (float)vector.xCoord;
-			offsetY = (float)vector.yCoord;
-			offsetZ = (float)vector.zCoord;
+			offsetX = (float)vector.x;
+			offsetY = (float)vector.y;
+			offsetZ = (float)vector.z;
 			return vector;
 		}
 		offsetX = x;
@@ -375,7 +375,7 @@ public class Bone
 	 */
 	public Vec3d getPosition()
 	{
-		return new Vec3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord);
+		return new Vec3d(positionVector.x, positionVector.y, positionVector.z);
 	}
 	
 	protected void addChildBone(Bone bone)
@@ -452,9 +452,9 @@ public class Bone
 		float zC = MathHelper.cos(z);
 		float zS = MathHelper.sin(z);
 
-		double xVec = vector.xCoord;
-		double yVec = vector.yCoord;
-		double zVec = vector.zCoord;
+		double xVec = vector.x;
+		double yVec = vector.y;
+		double zVec = vector.z;
 
 		// rotation around x
 		double xy = xC*yVec - xS*zVec;
@@ -511,9 +511,9 @@ public class Bone
 			currentModel.rotateAngleX = baseAngles.angleX + absoluteAngles.angleX;
 			currentModel.rotateAngleY = baseAngles.angleY + absoluteAngles.angleY;
 			currentModel.rotateAngleZ = baseAngles.angleZ + absoluteAngles.angleZ;
-			currentModel.rotationPointX = (float) positionVector.xCoord;
-			currentModel.rotationPointY = (float) positionVector.yCoord;
-			currentModel.rotationPointZ = (float) positionVector.zCoord;
+			currentModel.rotationPointX = (float) positionVector.x;
+			currentModel.rotationPointY = (float) positionVector.y;
+			currentModel.rotationPointZ = (float) positionVector.z;
 		}
 
 		for (Bone childNode : childNodes) {

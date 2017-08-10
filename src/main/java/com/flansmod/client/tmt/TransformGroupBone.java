@@ -34,7 +34,7 @@ public class TransformGroupBone extends TransformGroup
 	
 	public Vec3d getBaseVector()
 	{
-		return new Vec3d(baseVector.xCoord, baseVector.yCoord, baseVector.zCoord);
+		return new Vec3d(baseVector.x, baseVector.y, baseVector.z);
 	}
 	
 	public Vec3d getTransformVector()
@@ -63,7 +63,7 @@ public class TransformGroupBone extends TransformGroup
 	@Override
 	public Vec3d doTransformation(PositionTransformVertex vertex)
 	{
-		Vec3d vector = new Vec3d(vertex.neutralVector.xCoord, vertex.neutralVector.yCoord, vertex.neutralVector.zCoord);
+		Vec3d vector = new Vec3d(vertex.neutralVector.x, vertex.neutralVector.y, vertex.neutralVector.z);
 		vector = getBaseVector().subtract(vector);
 		Angle3D angle = getTransformAngle();
 		setVectorRotations(vector, angle.angleX, angle.angleY, angle.angleZ);
@@ -83,9 +83,9 @@ public class TransformGroupBone extends TransformGroup
 		float zC = MathHelper.cos(z);
 		float zS = MathHelper.sin(z);
 
-		double xVec = vector.xCoord;
-		double yVec = vector.yCoord;
-		double zVec = vector.zCoord;
+		double xVec = vector.x;
+		double yVec = vector.y;
+		double zVec = vector.z;
 
 		// rotation around x
 		double xy = xC*yVec - xS*zVec;

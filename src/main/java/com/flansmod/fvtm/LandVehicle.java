@@ -1,4 +1,4 @@
-package com.flansmod.fvm;
+package com.flansmod.fvtm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +13,14 @@ import com.flansmod.common.network.packets.PacketDriveableKeyHeld;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Vector3f;
-import com.flansmod.fvm.packets.PacketVehicleControl;
+import com.flansmod.fvtm.packets.PacketVehicleControl;
+
 import io.netty.buffer.ByteBuf;
+import net.fexcraft.mod.addons.gep.attributes.EngineAttribute;
 import net.fexcraft.mod.fvm.FVM;
-import net.fexcraft.mod.fvm.data.LoadedIn;
-import net.fexcraft.mod.fvm.data.VehicleType;
-import net.fexcraft.mod.fvm.items.VehicleItem;
-import net.fexcraft.mod.fvm.util.FvmPerms;
-import net.fexcraft.mod.fvm.util.FvmResources;
+import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleData;
+import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleScript;
+import net.fexcraft.mod.fvtm.util.Resources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
 import net.fexcraft.mod.lib.perms.PermManager;
@@ -59,7 +59,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	public double serverYaw, serverPitch, serverRoll;
 	
 	/** The driveable data which contains the inventory, the engine and the fuel */
-	public VehicleType data;
+	public LandVehicleData data;
 	
 	/** The throttle, in the range -1, 1 is multiplied by the maxThrottle (or maxNegativeThrottle) from the plane type to obtain the thrust */
 	public float throttle;
@@ -112,13 +112,13 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		stepHeight = 1.0F;
 	}
 	
-	public LandVehicle(World world, VehicleType type){
+	public LandVehicle(World world, LandVehicleData type){
 		this(world);
 		data = type;
 	}
 	
 	//This one deals with spawning from a vehicle spawner
-	public LandVehicle(World world, double x, double y, double z, VehicleType data){
+	public LandVehicle(World world, double x, double y, double z, LandVehicleData data){
 		this(world, data);
 		stepHeight = 1.0F;
 		setPosition(x, y, z);
@@ -126,7 +126,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 
 	//This one allows you to deal with spawning from items
-	public LandVehicle(World world, double x, double y, double z, EntityPlayer placer, VehicleType data){
+	public LandVehicle(World world, double x, double y, double z, EntityPlayer placer, LandVehicleData data){
 		this(world, data);
 		stepHeight = 1.0F;
 		setPosition(x, y, z);
@@ -135,7 +135,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 	
 	//This one allows you to deal with spawning from the constructor
-		public LandVehicle(World world, double x, double y, double z, int placer, VehicleType data){
+		public LandVehicle(World world, double x, double y, double z, int placer, LandVehicleData data){
 			this(world, data);
 			stepHeight = 1.0F;
 			setPosition(x, y, z);
@@ -145,7 +145,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	public void writeSpawnData(ByteBuf buffer){
-		ByteBufUtils.writeTag(buffer, data.write(null));
+		ByteBufUtils.writeTag(buffer, data.writeToNBT(new NBTTagCompound()));
 		
 		buffer.writeFloat(axes.getYaw());
 		buffer.writeFloat(axes.getPitch());
@@ -155,8 +155,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	@Override
 	public void readSpawnData(ByteBuf buffer){
 		try{
-			data = new VehicleType(LoadedIn.ENTITY, ByteBufUtils.readTag(buffer));
-			FvmResources.loadVehicleModel(data);
+			data = Resources.getLandVehicleData(ByteBufUtils.readTag(buffer));
 			
 			initType(data, true);
 			
@@ -175,25 +174,25 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		
 	}
 	
-	protected void initType(VehicleType type, boolean clientSide){
-		seats = new EntitySeat[type.seats.size()];
-		for(int i = 0; i < type.seats.size(); i++){
+	protected void initType(LandVehicleData type, boolean clientSide){
+		seats = new EntitySeat[type.getFMSeats().size()];
+		for(int i = 0; i < type.getFMSeats().size(); i++){
 			if(!clientSide){
 				seats[i] = new EntitySeat(world, this, i);
 				world.spawnEntity(seats[i]);
 			}
 		}
-		wheels = new EntityWheel[type.wheelPos.length];
+		wheels = new EntityWheel[type.getWheelPos().size()];
 		for(int i = 0; i < wheels.length; i++){
 			if(!clientSide){
 				wheels[i] = new EntityWheel(world, this, i);
 				world.spawnEntity(wheels[i]);
 			}
 		}
-		stepHeight = type.wheelStepHeight;
+		stepHeight = type.getVehicle().getFMWheelStepHeight();
 		yOffset = 10F / 16F;//TODO check dis
 		
-		data.scripts.onCreated(this);
+		data.getScripts().forEach((script) -> script.onCreated(this));
 	}
 
 	@Override
@@ -203,7 +202,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound tag){
-		tag = data.write(tag);
+		tag = data.writeToNBT(tag);
 		tag.setFloat("RotationYaw", axes.getYaw());
 		tag.setFloat("RotationPitch", axes.getPitch());
 		tag.setFloat("RotationRoll", axes.getRoll());
@@ -212,10 +211,10 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound tag){
 		if(data == null){
-			data = new VehicleType(LoadedIn.ENTITY, tag);
+			data = Resources.getLandVehicleData(tag);
 		}
 		else{
-			data.read(tag);
+			data.readFromNBT(tag);
 		}
 		
 		initType(data, false);
@@ -227,7 +226,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 	
 	protected boolean canSit(int seat){
-		return data.seats.size() >= seat && seats[seat].getControllingPassenger() == null;
+		return data.getFMSeats().size() >= seat && seats[seat].getControllingPassenger() == null;
 	}
 	
 	@Override
@@ -272,7 +271,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				wheel.setDead();
 			}
 		}
-		data.scripts.onRemoved(this);
+		data.getScripts().forEach((script) -> script.onRemove(this));
 	}
 	
 	@Override
@@ -377,21 +376,23 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			}
 			return true;
 		}
-		if(data.isLocked){
+		if(data.isLocked()){
 			Print.chat(entityplayer, "Vehicle is locked.");
 			return true;
 		}
 		
-		if(data.scripts.size() > 0){
-			if(data.scripts.onInteract(this, entityplayer)){
-				return true;
+		if(!data.getScripts().isEmpty()){
+			for(LandVehicleScript script : data.getScripts()){
+				if(script.onInteract(this, entityplayer)){
+					return true;
+				}
 			}
 		}
 		
 		//TODO Item interaction
 		
 		//Check each seat in order to see if the player can sit in it
-		for(int i = 0; i <= data.seats.size(); i++){
+		for(int i = 0; i <= data.getFMSeats().size(); i++){
 			if(seats[i] != null && seats[i].processInitialInteract(entityplayer, hand)){
 				if(i == 0){
 					//FlansMod.proxy.doTutorialStuff(entityplayer, this);
@@ -428,7 +429,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 					if(throttle < -1F){
 						throttle = -1F;
 					}
-					if(throttle < 0F && data.maxNegativeThrottle == 0F){
+					if(throttle < 0F && data.getVehicle().getFMMaxNegativeThrottle() == 0F){
 						throttle = 0F;
 					}
 					return true;
@@ -496,9 +497,9 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				{
 					if(toggleTimer <= 0)
 					{
-						data.doors = !data.doors;
+						data.toggleDoors(null);
 						//if(data.hasDoor)
-							player.sendMessage(new TextComponentString("Doors " + (data.doors ? "open" : "closed")));
+							player.sendMessage(new TextComponentString("Doors " + (data.doorsOpen() ? "open" : "closed")));
 						toggleTimer = 10;
 						FlansMod.getNewPacketHandler().sendToServer(new PacketVehicleControl(this));
 					}
@@ -555,13 +556,13 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
         super.onUpdate();
         
         if(!world.isRemote){
-        	for(int i = 0; i < data.seats.size(); i++){
+        	for(int i = 0; i < data.getWheelPos().size(); i++){
         		if(seats[i] == null || !seats[i].addedToChunk){
         			seats[i] = new EntitySeat(world, this, i);
     				world.spawnEntity(seats[i]);
         		}
         	}
-        	for(int i = 0; i < data.wheelPos.length; i++){
+        	for(int i = 0; i < data.getWheelPos().size(); i++){
         		if(wheels[i] == null || !wheels[i].addedToChunk){
         			wheels[i] = new EntityWheel(world, this, i);
     				world.spawnEntity(wheels[i]);
@@ -625,14 +626,14 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		prevRotationRoll = axes.getRoll();		
 		prevAxes = axes.clone();
 		
-		boolean canThrust = driverIsCreative() || data.fuelStored > 0;
+		boolean canThrust = driverIsCreative() || data.getFuelTankContent() > 0;
 
 		//If there's no player in the driveable or it cannot thrust, slow the plane and turn off mouse held actions
 		if(seats == null || seats.length == 0){
 			this.setDead();
 			return;
 		}
-		if((seats[0] != null && seats[0].getControllingPassenger() == null) || !canThrust && data.maxThrottle != 0 && data.maxNegativeThrottle != 0){
+		if((seats[0] != null && seats[0].getControllingPassenger() == null) || !canThrust && data.getVehicle().getFMMaxPositiveThrottle() != 0 && data.getVehicle().getFMMaxPositiveThrottle() != 0){
 			throttle *= 0.98F;
 			rightMouseHeld = leftMouseHeld = false;
 		}
@@ -782,7 +783,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			//Update angles
 			wheel.rotationYaw = axes.getYaw();
 			//Front wheels
-			if(!data.hasTracks() && (wheel.ID == 2 || wheel.ID == 3))
+			if(!data.getVehicle().getDriveType().hasTracks() && (wheel.ID == 2 || wheel.ID == 3))
 			{
 				wheel.rotationYaw += wheelsYaw;
 			}
@@ -798,27 +799,27 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			//If the player driving this is in creative, then we can thrust, no matter what
 			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
-			if(canThrustCreatively || data.fuelStored > data.getPart("engine").fuelConsumption * throttle){
+			if(canThrustCreatively || data.getFuelTankContent() > data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() * throttle){
 				float velocityScale;
-				if(data.hasTracks()){
+				if(data.getVehicle().getDriveType().hasTracks()){
 					boolean left = wheel.ID == 0 || wheel.ID == 3;
 					
 					float turningDrag = 0.02F;
 					wheel.motionX *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					wheel.motionZ *= 1F - (Math.abs(wheelsYaw) * turningDrag);
 					
-					velocityScale = 0.04F * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
-					float steeringScale = 0.1F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier);
+					velocityScale = 0.04F * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
+					float steeringScale = 0.1F * (wheelsYaw > 0 ? data.getVehicle().getFMTurnLeftModifier() : data.getVehicle().getFMTurnRightModifier());
 					float effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
 					wheel.motionZ += effectiveWheelSpeed * Math.sin(wheel.rotationYaw * 3.14159265F / 180F);
 				}
-				else if(data.is4WD()){
-					velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+				else if(data.getVehicle().getDriveType().is4WD()){
+					velocityScale = 0.1F * throttle * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
 					wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					
-					velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
+					velocityScale = 0.01F * (wheelsYaw > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * (throttle > 0 ? 1 : -1);
 					if(wheel.ID == 2 || wheel.ID == 3){
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
@@ -828,12 +829,12 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 						wheel.motionZ *= 0.9F;
 					}
 				}
-				else if(data.isFWD()){
+				else if(data.getVehicle().getDriveType().isFWD()){
 					if(wheel.ID == 2 || wheel.ID == 3){
-						velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						velocityScale = 0.1F * throttle * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-						velocityScale = 0.01F * (wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * (throttle > 0 ? 1 : -1);
+						velocityScale = 0.01F * (wheelsYaw > 0 ? data.getVehicle().getFMTurnLeftModifier() : data.getVehicle().getFMTurnRightModifier()) * (throttle > 0 ? 1 : -1);
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 					}
@@ -842,15 +843,15 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 						wheel.motionZ *= 0.9F;
 					}
 				}
-				else if(data.isRWD()){
+				else if(data.getVehicle().getDriveType().isRWD()){
 					if(wheel.ID == 0 || wheel.ID == 1){
-						velocityScale = 0.1F * throttle * (throttle > 0 ? data.maxThrottle : data.maxNegativeThrottle) * data.getPart("engine").engineSpeed;
+						velocityScale = 0.1F * throttle * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 						wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
 					}
 					
 					if(wheel.ID == 2 || wheel.ID == 3){
-						velocityScale = 0.01F * ((wheelsYaw > 0 ? data.turnLeftModifier : data.turnRightModifier) * 16) * (throttle > 0 ? 1 : -1);
+						velocityScale = 0.01F * ((wheelsYaw > 0 ? data.getVehicle().getFMTurnLeftModifier() : data.getVehicle().getFMTurnRightModifier()) * 16) * (throttle > 0 ? 1 : -1);
 						wheel.motionX = wheels[wheel.ID - 2].motionX;
 						wheel.motionZ = wheels[wheel.ID - 2].motionZ;
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
@@ -875,11 +876,11 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			wheel.move(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
 			
 			//Pull wheels towards car
-			Pos pos = data.wheelPos[wheel.ID];
+			Pos pos = data.getWheelPos().get(wheel.ID);
 			Vector3f targetWheelPos = axes.findLocalVectorGlobally(new Vector3f(pos.to16FloatX(), pos.to16FloatY(), pos.to16FloatZ()));
 			Vector3f currentWheelPos = new Vector3f(wheel.posX - posX, wheel.posY - posY, wheel.posZ - posZ);
 				
-			Vector3f dPos = ((Vector3f)Vector3f.sub(targetWheelPos, currentWheelPos, null).scale(data.wheelSpringStrength));
+			Vector3f dPos = ((Vector3f)Vector3f.sub(targetWheelPos, currentWheelPos, null).scale(data.getVehicle().getFMWheelSpringStrength()));
 					
 			if(dPos.length() > 0.001F){
 				wheel.move(MoverType.SELF, dPos.x, dPos.y, dPos.z);
@@ -916,7 +917,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			float roll = 0F;
 			roll = -(float)Math.atan2(dry, drxz);
 			
-			if(data.hasTracks()){
+			if(data.getVehicle().getDriveType().hasTracks()){
 				yaw = (float)Math.atan2(wheels[3].posZ - wheels[2].posZ, wheels[3].posX - wheels[2].posX) + (float)Math.PI / 2F;
 			}
 			
@@ -960,7 +961,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		}
 		
 		//Behavior Scripts
-		data.scripts.onUpdate(this);
+		data.getScripts().forEach((script) -> script.onUpdate(this));
 	}
 	
 	private float averageAngles(float a, float b){
@@ -981,11 +982,11 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 
 	private Vec3d subtract(Vec3d a, Vec3d b){
-		return new Vec3d(a.xCoord - b.xCoord, a.yCoord - b.yCoord, a.zCoord - b.zCoord);
+		return new Vec3d(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 	
 	private Vec3d crossProduct(Vec3d a, Vec3d b){
-        return new Vec3d(a.yCoord * b.zCoord - a.zCoord * b.yCoord, a.zCoord * b.xCoord - a.xCoord * b.zCoord, a.xCoord * b.yCoord - a.yCoord * b.xCoord);
+        return new Vec3d(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 	}
 
 	public boolean landVehicle(){
@@ -996,16 +997,15 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		if(world.isRemote || isDead){
 			return true;
 		}
-		if(damagesource.damageType.equals("player") && damagesource.getEntity().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
-			if(data.isLocked){
-				Print.chat(damagesource.getEntity(), "Vehicle is locked. Unlock to remove it.");
+		if(damagesource.damageType.equals("player") && damagesource.getImmediateSource().onGround && (seats[0] == null || seats[0].getControllingPassenger() == null)){
+			if(data.isLocked()){
+				Print.chat(damagesource.getImmediateSource(), "Vehicle is locked. Unlock to remove it.");
 				return false;
 			}
 			else{
-				PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getEntity());
-				ItemStack stack = new ItemStack(VehicleItem.defaultItem(), 1, 0);
-				stack.setTagCompound(data.write(new NBTTagCompound()));
-				boolean brk = pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
+				PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getImmediateSource());
+				ItemStack stack = data.getVehicle().getItemStack(data);
+				boolean brk = true;//= pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
 				if(brk){
 					entityDropItem(stack, 0.5F);
 			 		setDead();
@@ -1013,7 +1013,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			 		return true;
 				}
 				else{
-					Print.chat(damagesource.getEntity(), "No permission to break this vehicle/type.");
+					Print.chat(damagesource.getImmediateSource(), "No permission to break this vehicle/type.");
 			 		Print.debug(stack.toString());
 					return false;
 				}
@@ -1024,7 +1024,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	public boolean isLocked(){
-		return data.isLocked;
+		return data.isLocked();
 	}
 
 	@Override
@@ -1041,28 +1041,28 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 						return false;
 					}
 					else{
-						if(item.getCode(stack).equals(data.lock_code)){
-							data.isLocked = false;
+						if(item.getCode(stack).equals(data.getLockCode())){
+							data.setLocked(false);
 							Print.chat(entity, "Vehicle is now unlocked.");
 							return true;
 						}
 						else{
-							Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							Print.chat(entity, "Wrong key.\n[V:" + data.getLockCode().toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
 							return false;
 						}
 					}
 				case COMMON:
-					if(item.getCode(stack).equals(data.lock_code)){
-						data.isLocked = false;
+					if(item.getCode(stack).equals(data.getLockCode())){
+						data.setLocked(false);
 						Print.chat(entity, "Vehicle is now unlocked.");
 						return true;
 					}
 					else{
-						Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+						Print.chat(entity, "Wrong key.\n[V:" + data.getLockCode().toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
 						return false;
 					}
 				case ADMIN:
-					data.isLocked = false;
+					data.setLocked(false);
 					Print.chat(entity, "[SU] Vehicle is now unlocked.");
 					return true;
 			}
@@ -1072,7 +1072,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 
 	@Override
 	public boolean lock(World world, EntityPlayer entity, ItemStack stack, KeyItem item) {
-		if(!data.hasLock){
+		if(!data.isLocked()){
 			Print.chat(entity, "This vehicle doesn't allow locking.");
 			return false;
 		}
@@ -1089,28 +1089,28 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 							return false;
 						}
 						else{
-							if(item.getCode(stack).equals(data.lock_code)){
-								data.isLocked = true;
+							if(item.getCode(stack).equals(data.getLockCode())){
+								data.setLocked(true);
 								Print.chat(entity, "Vehicle is now locked.");
 								return true;
 							}
 							else{
-								Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+								Print.chat(entity, "Wrong key.\n[V:" + data.getLockCode().toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
 								return false;
 							}
 						}
 					case COMMON:
-						if(item.getCode(stack).equals(data.lock_code)){
-							data.isLocked = true;
+						if(item.getCode(stack).equals(data.getLockCode())){
+							data.setLocked(true);
 							Print.chat(entity, "Vehicle is now locked.");
 							return true;
 						}
 						else{
-							Print.chat(entity, "Wrong key.\n[V:" + data.lock_code.toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
+							Print.chat(entity, "Wrong key.\n[V:" + data.getLockCode().toUpperCase() + "] != [K:" + item.getCode(stack).toUpperCase() + "]");
 							return false;
 						}
 					case ADMIN:
-						data.isLocked = true;
+						data.setLocked(true);
 						Print.chat(entity, "[SU] Vehicle is now locked.");
 						return true;
 				}
@@ -1193,7 +1193,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		
 	/** Takes a vector (such as the origin of a seat / gun) and translates it from local coordinates to global coordinates */
 	public Vector3f rotate(Vec3d inVec){
-		return rotate(inVec.xCoord, inVec.yCoord, inVec.zCoord);
+		return rotate(inVec.x, inVec.y, inVec.z);
 	}
 
 	/** Takes a vector (such as the origin of a seat / gun) and translates it from local coordinates to global coordinates */
@@ -1273,9 +1273,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public ItemStack getPickedResult(RayTraceResult target){
-		ItemStack stack = data.newStack();
+		ItemStack stack = data.getVehicle().getItemStack(data);
 		stack.setItemDamage(0);
-		stack.setTagCompound(data.write(new NBTTagCompound()));
 		return stack;
 	}
 	
@@ -1284,14 +1283,14 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		if(seats == null || seats[0] == null || seats[0].getControllingPassenger() == null){
 			return false;
 		}
-		return driverIsCreative() || data.fuelStored > 0;
+		return driverIsCreative() || data.getFuelTankContent() > 0;
 	}
 
 	public boolean hasEnoughFuel(){
 		if(seats == null || seats[0] == null || seats[0].getControllingPassenger() == null){
 			return false;
 		}
-		return driverIsCreative() || data.fuelStored > data.getPart("engine").fuelConsumption * throttle;
+		return driverIsCreative() || data.getFuelTankContent() > data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() * throttle;
 	}
 	
 	//Physics time! Oooh yeah
@@ -1329,7 +1328,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public float getCameraDistance(){
-		return data.cameraDistance;
+		return data.getVehicle().getFMCameraDistance();
 	}
 	
 	public boolean hasMouseControlMode(){
@@ -1338,7 +1337,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public String getName(){
-		return data.registryname;
+		return data.getVehicle().getName();
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -1364,12 +1363,12 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		return camera;
 	}
 
-	public VehicleType getData(){
+	public LandVehicleData getData(){
 		return data;
 	}
 
 	public Seat getSeatInfo(int id){
-		Pos s = data.seats.get(id).pos;
+		Pos s = data.getFMSeats().get(id).getPos();
 		return new Seat(id, s.x, s.y, s.z);
 	}
 	
