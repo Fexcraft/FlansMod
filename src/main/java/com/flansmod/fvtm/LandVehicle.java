@@ -17,15 +17,20 @@ import com.flansmod.fvtm.packets.PacketVehicleControl;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.addons.gep.attributes.EngineAttribute;
+import net.fexcraft.mod.addons.gep.attributes.EngineAttribute.EngineAttributeData;
 import net.fexcraft.mod.fvm.FVM;
 import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleData;
 import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleScript;
 import net.fexcraft.mod.fvtm.util.Resources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.api.network.IPacketReceiver;
+import net.fexcraft.mod.lib.network.packet.PacketEntityUpdate;
+import net.fexcraft.mod.lib.util.common.ApiUtil;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Pos;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
@@ -46,7 +51,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class LandVehicle extends Entity implements IControllable, IEntityAdditionalSpawnData, LockableObject {
+public class LandVehicle extends Entity implements IControllable, IEntityAdditionalSpawnData, LockableObject, IPacketReceiver<PacketEntityUpdate> {
 	
 	public boolean syncFromServer = true;
 	/** Ticks since last server update. Use to smoothly transition to new position */
@@ -60,7 +65,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	public LandVehicleData data;
 	
 	/** The throttle, in the range -1, 1 is multiplied by the maxThrottle (or maxNegativeThrottle) from the plane type to obtain the thrust */
-	public float throttle;
+	public double throttle;
 	/** The wheels on this plane */
 	public EntityWheel[] wheels;
 	
@@ -154,7 +159,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	@Override
 	public void readSpawnData(ByteBuf buffer){
 		try{
-			data = Resources.getLandVehicleData(ByteBufUtils.readTag(buffer));
+			data = Resources.getLandVehicleData(ByteBufUtils.readTag(buffer), world.isRemote);
 			
 			initType(data, true);
 			
@@ -191,7 +196,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		stepHeight = type.getVehicle().getFMWheelStepHeight();
 		yOffset = 10F / 16F;//TODO check dis
 		
-		data.getScripts().forEach((script) -> script.onCreated(this));
+		data.getScripts().forEach((script) -> script.onCreated(this, data));
 	}
 
 	@Override
@@ -210,10 +215,10 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound tag){
 		if(data == null){
-			data = Resources.getLandVehicleData(tag);
+			data = Resources.getLandVehicleData(tag, world.isRemote);
 		}
 		else{
-			data.readFromNBT(tag);
+			data.readFromNBT(tag, world.isRemote);
 		}
 		
 		initType(data, false);
@@ -256,8 +261,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	
 	@Override
 	public void setDead(){
-		new Exception().printStackTrace();
-		Print.debugChat("SD");
+		//new Exception().printStackTrace();
+		//Print.debugChat("SD");
 		super.setDead();
 		if(world.isRemote){
 			camera.setDead();
@@ -272,7 +277,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				wheel.setDead();
 			}
 		}
-		data.getScripts().forEach((script) -> script.onRemove(this));
+		data.getScripts().forEach((script) -> script.onRemove(this, data));
 	}
 	
 	@Override
@@ -326,7 +331,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		}
 	}
 	
-	public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, float roll, double motX, double motY, double motZ, float velYaw, float velPitch, float velRoll, float throt, float steeringYaw){
+	public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, float roll, double motX, double motY, double motZ, float velYaw, float velPitch, float velRoll, double throttle2, float steeringYaw){
 		if(world.isRemote){
 			serverPosX = x;
 			serverPosY = y;
@@ -348,7 +353,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		motionY = motY;
 		motionZ = motZ;
 		angularVelocity = new Vector3f(velYaw, velPitch, velRoll);
-		throttle = throt;
+		throttle = throttle2;
 		//
 		wheelsYaw = steeringYaw;
 	}
@@ -384,7 +389,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		
 		if(!data.getScripts().isEmpty()){
 			for(LandVehicleScript script : data.getScripts()){
-				if(script.onInteract(this, entityplayer)){
+				if(script.onInteract(this, data, entityplayer)){
 					return true;
 				}
 			}
@@ -453,10 +458,16 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 						motionX *= 0.8F;
 						motionZ *= 0.8F;
 					}
+					if(throttle < -0.0001){
+						throttle = 0;
+					}
 					return true;
 				}
-				case 5 : //Down : Do nothing
-				{
+				case 5 : //Down : TEMP: toggle engine;
+				{	
+					NBTTagCompound nbt = new NBTTagCompound();
+					nbt.setString("task", "engine_toggle");
+					ApiUtil.sendEntityUpdatePacketToServer(this, nbt);
 					return true;
 				}
 				case 6 : //Exit : Get out
@@ -638,66 +649,6 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			throttle *= 0.98F;
 			rightMouseHeld = leftMouseHeld = false;
 		}
-
-		//Handle fuel
-			
-		//int fuelMultiplier = 2;
-		
-		//The tank is currently full, so do nothing
-		/*if(data.fuelStored >= data.fuelTankSize){
-			return;
-		}*///TODO
-		
-		//Look through the entire inventory for fuel cans, buildcraft fuel buckets and RedstoneFlux power sources
-		/*for(int i = 0; i < data.getContainer().getSizeInventory(); i++){
-			ItemStack stack = data.getContainer().getStackInSlot(i);
-			if(stack == null || stack.getCount() <= 0)
-				continue;
-			Item item = stack.getItem();
-			//If we have an electric engine, look for RedstoneFlux power source items, such as power cubes
-			
-			if(getDriveableData().engine.useRFPower)
-			{
-				if(item instanceof IEnergyContainerItem)
-				{
-					IEnergyContainerItem energy = (IEnergyContainerItem)item;
-					getDriveableData().fuelInTank += (fuelMultiplier * energy.extractEnergy(stack, getDriveableData().engine.RFDrawRate, false)) / getDriveableData().engine.RFDrawRate;
-				}
-			}
-			else
-			{
-				//Check for Flan's Mod fuel items
-				if(item instanceof ItemPart)
-				{
-					PartType part = ((ItemPart)item).type;
-					//Check it is a fuel item
-					if(part.category == EnumPartCategory.FUEL)
-					{
-						//Put 2 points of fuel 
-						getDriveableData().fuelInTank += fuelMultiplier;
-						
-						//Damage the fuel item to indicate being used up
-						int damage = stack.getItemDamage();
-						stack.setItemDamage(damage + 1);
-		
-						//If we have finished this fuel item
-						if(damage >= stack.getMaxDamage())
-						{
-							//Reset the damage to 0
-							stack.setItemDamage(0);
-							//Consume one item
-							stack.shrink(1);
-							//If we consumed the last one, destroy the stack
-							if(stack.getCount() <= 0)
-								getDriveableData().setInventorySlotContents(i, null);
-						}
-						
-						//We found a fuel item and consumed some, so we are done
-						break;
-					}
-				}
-			}
-		}*/
 		
 		//Vehicle Stuff
 		//Get vehicle type
@@ -742,7 +693,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		//Player is not driving this. Update its position from server update packets 
 		if(world.isRemote && !thePlayerIsDrivingThis){
 			//The driveable is currently moving towards its server position. Continue doing so.
-			if (serverPositionTransitionTicker > 0){
+			if(serverPositionTransitionTicker > 0){
 				double x = posX + (serverPosX - posX) / serverPositionTransitionTicker;
 				double y = posY + (serverPosY - posY) / serverPositionTransitionTicker;
 				double z = posZ + (serverPosZ - posZ) / serverPositionTransitionTicker;
@@ -800,8 +751,13 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			//If the player driving this is in creative, then we can thrust, no matter what
 			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
-			if(canThrustCreatively || data.getFuelTankContent() > data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() * throttle){
-				float velocityScale;
+			boolean consumed = false;
+			if(data.getPart("engine").getAttributeData(EngineAttributeData.class).isOn() && data.getFuelTankContent() > data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() * throttle){
+				double d = (data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() * throttle) / 80;//20, set lower to prevent too fast compsumption.
+				consumed = data.consumeFuel(d > 0 ? d : (data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getFuelCompsumption() / 320));
+			}
+			if((canThrustCreatively || consumed)){
+				double velocityScale;
 				if(data.getVehicle().getDriveType().hasTracks()){
 					boolean left = wheel.ID == 0 || wheel.ID == 3;
 					
@@ -811,7 +767,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 					
 					velocityScale = 0.04F * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
 					float steeringScale = 0.1F * (wheelsYaw > 0 ? data.getVehicle().getFMTurnLeftModifier() : data.getVehicle().getFMTurnRightModifier());
-					float effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
+					double effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
 					wheel.motionZ += effectiveWheelSpeed * Math.sin(wheel.rotationYaw * 3.14159265F / 180F);
 				}
@@ -963,7 +919,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		}
 		
 		//Behavior Scripts
-		data.getScripts().forEach((script) -> script.onUpdate(this));
+		data.getScripts().forEach((script) -> script.onUpdate(this, data));
 	}
 	
 	private float averageAngles(float a, float b){
@@ -1006,6 +962,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			}
 			else{
 				//PlayerPerms pp = PermManager.getPlayerPerms((EntityPlayer)damagesource.getImmediateSource());
+				data.getPart("engine").getAttributeData(EngineAttributeData.class).setOn(false);
 				ItemStack stack = data.getVehicle().getItemStack(data);
 				boolean brk = true;//= pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
 				if(brk){
@@ -1372,6 +1329,59 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	public Seat getSeatInfo(int id){
 		Pos s = data.getFMSeats().get(id).getPos();
 		return new Seat(id, s.x, s.y, s.z);
+	}
+	
+	private int lr = -1;
+	
+	@Override
+	public void processServerPacket(PacketEntityUpdate pkt){
+		if(pkt.nbt.hasKey("ScriptId")){
+			for(LandVehicleScript script : data.getScripts()){
+				if(script.getId().toString().equals(pkt.nbt.getString("ScriptId"))){
+					script.onDataPacket(this, data, pkt.nbt, Side.SERVER);
+				}
+			}
+		}
+		if(pkt.nbt.hasKey("task")){
+			switch(pkt.nbt.getString("task")){
+				case "engine_toggle":{
+					if(lr == Time.getSecond()){
+						break;
+					}
+					lr = Time.getSecond();
+					pkt.nbt.setBoolean("engine_toggle_result", data.getPart("engine").getAttributeData(EngineAttributeData.class).toggle());
+					if(data.getFuelTankContent() == 0 || data.getFuelTankContent() < 0.1){
+						pkt.nbt.setBoolean("engine_toggle_result", false);
+						pkt.nbt.setBoolean("no_fuel", true);
+					}
+					ApiUtil.sendEntityUpdatePacketToAllAround(this, pkt.nbt);
+					throttle = 0;
+					break;
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void processClientPacket(PacketEntityUpdate pkt){
+		if(pkt.nbt.hasKey("ScriptId")){
+			for(LandVehicleScript script : data.getScripts()){
+				if(script.getId().toString().equals(pkt.nbt.getString("ScriptId"))){
+					script.onDataPacket(this, data, pkt.nbt, Side.SERVER);
+				}
+			}
+		}
+		if(pkt.nbt.hasKey("task")){
+			switch(pkt.nbt.getString("task")){
+				case "engine_toggle":{
+					Print.chat(net.minecraft.client.Minecraft.getMinecraft().player, "Engine toggled " + (data.getPart("engine").getAttributeData(EngineAttributeData.class).setOn(pkt.nbt.getBoolean("engine_toggle_result")) ? "on" : "off") + ".");
+					if(pkt.nbt.hasKey("no_fuel") && pkt.nbt.getBoolean("no_fuel")){
+						Print.chat(net.minecraft.client.Minecraft.getMinecraft().player, "Out of fuel!");
+					}
+					throttle = 0;
+				}
+			}
+		}
 	}
 	
 }

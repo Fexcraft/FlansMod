@@ -122,7 +122,7 @@ public class KeyInputHandler{
 			if(mc.gameSettings.keyBindJump.isPressed()){
 				riding.pressKey(4, player);
 			}
-			if(downKey.isPressed()){
+			if(downKey.isKeyDown()){
 				riding.pressKey(5, player);
 			}
 			if(mc.gameSettings.keyBindSneak.isPressed()){

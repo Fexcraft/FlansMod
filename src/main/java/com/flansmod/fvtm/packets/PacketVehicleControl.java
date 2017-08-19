@@ -13,7 +13,7 @@ public class PacketVehicleControl implements IPacket, IMessage{
 	public float yaw, pitch, roll;
 	public double motX, motY, motZ;
 	public float avelx, avely, avelz;
-	public float throttle;
+	public double throttle;
 	public float steeringYaw;
 	public boolean doors;
 	
@@ -53,7 +53,7 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		buf.writeFloat(avelx);
 		buf.writeFloat(avely);
 		buf.writeFloat(avelz);
-		buf.writeFloat(throttle);
+		buf.writeDouble(throttle);
 		buf.writeFloat(steeringYaw);
 		buf.writeBoolean(doors);
 	}
@@ -73,7 +73,7 @@ public class PacketVehicleControl implements IPacket, IMessage{
 		avelx = buf.readFloat();
 		avely = buf.readFloat();
 		avelz = buf.readFloat();
-		throttle = buf.readFloat();
+		throttle = buf.readDouble();
 		steeringYaw = buf.readFloat();
 		doors = buf.readBoolean();
 	}

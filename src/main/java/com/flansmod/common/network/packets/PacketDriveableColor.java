@@ -24,19 +24,19 @@ public class PacketDriveableColor implements IPacket, IMessage{
 	@Override
 	public void toBytes(ByteBuf buf){
 		buf.writeInt(entityId);
-		buf.writeFloat(primary.red);
-		buf.writeFloat(primary.green);
-		buf.writeFloat(primary.blue);
-		buf.writeFloat(secondary.red);
-		buf.writeFloat(secondary.green);
-		buf.writeFloat(secondary.blue);
+		buf.writeByte(primary.red);
+		buf.writeByte(primary.green);
+		buf.writeByte(primary.blue);
+		buf.writeByte(secondary.red);
+		buf.writeByte(secondary.green);
+		buf.writeByte(secondary.blue);
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf){
 		entityId = buf.readInt();
-		primary = new RGB(buf.readFloat(), buf.readFloat(), buf.readFloat());
-		secondary = new RGB(buf.readFloat(), buf.readFloat(), buf.readFloat());
+		primary = new RGB(buf.readByte(), buf.readByte(), buf.readByte());
+		secondary = new RGB(buf.readByte(), buf.readByte(), buf.readByte());
 	}
 	
 }

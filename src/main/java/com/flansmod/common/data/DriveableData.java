@@ -120,18 +120,18 @@ public class DriveableData implements IInventory {
 			if(nbt.hasKey("HasColor") && nbt.getBoolean("HasColor")){
 				hasColor = true;
 				if(nbt.hasKey("PrimaryColorRed")){
-					float pr = nbt.getFloat("PrimaryColorRed");
-					float pg = nbt.getFloat("PrimaryColorGreen");
-					float pb = nbt.getFloat("PrimaryColorBlue");
+					byte pr = nbt.getByte("PrimaryColorRed");
+					byte pg = nbt.getByte("PrimaryColorGreen");
+					byte pb = nbt.getByte("PrimaryColorBlue");
 					primary_color = new RGB(pr, pg, pb);
 				}
 				else{
 					primary_color = dType.default_primary_color;
 				}
 				if(nbt.hasKey("SecondaryColorRed")){
-					float sr = nbt.getFloat("SecondaryColorRed");
-					float sg = nbt.getFloat("SecondaryColorGreen");
-					float sb = nbt.getFloat("SecondaryColorBlue");
+					byte sr = nbt.getByte("SecondaryColorRed");
+					byte sg = nbt.getByte("SecondaryColorGreen");
+					byte sb = nbt.getByte("SecondaryColorBlue");
 					secondary_color = new RGB(sr, sg, sb);
 				}
 				else{

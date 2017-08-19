@@ -223,11 +223,11 @@ public abstract class DataType implements Comparable<DataType> {
 	
 	protected RGB parseRGB(String[] split){
 		try{
-			return new RGB(Float.parseFloat(split[1]) / 16F, Float.parseFloat(split[2]) / 16F, Float.parseFloat(split[3]) / 16F);
+			return new RGB(new String[]{split[1], split[2], split[3]});
 		}
 		catch(Exception e){
 			exception(e, split[0]);
-			return new RGB(RGB.WHITE.red, RGB.WHITE.green, RGB.WHITE.blue);
+			return new RGB();
 		}
 	}
 	

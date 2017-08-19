@@ -5,6 +5,7 @@ import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
 
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -61,9 +62,10 @@ public class ClientEventHandler {
 			if(mc.player.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat){
 				com.flansmod.fvtm.LandVehicle ent = ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).vehicle;
 				mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " chunks per hour", 2, 2, 0xffffff);
-				if(Static.dev()){
-					mc.fontRenderer.drawString("Throttle : " + ent.throttle, 2, 12, 0xffffff);
-				}
+				//if(Static.dev()){
+					mc.fontRenderer.drawString("Throttle: " + RGB.format(ent.throttle), 2, 12, 0xffffff);
+					mc.fontRenderer.drawString("Fuel: " + RGB.format(ent.data.getFuelTankContent()) + "/" + ent.data.getFuelTankSize(), 2, 22, 0xffffff);
+				//}
 			}
 		}
 	}
