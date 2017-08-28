@@ -18,9 +18,11 @@ import com.flansmod.fvtm.packets.PacketVehicleControl;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.addons.gep.attributes.EngineAttribute;
 import net.fexcraft.mod.addons.gep.attributes.EngineAttribute.EngineAttributeData;
-import net.fexcraft.mod.fvm.FVM;
+import net.fexcraft.mod.fvtm.FVTM;
+import net.fexcraft.mod.fvtm.api.Fuel.FuelItem;
 import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleData;
 import net.fexcraft.mod.fvtm.api.LandVehicle.LandVehicleScript;
+import net.fexcraft.mod.fvtm.gui.GuiHandler;
 import net.fexcraft.mod.fvtm.util.Resources;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.api.item.KeyItem;
@@ -387,6 +389,10 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 			return true;
 		}
 		
+		if(!currentItem.isEmpty() && currentItem.getItem() instanceof FuelItem){
+			entityplayer.openGui(FVTM.getInstance(), GuiHandler.VEHICLE_INVENTORY, world, 2, 0, 0);//Fuel Inventory.
+		}
+		
 		if(!data.getScripts().isEmpty()){
 			for(LandVehicleScript script : data.getScripts()){
 				if(script.onInteract(this, data, entityplayer)){
@@ -416,7 +422,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				return false;
 			}
 			//Send keys which require server side updates to the server
-			if(world.isRemote && (key == 6 || key == 8 || key == 9 || key == 16 || key == 17)){
+			if(world.isRemote && (key == 6 ||key == 7 || key == 8 || key == 9 || key == 16 || key == 17)){
 				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 				return true;
 			}
@@ -477,9 +483,13 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				}
 				case 7 : //Inventory
 				{
-					if(world.isRemote)
-					{
-						((EntityPlayer)seats[0].getControllingPassenger()).openGui(FVM.INSTANCE, 356, world, getPosition().getX(), getPosition().getY(), getPosition().getZ());
+					if(!world.isRemote){
+						if(this.data.getPart("engine").getAttributeData(EngineAttributeData.class).isOn()){
+							Print.chat(player, "Turn engine off first!");
+						}
+						else{
+							((EntityPlayer)seats[0].getControllingPassenger()).openGui(FVTM.getInstance(), GuiHandler.VEHICLE_INVENTORY, world, 0, 0, 0);
+						}
 						//open inventory
 					}
 					return true;
@@ -771,22 +781,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
 					wheel.motionZ += effectiveWheelSpeed * Math.sin(wheel.rotationYaw * 3.14159265F / 180F);
 				}
-				else if(data.getVehicle().getDriveType().is4WD()){
-					velocityScale = 0.1F * throttle * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
-					wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-					wheel.motionZ += Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
-					
-					velocityScale = 0.01F * (wheelsYaw > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * (throttle > 0 ? 1 : -1);
-					if(wheel.ID == 2 || wheel.ID == 3){
-						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
-					}
-					else{
-						wheel.motionX *= 0.9F;
-						wheel.motionZ *= 0.9F;
-					}
-				}
-				else if(data.getVehicle().getDriveType().isFWD()){
+				else if(data.getVehicle().getDriveType().isFWD() || data.getVehicle().getDriveType().is4WD()){
 					if(wheel.ID == 2 || wheel.ID == 3){
 						velocityScale = 0.1F * throttle * (throttle > 0 ? data.getVehicle().getFMMaxPositiveThrottle() : data.getVehicle().getFMMaxNegativeThrottle()) * data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed();
 						wheel.motionX += Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale;
@@ -814,8 +809,8 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 
-						wheels[wheel.ID - 2].motionX *= 0.9F;
-						wheels[wheel.ID - 2].motionZ *= 0.9F;
+						//wheels[wheel.ID - 2].motionX *= 0.9F;
+						//wheels[wheel.ID - 2].motionZ *= 0.9F;
 					}
 					//This is surely wrong.
 				}
