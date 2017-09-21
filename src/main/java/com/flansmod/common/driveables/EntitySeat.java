@@ -640,11 +640,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 	
 	@Override
-	public Entity getControllingEntity(){
-		return passenger;
-	}
-	
-	@Override
 	public Entity getControllingPassenger(){
 		return passenger;
 	}

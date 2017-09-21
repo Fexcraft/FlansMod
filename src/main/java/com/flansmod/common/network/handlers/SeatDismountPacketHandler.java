@@ -1,6 +1,7 @@
 package com.flansmod.common.network.handlers;
 
 import com.flansmod.common.network.packets.PacketSeatDismount;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.IThreadListener;

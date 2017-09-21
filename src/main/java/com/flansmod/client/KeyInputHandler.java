@@ -58,7 +58,6 @@ public class KeyInputHandler{
 			return;
 		}
 		
-		
 		/*//Handle universal keys
 		if(reloadKey.isPressed()){
 			PlayerData data = PlayerHandler.getPlayerData(player, Side.CLIENT);
@@ -104,8 +103,12 @@ public class KeyInputHandler{
 			Print.chat(player, "Reloading resources.");
 			FlansModClient.reloadModels(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT));
 		}
+		//Print.debugChat("ISN");
 		Entity ridingEntity = player.getRidingEntity();
 		if(ridingEntity instanceof IControllable){
+			Print.debugChat("IS");
+			//Static.stop();
+			Print.debugChat("KeyIE");
 			IControllable riding = (IControllable)ridingEntity;
 			if(mc.gameSettings.keyBindForward.isPressed()){
 				riding.pressKey(0, player);
@@ -156,5 +159,6 @@ public class KeyInputHandler{
 				riding.pressKey(15, player);
 			}
 		}
+		
 	}
 }

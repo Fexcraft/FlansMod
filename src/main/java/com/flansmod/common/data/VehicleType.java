@@ -5,6 +5,7 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.DriveablePosition;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntityVehicle;
+
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.render.ExternalTextureHelper;
@@ -19,6 +20,9 @@ public class VehicleType extends DriveableType {
 	public boolean rotateWheels = false;
 	public boolean tank = false;
 	public boolean hasDoor = false;
+	//Sounds
+	public String start_sound, engine_sound;
+	public int start_sound_length, engine_sound_length;
 
 	public VehicleType(String contentpack, String filename, String[] lines){
 		super(contentpack, filename, lines);
@@ -67,6 +71,68 @@ public class VehicleType extends DriveableType {
 					shootSoundSecondary = split[1];
 					FlansMod.proxy.loadSound(contentpack, "driveables", split[1]);
 					break;
+				case "DriverTraverseSounds":{
+					seats[0].traverseSounds = getBoolean(split);
+					break;
+				}
+				case "PassengerTraverseSounds":{
+					seats[Integer.parseInt(split[1])].traverseSounds = Boolean.getBoolean(split[2]);
+					break;
+				}
+				case "StartSoundLength":{
+					start_sound_length = this.getInteger(split);
+					break;
+				}
+				case "EngineSoundLength":{
+					engine_sound_length = this.getInteger(split);
+					break;
+				}
+				case "YawSoundLength":{
+					seats[0].yawSoundLength = getInteger(split);
+					break;
+				}
+				case "PitchSoundLength":{
+					seats[0].pitchSoundLength = getInteger(split);
+					break;
+				}
+				case "PassengerYawSoundLength":{
+					seats[Integer.parseInt(split[1])].yawSoundLength = Integer.parseInt(split[2]);
+					break;
+				}
+				case "PassengerPitchSoundLength":{
+					seats[Integer.parseInt(split[1])].pitchSoundLength = Integer.parseInt(split[2]);
+					break;
+				}
+				case "StartSound":{
+					this.start_sound = split[1];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
+				case "EngineSound":{
+					this.engine_sound = split[1];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
+				case "YawSound":{
+					seats[0].yawSound = split[1];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
+				case "PitchSound":{
+					seats[0].pitchSound = split[1];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
+				case "PassengerYawSound":{
+					seats[Integer.parseInt(split[1])].yawSound = split[2];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
+				case "PassengerPitchSound":{
+					seats[Integer.parseInt(split[1])].pitchSound = split[2];
+					FlansMod.proxy.loadSound(this.contentpack, "driveables", split[1]);
+					break;
+				}
 				default:
 					break;
 			}

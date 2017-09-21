@@ -5,15 +5,15 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import com.flansmod.common.driveables.ContainerDriveableInventory;
+import com.flansmod.common.driveables.EntityDriveable;
+
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-
-import com.flansmod.common.driveables.ContainerDriveableInventory;
-import com.flansmod.common.driveables.EntityDriveable;
 
 public class GuiDriveableInventory extends GuiContainer
 {

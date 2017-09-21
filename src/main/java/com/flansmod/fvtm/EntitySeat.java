@@ -288,9 +288,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		if(passengerr == null){
 			return;
 		}
-		if(passenger instanceof EntityPlayer == false){
+		/*if(passenger instanceof EntityPlayer == false){
 			passenger.dismountRidingEntity();
-		}
+		}*/
 		passenger.rotationYaw = playerYaw;
 		passenger.rotationPitch = playerPitch;
 		passenger.prevRotationYaw = prevPlayerYaw;
@@ -585,18 +585,19 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	}
 
 	@Override
-	public boolean pressKey(int key, EntityPlayer player) 
-	{
+	public boolean pressKey(int key, EntityPlayer player){
+		if(key < 0){
+			this.vehicle.data.getScripts().forEach((script) -> script.onKeyInput(key));
+			return false;
+		}
 		//Driver seat should pass input to vehicle
-		if(driver && (!world.isRemote || foundvehicle))
-		{
+		if(driver && (!world.isRemote || foundvehicle)){
+			//Print.debugChat(key + "");
 			return vehicle.pressKey(key, player);
 		}
 		
-		if(world.isRemote)
-		{
-			if(foundvehicle)
-			{
+		if(world.isRemote){
+			if(foundvehicle){
 				FlansMod.getNewPacketHandler().sendToServer(new PacketDriveableKey(key));
 			}
 			return false;
@@ -655,11 +656,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	public Entity getControllingEntity(){
-		return passenger;
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package com.flansmod.api;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,12 +22,6 @@ public interface IControllable
 	public boolean pressKey(int key, EntityPlayer player);
 	
 	public void updateKeyHeldState(int key, boolean held);
-	
-	/** 
-	 * @return riddenByEntity
-	 * 
-	 */
-	public Entity getControllingEntity();
 	
 	public boolean isDead();
 	

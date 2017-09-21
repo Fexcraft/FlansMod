@@ -6,6 +6,7 @@ import com.flansmod.common.FlansMod;
 import com.flansmod.common.data.VehicleType;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.EntityVehicle;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -180,7 +181,7 @@ public class RenderVehicle extends Render implements IRenderFactory {
 			if(entity instanceof EntityVehicle)
 			{
 				EntityVehicle vehicle = (EntityVehicle)entity;
-		        int i = vehicle.getBrightnessForRender(event.getPartialTicks());
+		        int i = vehicle.getBrightnessForRender();
 
 		        if (vehicle.isBurning())
 		        {

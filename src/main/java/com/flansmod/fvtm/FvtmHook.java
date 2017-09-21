@@ -13,8 +13,8 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 /**
- * FVM-Hook package, adds working Vehicles for FVM using Flansmod physics/api.
- * <br>Until FVM has it's own entities (if ever).
+ * FVTM-Hook package, adds working Vehicles for FVTM using Flansmod physics/api.
+ * <br>Until FVTM has it's own entities (if ever).
  * 
  * @author Ferdinand (FEX___96)
  *
@@ -22,9 +22,9 @@ import net.minecraftforge.fml.relauncher.Side;
 public class FvtmHook {
 
 	public static void registerEntities(){
-		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvm_vehicle"), LandVehicle.class, "fvm_vehicle", 96, FlansMod.INSTANCE, 256, 5, false);
-		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvm_seat"), EntitySeat.class, "fvm_seat", 100, FlansMod.INSTANCE, 256, 5, false);
-		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvm_wheel"), EntityWheel.class, "fvm_wheel", 104, FlansMod.INSTANCE, 256, 10, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvtm_vehicle"), LandVehicle.class, "fvtm_vehicle", 96, FlansMod.INSTANCE, 256, 5, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvtm_seat"), EntitySeat.class, "fvtm_seat", 100, FlansMod.INSTANCE, 256, 5, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(FlansMod.MODID, "fvtm_wheel"), EntityWheel.class, "fvtm_wheel", 104, FlansMod.INSTANCE, 256, 10, false);
 	}
 
 	public static void registerPackets(SimpleNetworkWrapper instance, int id){

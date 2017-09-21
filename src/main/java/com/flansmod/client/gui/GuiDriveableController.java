@@ -1,52 +1,64 @@
 package com.flansmod.client.gui;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.client.KeyInputHandler;
 import com.flansmod.common.FlansMod;
-
+import com.flansmod.common.driveables.EntityDriveable;
+import com.flansmod.common.driveables.EntitySeat;
+import net.fexcraft.mod.fvtm.api.Vehicle.VehicleData;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.Entity;
 
-public class GuiDriveableController extends GuiScreen 
-{
+public class GuiDriveableController extends GuiScreen {
+	
 	private IControllable plane;
 	private boolean leftMouseHeld;
 	private boolean rightMouseHeld;
+	//private double maxspeed, negspeed;
 	
-	public GuiDriveableController(IControllable thePlane)
-	{
+	public GuiDriveableController(IControllable thePlane){
 		super();
 		plane = thePlane;
+		/*if(plane instanceof LandVehicle){
+			LandVehicle landveh = (LandVehicle)plane;
+			if(landveh.data.getPart("engine") == null){
+				maxspeed = 1;
+				negspeed = -1;
+			}
+			else{
+				maxspeed = landveh.data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed() * landveh.data.getVehicle().getFMMaxPositiveThrottle();
+				negspeed = landveh.data.getPart("engine").getPart().getAttribute(EngineAttribute.class).getEngineSpeed() * landveh.data.getVehicle().getFMMaxNegativeThrottle();
+			}
+		}*/
 	}
 	
 	@Override
-	public void initGui()
-	{
+	public void initGui(){
 		if(mc.gameSettings.thirdPersonView == 1)
 			mc.setRenderViewEntity((plane.getCamera() == null ? mc.player : plane.getCamera()));
 	}
 	
 	@Override
-	public void onGuiClosed()
-	{
+	public void onGuiClosed(){
 		mc.mouseHelper.ungrabMouseCursor();
 		mc.setRenderViewEntity(mc.player);
     }
 	
 	@Override
-	public void handleMouseInput()
-	{
-		EntityPlayer player = (EntityPlayer)plane.getControllingEntity();
-		if(player != mc.player)
-		{
+	public void handleMouseInput(){
+		EntityPlayer player = (EntityPlayer)((Entity)plane).getControllingPassenger();
+		if(player != mc.player){
 			mc.displayGuiScreen(null);
 			return;
 		}
@@ -84,10 +96,8 @@ public class GuiDriveableController extends GuiScreen
 	}
 	
 	@Override
-	protected void keyTyped(char c, int i)
-	{
-		if(i == 1)
-		{
+	protected void keyTyped(char c, int i){
+		if(i == 1){
 			mc.displayGuiScreen(null);
 			mc.displayInGameMenu();
 		}
@@ -134,27 +144,29 @@ public class GuiDriveableController extends GuiScreen
 		{
 			FlansModClient.reloadModels(false);
 		}
+		/*if(plane instanceof com.flansmod.fvtm.EntitySeat){
+			plane.pressKey(-2, mc.player);
+		}*/
 	}
 	
 	@Override
-	public void updateScreen()
-	{
-		if(mc.gameSettings.thirdPersonView == 1)
+	public void updateScreen(){
+		if(mc.gameSettings.thirdPersonView == 1){
 			mc.setRenderViewEntity((plane.getCamera() == null ? mc.player : plane.getCamera()));
+		}
 		else mc.setRenderViewEntity(mc.player);
 	}
 	
+	private int s = 0;
+	
 	@Override
-	public void handleInput()
-	{
-		EntityPlayer player = (EntityPlayer)plane.getControllingEntity();
-		if(player != mc.player)
-		{
+	public void handleInput(){
+		EntityPlayer player = (EntityPlayer)((Entity)plane).getControllingPassenger();
+		if(player != mc.player){
 			mc.displayGuiScreen(null);
 			return;
 		}
-		if(!Mouse.isGrabbed())
-		{
+		if(!Mouse.isGrabbed()){
 			mc.mouseHelper.grabMouseCursor();
 		}
 		handleMouseInput();
@@ -166,8 +178,7 @@ public class GuiDriveableController extends GuiScreen
 		
 		plane.onMouseMoved(l, m);
 
-		if(plane != null && !plane.isDead() && plane.getControllingEntity() != null && plane.getControllingEntity() instanceof EntityPlayer)
-		{
+		if(plane != null && !plane.isDead() && ((Entity)plane).getControllingPassenger() != null && ((Entity)plane).getControllingPassenger() instanceof EntityPlayer){
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindForward.getKeyCode()))//KeyInputHandler.accelerateKey.getKeyCode()))
 			{
 				plane.pressKey(0, player);
@@ -235,24 +246,81 @@ public class GuiDriveableController extends GuiScreen
 			//if(FlansMod.proxy.keyDown(KeyInputHandler.trimKey.getKeyCode()))
 			//{
 			//	plane.pressKey(16, player);
-			//}				
-	
+			//}
+			if(s > 0){ s--; }
+			if(plane instanceof com.flansmod.fvtm.EntitySeat && s == 0){
+				plane.pressKey(-1, player);
+				s = 4;//5//20//10//4
+			}
 		}
-		else
-		{
+		else{
 			mc.displayGuiScreen(null);
 		}
 	}
 	   
 	@Override
-	public void drawBackground(int i)
-	{
-		//Plane gauges overlay
+	public void drawScreen(int mouseX, int mouseY, float partialTicks){
+		if(mc.player.getRidingEntity() instanceof EntitySeat){
+			mc.renderEngine.bindTexture(texture);
+			drawTexturedModalRect(0, 0, 0, 0, 206, 36);
+			//
+			EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;
+			mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " ck/m", 7, 7, 0xffffff);
+			mc.fontRenderer.drawString("Throttle: " + pc(ent.throttle) + "%", 7, 21, 0xffffff);
+		}
+		else if(FlansMod.FVTM){
+			if(mc.player.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat && ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).driver){
+				mc.renderEngine.bindTexture(texture);
+				drawTexturedModalRect(0, 0, 0, 0, 206, 36);//238
+				//
+				com.flansmod.fvtm.LandVehicle ent = ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).vehicle;
+				if(ent.data.getPart("engine") == null){
+					mc.fontRenderer.drawString("No Engine installed.", 7, 7, 0xffffff);
+					return;
+				}
+				mc.fontRenderer.drawString(Formatter.format("Speed: " + calculateSpeed(ent) + " ck/m  || Throttle: " + throttleColour(ent.throttle) + pc(ent.throttle) + "%"), 7, 7, 0xffffff);//TODO check if it's actually a minute.
+				mc.fontRenderer.drawString(Formatter.format("Fuel: " + fuelColour(ent.data) + format(ent.data.getFuelTankContent()) + "&f/&b" + ent.data.getFuelTankSize()), 7, 21, 0xffffff);
+			}
+		}
+	}
+	
+	private String fuelColour(VehicleData data){
+		double d = data.getFuelTankContent() / data.getFuelTankSize();
+		//return d < 0.3 ? "&e" : d < 0.1 ? "&c" : "&a";
+		return d < 0.3 ? d < 0.1 ? "&c" : "&e" : "&a";
 	}
 
+	private String throttleColour(double throttle){
+		if(throttle > 0.7){
+			return throttle > 0.9 ? "&c" : "&e";
+		}
+		if(throttle < -0.7){
+			return throttle < -0.9 ? "&c" : "&e";
+		}
+		return "&f";
+	}
+
+	private String pc(double f){
+		return format(f * 100);
+	}
+	
+	private static final DecimalFormat df = new DecimalFormat("##.##");
+	//static { df.setRoundingMode(RoundingMode.DOWN); }
+	
+	public static String format(double d){
+		return df.format(d);
+	}
+
+	public static float calculateSpeed(Entity ent){
+		double dX = ent.posX - ent.prevPosX, dY = ent.posY - ent.prevPosY, dZ = ent.posZ - ent.prevPosZ;
+		float speed = (float)Math.sqrt(dX * dX + dY * dY + dZ * dZ) * 1000F / 16F; 
+		return speed = (int)(speed * 10F) / 10F;
+	}
+	
+	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/vehicle_stat.png");
+
 	@Override
-	public boolean doesGuiPauseGame()
-	{
+	public boolean doesGuiPauseGame(){
 		return false;
 	}
 }

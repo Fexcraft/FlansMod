@@ -13,6 +13,7 @@ import com.flansmod.common.network.packets.PacketDriveableColor;
 import com.flansmod.common.network.packets.PacketDriveableKey;
 import com.flansmod.common.network.packets.PacketDriveableSync;
 import com.flansmod.common.network.packets.PacketDriveableTexture;
+import com.flansmod.common.network.packets.PacketPlaySound;
 import com.flansmod.common.network.packets.PacketVehicleControl;
 import com.flansmod.common.util.Config;
 import com.flansmod.common.util.Util;
@@ -377,14 +378,18 @@ public class EntityVehicle extends EntityDriveable {
 		
 		//Shooting, inventories, etc.
 		//Decrement shell and gun timers
-		if(shellDelay > 0)
+		if(shellDelay > 0){
 			shellDelay--;
-		if(gunDelay > 0)
+		}
+		if(gunDelay > 0){
 			gunDelay--;
-		if(toggleTimer > 0)
+		}
+		if(toggleTimer > 0){
 			toggleTimer--;
-		if(soundPosition > 0)
+		}
+		if(soundPosition > 0){
 			soundPosition--;
+		}
 		
 		//Aesthetics
 		//Rotate the wheels
@@ -429,20 +434,18 @@ public class EntityVehicle extends EntityDriveable {
 
 		Vector3f amountToMoveCar = new Vector3f();
 		
-		for(EntityWheel wheel : wheels)
-		{
-			if(wheel != null && world != null)
-			{
+		for(EntityWheel wheel : wheels){
+			if(wheel != null && world != null){
 				wheel.prevPosX = wheel.posX;
 				wheel.prevPosY = wheel.posY;
 				wheel.prevPosZ = wheel.prevPosZ;
 			}
 		}
 		
-		for(EntityWheel wheel : wheels)
-		{
-			if(wheel == null)
+		for(EntityWheel wheel : wheels){
+			if(wheel == null){
 				continue;
+			}
 			
 			//Hacky way of forcing the car to step up blocks
 			onGround = true;
@@ -451,8 +454,7 @@ public class EntityVehicle extends EntityDriveable {
 			//Update angles
 			wheel.rotationYaw = axes.getYaw();
 			//Front wheels
-			if(!type.tank && (wheel.ID == 2 || wheel.ID == 3))
-			{
+			if(!type.tank && (wheel.ID == 2 || wheel.ID == 3)){
 				wheel.rotationYaw += wheelsYaw;
 			}
 			
@@ -467,10 +469,8 @@ public class EntityVehicle extends EntityDriveable {
 			//If the player driving this is in creative, then we can thrust, no matter what
 			boolean canThrustCreatively = !Config.vehiclesNeedFuel || (seats != null && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && ((EntityPlayer)seats[0].getControllingPassenger()).capabilities.isCreativeMode);
 			//Otherwise, check the fuel tanks!
-			if(canThrustCreatively || driveableData.fuelInTank > driveableData.engine.fuelConsumption * throttle)
-			{
-				if(getVehicleType().tank)
-				{
+			if(canThrustCreatively || driveableData.fuelInTank > driveableData.engine.fuelConsumption * throttle){
+				if(getVehicleType().tank){
 					boolean left = wheel.ID == 0 || wheel.ID == 3;
 					
 					float turningDrag = 0.02F;
@@ -482,11 +482,8 @@ public class EntityVehicle extends EntityDriveable {
 					float effectiveWheelSpeed = (throttle + (wheelsYaw * (left ? 1 : -1) * steeringScale)) * velocityScale;
 					wheel.motionX += effectiveWheelSpeed * Math.cos(wheel.rotationYaw * 3.14159265F / 180F);
 					wheel.motionZ += effectiveWheelSpeed * Math.sin(wheel.rotationYaw * 3.14159265F / 180F);
-					
-	
 				}
-				else
-				{
+				else{
 					//if(getVehicleType().fourWheelDrive || wheel.ID == 0 || wheel.ID == 1)
 					{
 						float velocityScale = 0.1F * throttle * (throttle > 0 ? type.maxThrottle : type.maxNegativeThrottle) * driveableData.engine.engineSpeed;
@@ -495,23 +492,20 @@ public class EntityVehicle extends EntityDriveable {
 					}
 					
 					//Apply steering
-					if(wheel.ID == 2 || wheel.ID == 3)
-					{
+					if(wheel.ID == 2 || wheel.ID == 3){
 						float velocityScale = 0.01F * (wheelsYaw > 0 ? type.turnLeftModifier : type.turnRightModifier) * (throttle > 0 ? 1 : -1);
 		
 						wheel.motionX -= wheel.getSpeedXZ() * Math.sin(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 						wheel.motionZ += wheel.getSpeedXZ() * Math.cos(wheel.rotationYaw * 3.14159265F / 180F) * velocityScale * wheelsYaw;
 					}
-					else
-					{
+					else{
 						wheel.motionX *= 0.9F;
 						wheel.motionZ *= 0.9F;
 					}
 				}
 			}
 			
-			if(type.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox()))//.isAnyLiquid(wheel.getEntityBoundingBox()))
-			{
+			if(type.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox())){
 				wheel.motionY += type.buoyancy;
 			}
 
@@ -523,8 +517,7 @@ public class EntityVehicle extends EntityDriveable {
 			
 			Vector3f dPos = ((Vector3f)Vector3f.sub(targetWheelPos, currentWheelPos, null).scale(getVehicleType().wheelSpringStrength));
 				
-			if(dPos.length() > 0.001F)
-			{
+			if(dPos.length() > 0.001F){
 				wheel.move(MoverType.SELF, dPos.x, dPos.y, dPos.z);
 				dPos.scale(0.5F);
 				Vector3f.sub(amountToMoveCar, dPos, amountToMoveCar);
@@ -533,8 +526,7 @@ public class EntityVehicle extends EntityDriveable {
 		
 		move(MoverType.SELF, amountToMoveCar.x, amountToMoveCar.y, amountToMoveCar.z);
 		
-		if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null)
-		{
+		if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null){
 			Vector3f frontAxleCentre = new Vector3f((wheels[2].posX + wheels[3].posX) / 2F, (wheels[2].posY + wheels[3].posY) / 2F, (wheels[2].posZ + wheels[3].posZ) / 2F); 
 			Vector3f backAxleCentre = new Vector3f((wheels[0].posX + wheels[1].posX) / 2F, (wheels[0].posY + wheels[1].posY) / 2F, (wheels[0].posZ + wheels[1].posZ) / 2F); 
 			Vector3f leftSideCentre = new Vector3f((wheels[0].posX + wheels[3].posX) / 2F, (wheels[0].posY + wheels[3].posY) / 2F, (wheels[0].posZ + wheels[3].posZ) / 2F); 
@@ -558,8 +550,7 @@ public class EntityVehicle extends EntityDriveable {
 				roll = -(float)Math.atan2(dry, drxz);
 			}
 			
-			if(type.tank)
-			{
+			if(type.tank){
 				yaw = (float)Math.atan2(wheels[3].posZ - wheels[2].posZ, wheels[3].posX - wheels[2].posX) + (float)Math.PI / 2F;
 			}
 			
@@ -570,22 +561,21 @@ public class EntityVehicle extends EntityDriveable {
 
 		//Sounds
 		//Starting sound
-		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel())
-		{
+		if (throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel()){
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketPlaySound(this.getEntityId(), posX, posY, posZ, type.start_sound, false), new TargetPoint(dimension, posX, posY, posZ, 50));
 			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.startSound, false);
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
-		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel())
-		{
+		if (throttle > 0.2F && soundPosition == 0 && hasEnoughFuel()){
+			FlansMod.getNewPacketHandler().sendToAllAround(new PacketPlaySound(this.getEntityId(), posX, posY, posZ, type.engine_sound, false), new TargetPoint(dimension, posX, posY, posZ, 50));
 			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, 50, dimension, type.engineSound, false);
 			soundPosition = type.engineSoundLength;
 		}
 		
 		for(EntitySeat seat : seats){
-			if(seat != null){
+			if(seat != null)
 				seat.updatePosition();
-			}
 		}
 		
 		//Calculate movement on the client and then send position, rotation etc to the server

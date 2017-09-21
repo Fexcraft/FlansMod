@@ -878,12 +878,6 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	}
 	
 	@Override
-	public Entity getControllingEntity()
-	{
-		return seats[0].getControllingEntity();
-	}
-	
-	@Override
 	public ItemStack getPickedResult(RayTraceResult target)
 	{
 		ItemStack stack = new ItemStack(getDriveableType().item, 1, 0);

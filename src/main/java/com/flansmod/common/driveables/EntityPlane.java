@@ -1,21 +1,5 @@
 package com.flansmod.common.driveables;
 
-import net.fexcraft.mod.lib.api.item.KeyItem;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.cmds.TextureCommand;
 import com.flansmod.common.data.DriveableData;
@@ -36,6 +20,22 @@ import com.flansmod.common.util.Util;
 import com.flansmod.common.vector.Matrix4f;
 import com.flansmod.common.vector.Vector3f;
 
+import net.fexcraft.mod.lib.api.item.KeyItem;
+import net.fexcraft.mod.lib.util.common.Print;
+import net.minecraft.entity.MoverType;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+
 public class EntityPlane extends EntityDriveable {
 	
 	/** The flap positions, used for renderering and for controlling the plane rotations */
@@ -45,9 +45,9 @@ public class EntityPlane extends EntityDriveable {
 	/** The angle of the propeller for the renderer */
 	public float propAngle;
 	/** Weapon delays */
-	public int bombDelay, gunDelay;
+	//public int bombDelay, gunDelay;
 	/** Despawn timer */
-	public int ticksSinceUsed = 0;
+	//public int ticksSinceUsed = 0;
 	/** Mostly aesthetic model variables. Gear actually has a variable hitbox */
 	public boolean varGear = true, varDoor = false, varWing = false;
 	/** Delayer for gear, door and wing buttons */
@@ -369,7 +369,8 @@ public class EntityPlane extends EntityDriveable {
 		//Get plane type
 		PlaneType type = getPlaneType();
 		DriveableData data = getDriveableData();
-		if(type == null){
+		if(type == null)
+		{
 			Print.log("Plane type null. Not ticking plane");
 			return;
 		}
@@ -378,22 +379,10 @@ public class EntityPlane extends EntityDriveable {
 		boolean thePlayerIsDrivingThis = world.isRemote && seats[0] != null && seats[0].getControllingPassenger() instanceof EntityPlayer && FlansMod.proxy.isThePlayer((EntityPlayer)seats[0].getControllingPassenger());
 
 		//Despawning
-		ticksSinceUsed++;
-		if(!world.isRemote && seats[0].getControllingPassenger() != null){
-			ticksSinceUsed = 0;
-		}
-		if(!world.isRemote && Config.planeLife > 0 && ticksSinceUsed > Config.planeLife * 20){
-			setDead();
-		}
+		//ticksSinceUsed++;
+		//if(!world.isRemote && seats[0].getControllingEntity() != null){ ticksSinceUsed = 0; }
+		//if(!world.isRemote && TeamsManager.planeLife > 0 && ticksSinceUsed > TeamsManager.planeLife * 20){ setDead(); }
 		
-		//Shooting, inventories, etc.
-		//Decrement bomb and gun timers
-		if(bombDelay > 0){
-			bombDelay--;
-		}
-		if(gunDelay > 0){
-			gunDelay--;
-		}
 		if(toggleTimer > 0){
 			toggleTimer--;
 		}
@@ -410,18 +399,12 @@ public class EntityPlane extends EntityDriveable {
 		flapsPitchRight *= 0.9F;
 		
 		//Limit flap angles
-		if(flapsYaw > 20)
-			flapsYaw = 20;
-		if(flapsYaw < -20)
-			flapsYaw = -20;
-		if(flapsPitchRight > 20)
-			flapsPitchRight = 20;
-		if(flapsPitchRight < -20)
-			flapsPitchRight = -20;
-		if(flapsPitchLeft > 20)
-			flapsPitchLeft = 20;
-		if(flapsPitchLeft < -20)
-			flapsPitchLeft = -20;
+		if(flapsYaw > 20){ flapsYaw = 20; }
+		if(flapsYaw < -20){ flapsYaw = -20; }
+		if(flapsPitchRight > 20){ flapsPitchRight = 20; }
+		if(flapsPitchRight < -20){ flapsPitchRight = -20; }
+		if(flapsPitchLeft > 20){ flapsPitchLeft = 20; }
+		if(flapsPitchLeft < -20){ flapsPitchLeft = -20;}
 		
 		//Player is not driving this. Update its position from server update packets 
 		if(world.isRemote && !thePlayerIsDrivingThis){
@@ -461,9 +444,8 @@ public class EntityPlane extends EntityDriveable {
 		//Alter angles
 		//Sensitivity function
 		float sensitivityAdjust = (throttle > 0.5F ? 1.5F - throttle : 4F * throttle - 1F); 
-		if(sensitivityAdjust < 0F){
+		if(sensitivityAdjust < 0F)
 			sensitivityAdjust = 0F;
-		}
 		//Scalar
 		sensitivityAdjust *= 0.125F;
 		
@@ -480,10 +462,8 @@ public class EntityPlane extends EntityDriveable {
 		float roll = flapsRoll * (flapsRoll > 0 ? type.rollLeftModifier : type.rollRightModifier) * sensitivityAdjust;
 		
 		//Damage modifiers
-		if(mode == EnumPlaneMode.PLANE)
-		{
-			if(!isPartIntact(EnumDriveablePart.tail))
-			{
+		if(mode == EnumPlaneMode.PLANE){
+			if(!isPartIntact(EnumDriveablePart.tail)){
 				yaw = 0;
 				pitch = 0;
 				roll = 0;
@@ -517,160 +497,146 @@ public class EntityPlane extends EntityDriveable {
 		
 		float fuelConsumptionMultiplier = 2F;
 		
-		switch(mode)
-		{
-		case HELI :
-			
-			//Count the number of working propellers
-			for(Propeller prop : type.heliPropellers)
-				if(isPartIntact(prop.planePart))
-					numPropsWorking++;
-			numProps = type.heliPropellers.size();
-						
-			Vector3f up = axes.getYAxis();
-			
-			throttleScaled *= numProps == 0 ? 0 : numPropsWorking / numProps * 2F;
-						
-			float upwardsForce = throttle * throttleScaled + (g - throttleScaled / 2F);
-			if(throttle < 0.5F)
-				upwardsForce = g * throttle * 2F;
-			
-			if(!isPartIntact(EnumDriveablePart.blades))
-			{
-				upwardsForce = 0F;
+		switch(mode){
+			case HELI :{
+				//Count the number of working propellers
+				for(Propeller prop : type.heliPropellers)
+					if(isPartIntact(prop.planePart))
+						numPropsWorking++;
+				numProps = type.heliPropellers.size();
+							
+				Vector3f up = axes.getYAxis();
+				
+				throttleScaled *= numProps == 0 ? 0 : numPropsWorking / numProps * 2F;
+							
+				float upwardsForce = throttle * throttleScaled + (g - throttleScaled / 2F);
+				if(throttle < 0.5F)
+					upwardsForce = g * throttle * 2F;
+				
+				if(!isPartIntact(EnumDriveablePart.blades))
+				{
+					upwardsForce = 0F;
+				}
+				
+				//Move up
+				//Throttle - 0.5 means that the positive throttle scales from -0.5 to +0.5. Thus it accounts for gravity-ish
+				motionX += upwardsForce * up.x * 0.5F;
+				motionY += upwardsForce * up.y;
+				motionZ += upwardsForce * up.z * 0.5F;
+				//Apply gravity
+				motionY -= g;
+				
+				//Apply wobble
+				//motionX += rand.nextGaussian() * wobbleFactor;
+				//motionY += rand.nextGaussian() * wobbleFactor;
+				//motionZ += rand.nextGaussian() * wobbleFactor;
+				
+				//Apply drag
+				motionX *= drag;
+				motionY *= drag;
+				motionZ *= drag;
+				
+				data.fuelInTank -= upwardsForce * fuelConsumptionMultiplier * data.engine.fuelConsumption;
+				break;
 			}
-			
-			//Move up
-			//Throttle - 0.5 means that the positive throttle scales from -0.5 to +0.5. Thus it accounts for gravity-ish
-			motionX += upwardsForce * up.x * 0.5F;
-			motionY += upwardsForce * up.y;
-			motionZ += upwardsForce * up.z * 0.5F;
-			//Apply gravity
-			motionY -= g;
-			
-			//Apply wobble
-			//motionX += rand.nextGaussian() * wobbleFactor;
-			//motionY += rand.nextGaussian() * wobbleFactor;
-			//motionZ += rand.nextGaussian() * wobbleFactor;
-			
-			//Apply drag
-			motionX *= drag;
-			motionY *= drag;
-			motionZ *= drag;
-			
-			data.fuelInTank -= upwardsForce * fuelConsumptionMultiplier * data.engine.fuelConsumption;
-
-			break;
-			
-		case PLANE :
-			//Count the number of working propellers
-			for(Propeller prop : type.propellers)
-				if(isPartIntact(prop.planePart))
-					numPropsWorking++;
-			numProps = type.propellers.size();
-						
-			float throttleTemp = throttle * (numProps == 0 ? 0 : numPropsWorking / numProps * 2F);
-			
-			//Apply forces
-			Vector3f forwards = (Vector3f)axes.getXAxis().normalise();
-			
-			//Sanity limiter
-			if(lastTickSpeed > 2F)
-				lastTickSpeed = 2F;
-			
-			float newSpeed = lastTickSpeed + throttleScaled * 2F;
-			
-			//Calculate the amount to alter motion by
-			float proportionOfMotionToCorrect = 2F * throttleTemp - 0.5F;
-			if(proportionOfMotionToCorrect < 0F)
-				proportionOfMotionToCorrect = 0F;
-			if(proportionOfMotionToCorrect > 0.5F)
-				proportionOfMotionToCorrect = 0.5F;
-			
-			//Apply gravity
-			g = 0.98F / 20F;
-			motionY -= g;
-			
-			//Apply lift
-			int numWingsIntact = 0;
-			if(isPartIntact(EnumDriveablePart.rightWing)) numWingsIntact++;
-			if(isPartIntact(EnumDriveablePart.leftWing)) numWingsIntact++; 
-			
-			float amountOfLift = 2F * g * throttleTemp * numWingsIntact / 2F;
-			if(amountOfLift > g)
-				amountOfLift = g;
-			
-			if(!isPartIntact(EnumDriveablePart.tail))
-				amountOfLift *= 0.75F;
-			
-			motionY += amountOfLift;
-			
-			//Cut out some motion for correction
-			motionX *= 1F - proportionOfMotionToCorrect;
-			motionY *= 1F - proportionOfMotionToCorrect;
-			motionZ *= 1F - proportionOfMotionToCorrect;
-			
-			//Add the corrected motion
-			motionX += proportionOfMotionToCorrect * newSpeed * forwards.x;
-			motionY += proportionOfMotionToCorrect * newSpeed * forwards.y;
-			motionZ += proportionOfMotionToCorrect * newSpeed * forwards.z;
-			
-			//Apply drag
-			motionX *= drag;
-			motionY *= drag;
-			motionZ *= drag;
-			
-			data.fuelInTank -= throttleScaled * fuelConsumptionMultiplier * data.engine.fuelConsumption;
-			break;
-		default:
-			break;
+			case PLANE :{//Count the number of working propellers
+				for(Propeller prop : type.propellers)
+					if(isPartIntact(prop.planePart))
+						numPropsWorking++;
+				numProps = type.propellers.size();
+							
+				float throttleTemp = throttle * (numProps == 0 ? 0 : numPropsWorking / numProps * 2F);
+				
+				//Apply forces
+				Vector3f forwards = (Vector3f)axes.getXAxis().normalise();
+				
+				//Sanity limiter
+				if(lastTickSpeed > 2F)
+					lastTickSpeed = 2F;
+				
+				float newSpeed = lastTickSpeed + throttleScaled * 2F;
+				
+				//Calculate the amount to alter motion by
+				float proportionOfMotionToCorrect = 2F * throttleTemp - 0.5F;
+				if(proportionOfMotionToCorrect < 0F)
+					proportionOfMotionToCorrect = 0F;
+				if(proportionOfMotionToCorrect > 0.5F)
+					proportionOfMotionToCorrect = 0.5F;
+				
+				//Apply gravity
+				g = 0.98F / 20F;
+				motionY -= g;
+				
+				//Apply lift
+				int numWingsIntact = 0;
+				if(isPartIntact(EnumDriveablePart.rightWing)) numWingsIntact++;
+				if(isPartIntact(EnumDriveablePart.leftWing)) numWingsIntact++; 
+				
+				float amountOfLift = 2F * g * throttleTemp * numWingsIntact / 2F;
+				if(amountOfLift > g)
+					amountOfLift = g;
+				
+				if(!isPartIntact(EnumDriveablePart.tail))
+					amountOfLift *= 0.75F;
+				
+				motionY += amountOfLift;
+				
+				//Cut out some motion for correction
+				motionX *= 1F - proportionOfMotionToCorrect;
+				motionY *= 1F - proportionOfMotionToCorrect;
+				motionZ *= 1F - proportionOfMotionToCorrect;
+				
+				//Add the corrected motion
+				motionX += proportionOfMotionToCorrect * newSpeed * forwards.x;
+				motionY += proportionOfMotionToCorrect * newSpeed * forwards.y;
+				motionZ += proportionOfMotionToCorrect * newSpeed * forwards.z;
+				
+				//Apply drag
+				motionX *= drag;
+				motionY *= drag;
+				motionZ *= drag;
+				
+				data.fuelInTank -= throttleScaled * fuelConsumptionMultiplier * data.engine.fuelConsumption;
+				break;
+			}
+			default: break;
 		}
 		
 		double motion = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-		if(motion > 10)
-		{
+		if(motion > 10){
 			motionX *= 10 / motion;
 			motionY *= 10 / motion;
 			motionZ *= 10 / motion;
 		}
-				
-		for(EntityWheel wheel : wheels)
-		{
-			if(wheel != null && world != null)
-			{
+		for(EntityWheel wheel : wheels){
+			if(wheel != null && world != null){
 				wheel.prevPosX = wheel.posX;
 				wheel.prevPosY = wheel.posY;
 				wheel.prevPosZ = wheel.posZ;
 			}
 		}
-		for(EntityWheel wheel : wheels)
-		{
+		for(EntityWheel wheel : wheels){
 			if(wheel != null && world != null)
-			if(type.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox()))
-			{
+			if(type.floatOnWater && world.containsAnyLiquid(wheel.getEntityBoundingBox())){
 				motionY += type.buoyancy;
 			}
 		}
 		
 		//Move the wheels first
-		for(EntityWheel wheel : wheels)
-		{
-			if(wheel != null)
-			{
+		for(EntityWheel wheel : wheels){
+			if(wheel != null){
 				wheel.prevPosY = wheel.posY;
 				wheel.move(MoverType.SELF, motionX, motionY, motionZ);
 			}
 		}
 		
 		//Update wheels
-		for(int i = 0; i < 2; i++)
-		{
+		for(int i = 0; i < 2; i++){
 			Vector3f amountToMoveCar = new Vector3f(motionX / 2F, motionY / 2F, motionZ / 2F);
-			
-			for(EntityWheel wheel : wheels)
-			{
-				if(wheel == null)
+			for(EntityWheel wheel : wheels){
+				if(wheel == null){
 					continue;
+				}
 				
 				//Hacky way of forcing the car to step up blocks
 				onGround = true;
@@ -740,18 +706,19 @@ public class EntityPlane extends EntityDriveable {
 		//Sounds
 		//Starting sound
 		if(throttle > 0.01F && throttle < 0.2F && soundPosition == 0 && hasEnoughFuel()){
-			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.startSound, false);
+			//TODO PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.startSound, false);
 			soundPosition = type.startSoundLength;
 		}
 		//Flying sound
 		if(throttle > 0.2F && soundPosition == 0 && hasEnoughFuel()){
-			//PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.engineSound, false);
+			//TODO PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.engineSound, false);
 			soundPosition = type.engineSoundLength;
 		}
 
 		//Sound decrementer
-		if(soundPosition > 0)
+		if(soundPosition > 0){
 			soundPosition--;
+		}
 		
 		for(EntitySeat seat : seats){
 			if(seat != null){
@@ -769,9 +736,8 @@ public class EntityPlane extends EntityDriveable {
 		}
 		
 		//If this is the server, send position updates to everyone, having received them from the driver
-		float updateSpeed = 0.01F;
-		if(!world.isRemote)// && (Math.abs(posX - prevPosX) > updateSpeed || Math.abs(posY - prevPosY) > updateSpeed || Math.abs(posZ - prevPosZ) > updateSpeed))
-		{
+		//float updateSpeed = 0.01F;
+		if(!world.isRemote){
 			FlansMod.getNewPacketHandler().sendToAllAround(new PacketPlaneControl(this), new TargetPoint(dimension, posX, posY, posZ, Config.driveableUpdateRange));
 		}
 	}
