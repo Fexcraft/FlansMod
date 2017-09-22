@@ -71,7 +71,7 @@ public class KeyCommand extends CommandBase {
 		}
 		else if(args[0].equals("get")){
 			if(args.length < 2){
-				Print.chat(sender, "M&8issing argument.");
+				Print.chat(sender, "&8Missing argument.");
 				Print.chat(sender, "&7try: /" + NAME + " get <one/all>");
 			}
 			else if(args[1].equals("one")){
@@ -101,7 +101,8 @@ public class KeyCommand extends CommandBase {
 				bool = ((EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).driveable.driveableData.hasLock = !((EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).driveable.driveableData.hasLock;
 			}
 			if(sender.getCommandSenderEntity().getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat){
-				bool = ((com.flansmod.fvtm.EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).vehicle.data.setLocked(null);
+				//bool = ((com.flansmod.fvtm.EntitySeat)sender.getCommandSenderEntity().getRidingEntity()).vehicle.data.setLocked(null);
+				bool = true;
 			}
 			Print.chat(sender, "&7Can be locked: " + bool);
 		}
@@ -139,10 +140,10 @@ public class KeyCommand extends CommandBase {
 		}
 		else if(sender.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat){
 			LandVehicle driveable = ((com.flansmod.fvtm.EntitySeat)sender.getRidingEntity()).vehicle;
-			if(!driveable.data.isLocked()){
+			/*if(!driveable.data.isLocked()){
 				Print.chat(sender, "This vehicle doesn't allow locking.");
 				return;
-			}
+			}*/
 			for(int j = 0; j < i; j++){
 				if((driveable.data.getSpawnedKeysAmount() + 1) <= Config.maxVehicleKeys){
 					ItemStack stack = new ItemStack(FlansMod.key, 1, 0);

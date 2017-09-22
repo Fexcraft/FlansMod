@@ -371,33 +371,33 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 	
 	@Override
-	public boolean processInitialInteract(EntityPlayer entityplayer, EnumHand hand){
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand){
 		if(isDead || world.isRemote || hand == EnumHand.OFF_HAND){
 			return false;
 		}
 		
-		ItemStack currentItem = entityplayer.getHeldItemMainhand();
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof KeyItem){
+		ItemStack stack = player.getHeldItemMainhand();
+		if(!stack.isEmpty() && stack.getItem() instanceof KeyItem){
 			if(this.isLocked()){
-				this.unlock(world, entityplayer, currentItem, (KeyItem)currentItem.getItem());
+				this.unlock(world, player, stack, (KeyItem)stack.getItem());
 			}
 			else{
-				this.lock(world, entityplayer, currentItem, (KeyItem)currentItem.getItem());
+				this.lock(world, player, stack, (KeyItem)stack.getItem());
 			}
 			return true;
 		}
 		if(data.isLocked()){
-			Print.chat(entityplayer, "Vehicle is locked.");
+			Print.chat(player, "Vehicle is locked.");
 			return true;
 		}
 		
-		if(!currentItem.isEmpty() && currentItem.getItem() instanceof FuelItem){
-			entityplayer.openGui(FVTM.getInstance(), GuiHandler.VEHICLE_INVENTORY, world, 2, 0, 0);//Fuel Inventory.
+		if(!stack.isEmpty() && stack.getItem() instanceof FuelItem){
+			player.openGui(FVTM.getInstance(), GuiHandler.VEHICLE_INVENTORY, world, 2, 0, 0);//Fuel Inventory.
 		}
 		
 		if(!data.getScripts().isEmpty()){
 			for(VehicleScript script : data.getScripts()){
-				if(script.onInteract(this, data, entityplayer)){
+				if(script.onInteract(this, data, player)){
 					return true;
 				}
 			}
@@ -407,7 +407,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 		
 		//Check each seat in order to see if the player can sit in it
 		for(int i = 0; i <= data.getFMSeats().size(); i++){
-			if(seats[i] != null && seats[i].processInitialInteract(entityplayer, hand)){
+			if(seats[i] != null && seats[i].processInitialInteract(player, hand)){
 				if(i == 0){
 					//FlansMod.proxy.doTutorialStuff(entityplayer, this);
 				}
@@ -921,6 +921,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 				if(data.getPart("engine") != null){
 					data.getPart("engine").getAttributeData(EngineAttributeData.class).setOn(false);
 				}
+				data.getScripts().forEach((script) -> script.onRemove(this, data));
 				ItemStack stack = data.getVehicle().getItemStack(data);
 				boolean brk = true;//= pp.hasPermission(FvmPerms.LAND_VEHICLE_BREAK) ? pp.hasPermission(FvmPerms.permBreak(stack)) : false;
 				if(brk){
@@ -1037,6 +1038,7 @@ public class LandVehicle extends Entity implements IControllable, IEntityAdditio
 	}
 		
 	public void checkForCollisions(){
+		return;
 		/*boolean crashInWater = false;
 		double speed = getSpeedXYZ();
 		for(DriveablePosition p : this.getCollisionPoints()){
