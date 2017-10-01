@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -34,6 +35,7 @@ import com.flansmod.fvtm.FvtmHook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -56,6 +58,8 @@ public class ClientProxy extends CommonProxy
 	public List<File> contentPacks;
 	
 	private FlansModClient flansModClient;
+	
+	public static final TreeMap<String, ResourceLocation> sounds = new TreeMap<String, ResourceLocation>();
 
 	@Override
 	public void load()
@@ -254,8 +258,8 @@ public class ClientProxy extends CommonProxy
 	
 	/** Sound loading method. Defers to FlansModResourceHandler */
 	@Override
-	public void loadSound(String contentPack, String type, String sound)
-	{
+	public void loadSound(String contentPack, String type, String sound){
+		this.sounds.put(sound, new ResourceLocation(FlansMod.MODID, sound));
 		//FlansModResourceHandler.getSound(sound);
 		//FMLClientHandler.instance().getClient().installResource("sound3/" + type + "/" + sound + ".ogg", new File(FMLClientHandler.instance().getClient().mcDataDir, "/Flan/" + contentPack + "/sounds/" + sound + ".ogg"));
 	}

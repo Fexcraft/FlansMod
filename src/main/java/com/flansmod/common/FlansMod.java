@@ -31,6 +31,7 @@ import com.flansmod.common.util.CrateBlock;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
 import com.flansmod.fvtm.FvtmHook;
+
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
 import net.fexcraft.mod.lib.util.registry.RegistryUtil.AutoRegisterer;
 import net.minecraft.entity.item.EntityItem;
@@ -53,15 +54,15 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
-@Mod(modid = "flansmod", name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl;after:fvm", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
+@Mod(modid = FlansMod.MODID, name = FlansMod.NAME, version = FlansMod.VERSION, dependencies = "required-after:fcl;after:fvtm", acceptableRemoteVersions = "*", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod {
 	
 	//Core mod stuff
 	public static boolean DEBUG = false;
 	public static boolean FVTM = false;
 	public static final String MODID = "flansmod";
-	public static final String VERSION = "5.F2.4-EX";
-	public static final String NAME = "Flan's Mod Minus";
+	public static final String VERSION = "@VERSION@";
+	public static final String NAME = "(Fex's) FlansMod Minus";
 	@Mod.Instance("flansmod")
 	public static FlansMod INSTANCE;
 	@SidedProxy(clientSide = "com.flansmod.client.ClientProxy", serverSide = "com.flansmod.common.CommonProxy")
@@ -102,9 +103,9 @@ public class FlansMod {
 		}
 		
 		//Set up mod blocks and items
-		if(event.getSide().isClient()){
+		//if(event.getSide().isClient()){
 			AUTOREG.addBlock("crate", CrateBlock.INSTANCE, null, 0, null);
-		}
+		//}
 		
 		AUTOREG.addItem("key", key = new ItemKey(), 0, null);
 		AUTOREG.addItem("rainbowPaintcan", rainbowPaintcan = new Item().setCreativeTab(CTabs.OTHER), 0, null);
@@ -163,7 +164,7 @@ public class FlansMod {
 	/** The mod post-initialisation method */
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event){
-		packet_handler.initialise();
+		PacketHandler.initialise();
 		if(event.getSide().isClient()){
 			MinecraftForge.EVENT_BUS.register(new com.flansmod.client.debug.UtilGui());
 		}
@@ -310,7 +311,7 @@ public class FlansMod {
 	}
 	
 	public static SimpleNetworkWrapper getNewPacketHandler(){
-		return packet_handler.getInstance();
+		return PacketHandler.getInstance();
 	}
 	
 }

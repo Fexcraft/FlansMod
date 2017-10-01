@@ -8,10 +8,11 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: "eclipse"
 
-version = "5.2"
-group= "com.flansmod"
-archivesBaseName = "Flan's Mod"
+version = "5.F3.2"
+group= "com.flansmod.commmon"
+archivesBaseName = "FlansMod Minus"
 
 sourceCompatibility = targetCompatibility = "1.8"
 compileJava {
@@ -22,19 +23,13 @@ minecraft {
     version = "1.12-14.21.1.2387"
     runDir = "run"
 
-    replace "@ALLOWED_VERSION@", "[5.2,5.3)"
     replace "@VERSION@", project.version
     replaceIn "FlansMod.java"
-	
-	replace "@APOCALYPSEALLOWEDVERSIONS@", "[1.0, 1.1)"
-    replace "@APOCALYPSEVERSION@", "1.0"
-    replaceIn "FlansModApocalypse.java"
     
     mappings = "snapshot_20170630"
 }
 
-processResources
-{
+processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -51,6 +46,11 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+dependencies {
+	compile project(':FCL')
+	compile project(':FVTM')
 }
 
 version = "${project.minecraft.version}-${project.version}"

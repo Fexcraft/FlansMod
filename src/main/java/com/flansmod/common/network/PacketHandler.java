@@ -40,6 +40,8 @@ public class PacketHandler {
 		instance.registerMessage(DriveableSyncPacketHandler.Client.class,         PacketDriveableSync.class,       id++, Side.CLIENT);
 		instance.registerMessage(DriveableTexturePacketHandler.Client.class,      PacketDriveableTexture.class,    id++, Side.CLIENT);
 		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
+		instance.registerMessage(PlaySoundPacketHandler.Server.class,             PacketPlaySound.class,           id++, Side.SERVER);
+		instance.registerMessage(PlaySoundPacketHandler.Client.class,             PacketPlaySound.class,           id++, Side.CLIENT);
 		if(FlansMod.FVTM){
 			FvtmHook.registerPackets(instance, id);
 		}

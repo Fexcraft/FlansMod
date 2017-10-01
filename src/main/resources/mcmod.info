@@ -1,13 +1,12 @@
 [
 {
   "modid": "flansmod",
-  "name": "Flan's Mod",
-  "description": "Guns, planes and other vehicles in Minecraft.",
+  "description": "Planes, Cars, Ships and other vehicles in Minecraft.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "http://www.flansmod.com",
+  "url": "http://fexcraft.net/",
   "updateUrl": "",
-  "authorList": ["jamioflan"],
+  "authorList": ["jamioflan", "FEX___96"],
   "credits": "All code contributors.",
   "logoFile": "flansmod.png",
   "screenshots": [],

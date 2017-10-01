@@ -174,7 +174,7 @@ public abstract class DataType implements Comparable<DataType> {
 	protected void exception(Exception e, String s){
 		Print.log("FFMM", "Failed to read config line (" + s + ") in [" + filename + ">" + contentpack + "];");
 		e.printStackTrace();
-		Static.stop();
+		//Static.stop();
 	}
 	
 	protected int getInteger(String[] split){
