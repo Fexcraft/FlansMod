@@ -19,3 +19,4 @@ Edit by FEX:
 - <a href="https://github.com/Fexcraft/FlansMod/issues/23">Ideas/Suggestions</a>
 - This version/fork of FlansMod requires the FCL (Library) to work.
 
+Our Discord Server: https://discord.gg/Tx4jy9v
