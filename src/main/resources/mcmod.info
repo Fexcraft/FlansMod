@@ -1,6 +1,7 @@
 [
 {
   "modid": "flansmod",
+  "name": "(Fex's) FlansMod Minus",
   "description": "Planes, Cars, Ships and other vehicles in Minecraft.",
   "version": "${version}",
   "mcversion": "${mcversion}",
