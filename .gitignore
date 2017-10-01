@@ -40,10 +40,4 @@ run/Flan/WW2 Pack/.DS_Store
 
 run/Flan/WW2 Pack/boxes/.DS_Store
 *.launch
-*.1.java
 
-src/main/java/com/flansmod/client/model/fvp/*
-src/main/java/com/flansmod.*/
-src/main/java/com/flansmod/SyncToy*
-src/main/resources/assets/flansmod/SyncToy_*
-src/main/resources/assets/flansmod.*/
