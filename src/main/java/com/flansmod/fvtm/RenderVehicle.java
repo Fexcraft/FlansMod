@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.flansmod.common.FlansMod;
 
+import net.fexcraft.mod.fvtm.api.Vehicle.VehicleData;
 import net.fexcraft.mod.fvtm.model.vehicle.VehicleModel;
 import net.fexcraft.mod.lib.util.math.Pos;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory {
+public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory<LandVehicle> {
 	
 	public RenderVehicle(RenderManager renderManager) {
 		super(renderManager);
@@ -63,7 +64,7 @@ public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory
 			GL11.glPushMatrix();
 			{
 				//GL11.glScalef(modelScale, modelScale, modelScale);//let the models deal with theyr own scaling.
-				VehicleModel modVehicle = vehicle.data.getVehicle().getModel();
+				VehicleModel<VehicleData> modVehicle = vehicle.data.getVehicle().getModel();
 				if(modVehicle != null){
 					modVehicle.render(vehicle.data, vehicle, -1);
 					if(vehicle.data.getParts().size() > 0){
@@ -163,7 +164,7 @@ public class RenderVehicle extends Render<LandVehicle> implements IRenderFactory
 	}
 
 	@Override
-	public Render createRenderFor(RenderManager manager){
+	public Render<LandVehicle> createRenderFor(RenderManager manager){
 		return new RenderVehicle(manager);
 	}
 	
