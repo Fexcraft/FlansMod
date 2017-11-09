@@ -30,8 +30,6 @@ import com.flansmod.common.util.Config;
 import com.flansmod.common.util.CrateBlock;
 import com.flansmod.common.util.Ticker;
 import com.flansmod.common.util.Util;
-import com.flansmod.fvtm.FvtmHook;
-
 import net.fexcraft.mod.lib.network.SimpleUpdateHandler;
 import net.fexcraft.mod.lib.util.registry.RegistryUtil.AutoRegisterer;
 import net.minecraft.entity.item.EntityItem;
@@ -149,9 +147,6 @@ public class FlansMod {
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "vehicle"), EntityVehicle.class, "Vehicle", 95, this, 256, 10, false);
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "seat"), EntitySeat.class, "Seat", 99, this, 256, 10, false);
 		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "wheel"), EntityWheel.class, "Wheel", 103, this, 256, 20, false);
-		if(FVTM){
-			FvtmHook.registerEntities();
-		}
 		
 		//Register the chunk loader 
 		//ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());

@@ -30,8 +30,6 @@ import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.EntityVehicle;
 import com.flansmod.common.driveables.EntityWheel;
 import com.flansmod.common.util.Util;
-import com.flansmod.fvtm.FvtmHook;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -165,9 +163,6 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugDot.class, RenderDebugDot::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugVector.class, RenderDebugVector::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebugAABB.class, RenderDebugAABB::new);
-		if(FlansMod.FVTM){
-			FvtmHook.registerRenders();
-		}
 	}
 	
 	/** Old one time tutorial code that displays messages the first time you enter a plane / vehicle. Needs reworking */
@@ -259,7 +254,7 @@ public class ClientProxy extends CommonProxy
 	/** Sound loading method. Defers to FlansModResourceHandler */
 	@Override
 	public void loadSound(String contentPack, String type, String sound){
-		this.sounds.put(sound, new ResourceLocation(FlansMod.MODID, sound));
+		ClientProxy.sounds.put(sound, new ResourceLocation(FlansMod.MODID, sound));
 		//FlansModResourceHandler.getSound(sound);
 		//FMLClientHandler.instance().getClient().installResource("sound3/" + type + "/" + sound + ".ogg", new File(FMLClientHandler.instance().getClient().mcDataDir, "/Flan/" + contentPack + "/sounds/" + sound + ".ogg"));
 	}

@@ -50,13 +50,6 @@ processResources {
 
 dependencies {
 	compile project(':FCL')
-	if(rootProject.name == "FlansMod"){
-		println "skipping fvtm"
-	}
-	else{
-		println "compiling fvtm"
-    	compile project(':FVTM')
-	}
 }
 
 version = "${project.minecraft.version}-${project.version}"

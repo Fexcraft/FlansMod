@@ -11,8 +11,6 @@ import com.flansmod.client.KeyInputHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.EntitySeat;
-import net.fexcraft.mod.fvtm.api.Vehicle.VehicleData;
-import net.fexcraft.mod.lib.util.common.Formatter;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -157,8 +155,6 @@ public class GuiDriveableController extends GuiScreen {
 		else mc.setRenderViewEntity(mc.player);
 	}
 	
-	private int s = 0;
-	
 	@Override
 	public void handleInput(){
 		EntityPlayer player = (EntityPlayer)((Entity)plane).getControllingPassenger();
@@ -247,11 +243,6 @@ public class GuiDriveableController extends GuiScreen {
 			//{
 			//	plane.pressKey(16, player);
 			//}
-			if(s > 0){ s--; }
-			if(plane instanceof com.flansmod.fvtm.EntitySeat && s == 0){
-				plane.pressKey(-1, player);
-				s = 4;//5//20//10//4
-			}
 		}
 		else{
 			mc.displayGuiScreen(null);
@@ -260,44 +251,12 @@ public class GuiDriveableController extends GuiScreen {
 	   
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks){
-		if(mc.player.getRidingEntity() instanceof EntitySeat){
-			mc.renderEngine.bindTexture(texture);
-			drawTexturedModalRect(0, 0, 0, 0, 206, 36);
-			//
-			EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;
-			mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " ck/m", 7, 7, 0xffffff);
-			mc.fontRenderer.drawString("Throttle: " + pc(ent.throttle) + "%", 7, 21, 0xffffff);
-		}
-		else if(FlansMod.FVTM){
-			if(mc.player.getRidingEntity() instanceof com.flansmod.fvtm.EntitySeat && ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).driver){
-				mc.renderEngine.bindTexture(texture);
-				drawTexturedModalRect(0, 0, 0, 0, 206, 36);//238
-				//
-				com.flansmod.fvtm.LandVehicle ent = ((com.flansmod.fvtm.EntitySeat)mc.player.getRidingEntity()).vehicle;
-				if(ent.data.getPart("engine") == null){
-					mc.fontRenderer.drawString("No Engine installed.", 7, 7, 0xffffff);
-					return;
-				}
-				mc.fontRenderer.drawString(Formatter.format("Speed: " + calculateSpeed(ent) + " ck/m  || Throttle: " + throttleColour(ent.throttle) + pc(ent.throttle) + "%"), 7, 7, 0xffffff);//TODO check if it's actually a minute.
-				mc.fontRenderer.drawString(Formatter.format("Fuel: " + fuelColour(ent.data) + format(ent.data.getFuelTankContent()) + "&f/&b" + ent.data.getFuelTankSize()), 7, 21, 0xffffff);
-			}
-		}
-	}
-	
-	private String fuelColour(VehicleData data){
-		double d = data.getFuelTankContent() / data.getFuelTankSize();
-		//return d < 0.3 ? "&e" : d < 0.1 ? "&c" : "&a";
-		return d < 0.3 ? d < 0.1 ? "&c" : "&e" : "&a";
-	}
-
-	private String throttleColour(double throttle){
-		if(throttle > 0.7){
-			return throttle > 0.9 ? "&c" : "&e";
-		}
-		if(throttle < -0.7){
-			return throttle < -0.9 ? "&c" : "&e";
-		}
-		return "&f";
+		mc.renderEngine.bindTexture(texture);
+		drawTexturedModalRect(0, 0, 0, 0, 206, 36);
+		//
+		EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;
+		mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " ck/m", 7, 7, 0xffffff);
+		mc.fontRenderer.drawString("Throttle: " + pc(ent.throttle) + "%", 7, 21, 0xffffff);
 	}
 
 	private String pc(double f){

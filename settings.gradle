@@ -1,13 +1,2 @@
 include ':FCL'
 project(':FCL').projectDir = new File(settingsDir, '../FCL')
-//
-if(rootProject.name == "FlansMod"){
-	println "skipping fvtm"
-}
-else{
-	println "loading fvtm"
-	include ':FVTM'
-	project(':FVTM').projectDir = new File(settingsDir, '../FVTM')
-}
-//
-println "loaded flansmod"

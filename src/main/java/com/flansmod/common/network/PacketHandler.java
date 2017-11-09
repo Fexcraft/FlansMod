@@ -1,10 +1,7 @@
 package com.flansmod.common.network;
 
-import com.flansmod.common.FlansMod;
 import com.flansmod.common.network.handlers.*;
 import com.flansmod.common.network.packets.*;
-import com.flansmod.fvtm.FvtmHook;
-
 import net.fexcraft.mod.lib.network.PacketHandler.PacketHandlerType;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -42,9 +39,6 @@ public class PacketHandler {
 		instance.registerMessage(SeatDismountPacketHandler.Client.class,          PacketSeatDismount.class,        id++, Side.CLIENT);
 		instance.registerMessage(PlaySoundPacketHandler.Server.class,             PacketPlaySound.class,           id++, Side.SERVER);
 		instance.registerMessage(PlaySoundPacketHandler.Client.class,             PacketPlaySound.class,           id++, Side.CLIENT);
-		if(FlansMod.FVTM){
-			FvtmHook.registerPackets(instance, id);
-		}
 		
 		net.fexcraft.mod.lib.network.PacketHandler.registerListener(PacketHandlerType.JSON, Side.CLIENT, new JsonPacketHandler.Client());
 		net.fexcraft.mod.lib.network.PacketHandler.registerListener(PacketHandlerType.JSON, Side.SERVER, new JsonPacketHandler.Server());

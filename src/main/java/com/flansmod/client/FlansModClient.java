@@ -1,6 +1,5 @@
 package com.flansmod.client;
 
-import java.io.File;
 import java.util.ArrayList;
 import com.flansmod.api.IControllable;
 import com.flansmod.client.gui.GuiDriveableController;
@@ -80,24 +79,6 @@ public class FlansModClient extends FlansMod {
 			controlModeSwitchTimer--;
 	}
 		
-	private boolean checkFileExists(File file)
-	{
-		if(!file.exists())
-		{
-			try
-			{ 
-				file.createNewFile();
-			}
-			catch(Exception e)
-			{
-				Util.log("Failed to create file");
-				Util.log(file.getAbsolutePath());
-			}
-			return false;
-		}	
-		return true;
-	}
-
 	public static boolean flipControlMode(){
 		if(controlModeSwitchTimer > 0){
 			return false;
