@@ -254,6 +254,9 @@ public class GuiDriveableController extends GuiScreen {
 		mc.renderEngine.bindTexture(texture);
 		drawTexturedModalRect(0, 0, 0, 0, 206, 36);
 		//
+		if(mc.player.getRidingEntity() == null){
+			return;
+		}
 		EntityDriveable ent = ((EntitySeat)mc.player.getRidingEntity()).driveable;
 		mc.fontRenderer.drawString("Speed: " + calculateSpeed(ent) + " ck/m", 7, 7, 0xffffff);
 		mc.fontRenderer.drawString("Throttle: " + pc(ent.throttle) + "%", 7, 21, 0xffffff);
