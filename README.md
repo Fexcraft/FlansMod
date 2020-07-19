@@ -4,9 +4,9 @@
 [![GitHub forks](https://img.shields.io/github/stars/FlansMods/FlansMod.svg?color=brightgreen)](https://GitHub.com/FlansMods/FlansMod/stargazers/)
 [![GitHub contributors](https://img.shields.io/github/contributors/FlansMods/FlansMod.svg)](https://GitHub.com/FlansMods/FlansMod/graphs/contributors/)
 
-# [Flan's Mod](https://www.flansmod.com/)
+# [Flan's Mod _Minus_](https://www.fexcraft.net/)
 
-This is the offical Github repository of the minecraft modification Flan's Mod.
+This is the offical Github repository of the minecraft modification Flan's Mod _**Minus**_.
 
 ## Installation
 
