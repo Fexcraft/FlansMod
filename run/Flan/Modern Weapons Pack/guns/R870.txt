@@ -23,7 +23,7 @@ Damage 1
 //For guns in which the magazine is integrated
 LoadIntoGun 7
 //The higher this value, the more the bullets spread
-Accuracy 20
+Accuracy 16
 //Time in ticks between rounds
 ShootDelay 15
 ShootSound R870Shoot
@@ -54,5 +54,7 @@ NumGenericAttachmentSlots 1
 //Format is "Paintjob iconName textureName requiredDyeAmount requiredDyeColour" Multiple colours may be listed in order, seperated by a space
 //Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
 Paintjob R870_Birch R870_Birch white 1 yellow 1
+Paintjob R870_Redwood R870_Redwood red 1 brown 1
+Paintjob R870_VroomVroom R870_VroomVroom green 2 yellow 1
 //Description - note the ammo type
 Description Ammo Type : Shotgun

@@ -1,50 +1,58 @@
 package com.flansmod.client.model;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
 
-import com.flansmod.client.FlansModResourceHandler;
+import com.flansmod.client.handlers.FlansModResourceHandler;
 import com.flansmod.common.guns.EntityBullet;
 
-public class RenderBullet extends Render
+public class RenderBullet extends Render<EntityBullet>
 {
-	public RenderBullet(RenderManager renderManager) 
+	public RenderBullet(RenderManager renderManager)
 	{
 		super(renderManager);
 		shadowSize = 0.5F;
 	}
-
+	
 	public void render(EntityBullet bullet, double d, double d1, double d2, float f, float f1)
 	{
-		if(bullet.owner == Minecraft.getMinecraft().thePlayer && bullet.ticksExisted < 1)
-			return;
+		//TODO may fix this again
+		//if(bullet.owner == Minecraft.getMinecraft().player && bullet.ticksExisted < 1)
+		//	return;
 		bindEntityTexture(bullet);
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d, (float) d1, (float) d2);
-		GL11.glRotatef(f, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(90F -bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * f1, 1.0F, 0.0F, 0.0F);
-		ModelBase model = bullet.type.model;
+		GlStateManager.pushMatrix();
+		GlStateManager.translate((float)d, (float)d1, (float)d2);
+		GlStateManager.rotate(f, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(90F - bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * f1, 1.0F, 0.0F, 0.0F);
+		ModelBase model = bullet.getFiredShot().getBulletType().model;
 		if(model != null)
 			model.render(bullet, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
-		GL11.glPopMatrix();
-	}
-
-	@Override
-	public void doRender(Entity entity, double d, double d1, double d2, float f, float f1)
-	{
-		render((EntityBullet) entity, d, d1, d2, f, f1);
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity) 
+	public void doRender(EntityBullet entity, double d, double d1, double d2, float f, float f1)
 	{
-		return FlansModResourceHandler.getTexture(((EntityBullet)entity).type);
+		render(entity, d, d1, d2, f, f1);
+	}
+	
+	@Override
+	protected ResourceLocation getEntityTexture(EntityBullet entity)
+	{
+		return FlansModResourceHandler.getTexture(entity.getFiredShot().getBulletType());
+	}
+	
+	public static class Factory implements IRenderFactory<EntityBullet>
+	{
+		@Override
+		public Render<EntityBullet> createRenderFor(RenderManager manager)
+		{
+			return new RenderBullet(manager);
+		}
 	}
 }
+

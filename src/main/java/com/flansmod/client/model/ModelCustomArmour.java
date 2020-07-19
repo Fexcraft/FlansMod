@@ -2,19 +2,19 @@ package com.flansmod.client.model;
 
 import org.lwjgl.opengl.GL11;
 
-import com.flansmod.client.tmt.ModelRendererTurbo;
-import com.flansmod.common.teams.ArmourType;
-
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 
-public class ModelCustomArmour extends ModelBiped 
+import com.flansmod.client.tmt.ModelRendererTurbo;
+import com.flansmod.common.teams.ArmourType;
+
+public class ModelCustomArmour extends ModelBiped
 {
 	public ArmourType type;
 	
@@ -26,33 +26,32 @@ public class ModelCustomArmour extends ModelBiped
 	public ModelRendererTurbo[] rightLegModel = new ModelRendererTurbo[0];
 	public ModelRendererTurbo[] skirtFrontModel = new ModelRendererTurbo[0]; //Acts like a leg piece, but its pitch is set to the maximum of the two legs
 	public ModelRendererTurbo[] skirtRearModel = new ModelRendererTurbo[0]; //Acts like a leg piece, but its pitch is set to the minimum of the two legs
-
+	
 	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
-	{ 
-		GL11.glPushMatrix();
-		GL11.glScalef(type.modelScale, type.modelScale, type.modelScale);
+	{
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(type.modelScale, type.modelScale, type.modelScale);
 		isSneak = entity.isSneaking();
-		ItemStack itemstack = ((EntityLivingBase)entity).getEquipmentInSlot(0);
-		heldItemRight = itemstack != null ? 1 : 0;
-
-        aimedBow = false;
-        if (itemstack != null && entity instanceof EntityPlayer && ((EntityPlayer)entity).getItemInUseCount() > 0)
-        {
-        	EnumAction enumaction = itemstack.getItemUseAction();
-            if (enumaction == EnumAction.BLOCK)
-            {
-                heldItemRight = 3;
-            }
-            else if (enumaction == EnumAction.BOW)
-            {
-                aimedBow = true;
-            }
-        }
-		setRotationAngles(f, f1, f2, f3, f4, f5, entity); 
-        if (isSneak)
-        {
-            GlStateManager.translate(0.0F, 0.2F, 0.0F);
-        }
+		ItemStack itemstack = ((EntityLivingBase)entity).getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
+		rightArmPose = itemstack.isEmpty() ? ArmPose.EMPTY : ArmPose.ITEM;
+		
+		if(!itemstack.isEmpty())
+		{
+			EnumAction enumaction = itemstack.getItemUseAction();
+			if(enumaction == EnumAction.BLOCK)
+			{
+				rightArmPose = ArmPose.BLOCK;
+			}
+			else if(enumaction == EnumAction.BOW)
+			{
+				rightArmPose = ArmPose.BOW_AND_ARROW;
+			}
+		}
+		setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+		if(isSneak)
+		{
+			GlStateManager.translate(0.0F, 0.4F, 0.0F);
+		}
 		render(headModel, bipedHead, f5, type.modelScale);
 		render(bodyModel, bipedBody, f5, type.modelScale);
 		render(leftArmModel, bipedLeftArm, f5, type.modelScale);
@@ -85,8 +84,8 @@ public class ModelCustomArmour extends ModelBiped
 				mod.render(f5);
 			}
 		}
-		GL11.glPopMatrix();
-	} 
+		GlStateManager.popMatrix();
+	}
 	
 	public void render(ModelRendererTurbo[] models, ModelRenderer bodyPart, float f5, float scale)
 	{

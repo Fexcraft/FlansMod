@@ -35,7 +35,7 @@ public class ContainerDriveableMenu extends Container
 			{
 				addSlotToContainer(new Slot(inventoryplayer, col + row * 9 + 9, 8 + col * 18, 79 + (isFuel ? 0 : 19) + row * 18));
 			}
-
+			
 		}
 		//Quickbar slots
 		for(int col = 0; col < 9; col++)
@@ -43,58 +43,59 @@ public class ContainerDriveableMenu extends Container
 			addSlotToContainer(new Slot(inventoryplayer, col, 8 + col * 18, 137 + (isFuel ? 0 : 19)));
 		}
 	}
-
+	
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotID)
 	{
-		ItemStack stack = null;
-		Slot currentSlot = (Slot)inventorySlots.get(slotID);
-
+		ItemStack stack = ItemStack.EMPTY.copy();
+		Slot currentSlot = inventorySlots.get(slotID);
+		
 		if(currentSlot != null && currentSlot.getHasStack())
 		{
 			ItemStack slotStack = currentSlot.getStack();
 			stack = slotStack.copy();
-
+			
 			if(slotID != 0)
 			{
 				if(!mergeItemStack(slotStack, 0, 1, false))
 				{
-					return null;
+					return ItemStack.EMPTY.copy();
 				}
 			}
-			else {
+			else
+			{
 				if(!mergeItemStack(slotStack, 1, inventorySlots.size(), true))
 				{
-					return null;
+					return ItemStack.EMPTY.copy();
 				}
 			}
-
-			if (slotStack.stackSize == 0)
+			
+			if(slotStack.getCount() == 0)
 			{
-				currentSlot.putStack(null);
+				currentSlot.putStack(ItemStack.EMPTY.copy());
 			}
 			else
 			{
 				currentSlot.onSlotChanged();
 			}
-
-			if (slotStack.stackSize == stack.stackSize)
+			
+			if(slotStack.getCount() == stack.getCount())
 			{
-				return null;
+				return ItemStack.EMPTY.copy();
 			}
-
-			currentSlot.onPickupFromSlot(player, slotStack);
+			
+			currentSlot.onTake(player, slotStack);
 		}
-
+		
 		return stack;
 	}
-
+	
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
 		return true;
 	}
-
+	
 	public EntityDriveable plane;
 	public boolean isFuel;
 	public InventoryPlayer inventory;

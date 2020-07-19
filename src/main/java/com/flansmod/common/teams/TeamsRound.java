@@ -1,27 +1,42 @@
 package com.flansmod.common.teams;
 
+import java.util.Optional;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
-/** This represents a round in the teams mod 
- * It designates the map, gametype and teams to be played that round 
+/**
+ * This represents a round in the teams mod
+ * It designates the map, gametype and teams to be played that round
  * A list of valid rounds is kept by the TeamsManager and then either
- * players vote on which rounds to play or there is a rotation */
+ * players vote on which rounds to play or there is a rotation
+ */
 public class TeamsRound implements Comparable<TeamsRound>
 {
 	public Gametype gametype;
 	public TeamsMap map;
-	/** The teams available. This does not include spectators */
+	/**
+	 * The teams available. This does not include spectators
+	 */
 	public Team[] teams;
-	/** The round length in minutes */
+	/**
+	 * The round length in minutes
+	 */
 	public int timeLimit;
-	/** The round score limit */
+	/**
+	 * The round score limit
+	 */
 	public int scoreLimit;
-	/** 0 is almost never picked, 1 is always always picked. Used to pick vote options */
+	/**
+	 * 0 is almost never picked, 1 is always always picked. Used to pick vote options
+	 */
 	public float popularity;
-	/** Number of rounds since it was offered as an option in the vote. Used to pick vote options */
+	/**
+	 * Number of rounds since it was offered as an option in the vote. Used to pick vote options
+	 */
 	public int roundsSincePlayed;
 	
-	public TeamsRound(TeamsMap map2, Gametype gametype2, Team[] teams2, int timeLimit, int scoreLimit) 
+	public TeamsRound(TeamsMap map2, Gametype gametype2, Team[] teams2, int timeLimit, int scoreLimit)
 	{
 		map = map2;
 		gametype = gametype2;
@@ -42,12 +57,17 @@ public class TeamsRound implements Comparable<TeamsRound>
 		for(int i = 0; i < teams.length; i++)
 		{
 			teams[i] = Team.getTeam(tags.getString("Team_" + i));
+			if(teams[i] == null)
+			{
+				teams[i] = Team.teams.get(0);
+			}
+			
 		}
 		
 		popularity = tags.getFloat("Pop");
 	}
-
-	public void writeToNBT(NBTTagCompound tags) 
+	
+	public void writeToNBT(NBTTagCompound tags)
 	{
 		tags.setString("Map", map.shortName);
 		tags.setString("Gametype", gametype.shortName);
@@ -78,13 +98,15 @@ public class TeamsRound implements Comparable<TeamsRound>
 	{
 		switch(id)
 		{
-		case 0 : return null;
-		case 1 : return Team.spectators;
-		default : return teams[id - 2];
+			case 0: return null;
+			case 1: return Team.spectators;
+			default: return teams[id - 2];
 		}
 	}
 	
-	/** In two team gametypes, returns the opposite team */
+	/**
+	 * In two team gametypes, returns the opposite team
+	 */
 	public Team getOtherTeam(Team team)
 	{
 		if(team == Team.spectators || team == null || teams.length != 2)
@@ -94,18 +116,30 @@ public class TeamsRound implements Comparable<TeamsRound>
 		return teams[0];
 	}
 	
+	public Optional<Team> getTeam(EntityPlayer player)
+	{
+		String username = player.getName();
+		for(Team team : teams)
+		{
+			for (String name : team.members)
+			{
+				if (username.equals(name))
+				{
+					return Optional.of(team);
+				}
+			}
+		}
+		return Optional.empty();
+	}
+	
 	public float getWeight()
 	{
 		return popularity * 4F + roundsSincePlayed;
 	}
-
+	
 	@Override
-	public int compareTo(TeamsRound o) 
+	public int compareTo(TeamsRound o)
 	{
-		if(getWeight() < o.getWeight())
-			return 1;
-		else if(getWeight() > o.getWeight())
-			return -1;
-		else return 0;
+		return Float.compare(o.getWeight(), getWeight());
 	}
 }

@@ -3,12 +3,11 @@ package com.flansmod.client.gui;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -21,47 +20,57 @@ import com.flansmod.common.driveables.EntitySeat;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.network.PacketDriveableGUI;
 
-public class GuiDriveableRepair extends GuiScreen 
+public class GuiDriveableRepair extends GuiScreen
 {
 	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/repair.png");
 	
-	/** The player using this GUI */
+	/**
+	 * The player using this GUI
+	 */
 	private EntityPlayer driver;
-	/** The driveable (s)he is driving */
+	/**
+	 * The driveable (s)he is driving
+	 */
 	private EntityDriveable driving;
-	/** The list of parts that are actually damageable*/
-	private ArrayList<DriveablePart> partsToDraw = new ArrayList<DriveablePart>();
+	/**
+	 * The list of parts that are actually damageable
+	 */
+	private ArrayList<DriveablePart> partsToDraw = new ArrayList<>();
 	
-	/** Item renderer */
+	/**
+	 * Item renderer
+	 */
 	private static RenderItem itemRenderer;
-	/** Gui origin */
+	/**
+	 * Gui origin
+	 */
 	private int guiOriginX, guiOriginY;
 	
 	public GuiDriveableRepair(EntityPlayer player)
 	{
 		super();
 		driver = player;
-		driving = ((EntitySeat)player.ridingEntity).driveable;
-    	for(DriveablePart part : driving.getDriveableData().parts.values())
-    	{
-    		//Check to see if the part is actually damageable
-    		if(part.maxHealth > 0)
-    		{
-    			//Add it to the list of parts to draw
-    			partsToDraw.add(part);  				
-    		}
-    	}	
+		driving = ((EntitySeat)player.getRidingEntity()).driveable;
+		for(DriveablePart part : driving.getDriveableData().parts.values())
+		{
+			//Check to see if the part is actually damageable
+			if(part.maxHealth > 0)
+			{
+				//Add it to the list of parts to draw
+				partsToDraw.add(part);
+			}
+		}
 	}
 	
 	@Override
 	public void initGui()
 	{
 		super.initGui();
-    	for(int i = 0; i < partsToDraw.size(); i++)
-    	{
-    		buttonList.add(new GuiButton(i, 0, 0, 55, 20, "Repair"));
-    	}
-    	itemRenderer = mc.getRenderItem();
+		for(int i = 0; i < partsToDraw.size(); i++)
+		{
+			buttonList.add(new GuiButton(i, 0, 0, 55, 20, "Repair"));
+		}
+		itemRenderer = mc.getRenderItem();
 	}
 
 	@Override
@@ -76,9 +85,10 @@ public class GuiDriveableRepair extends GuiScreen
 		for(int i = 0; i < partsToDraw.size(); i++)
 		{
 			DriveablePart part = partsToDraw.get(i);
-			GuiButton button = (GuiButton)buttonList.get(i);
-			button.xPosition = guiOriginX + 9;
-			button.yPosition = part.health <= 0 ? guiOriginY + y : -1000;
+			GuiButton button = buttonList.get(i);
+			button.visible = part.health <= 0;
+			button.x = guiOriginX + 9;
+			button.y = guiOriginY + y;
 			y += part.health <= 0 ? 40 : 20;
 		}
 	}
@@ -98,15 +108,15 @@ public class GuiDriveableRepair extends GuiScreen
 		updateButtons();
 
 		//Standard GUI render stuff
-		ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		ScaledResolution scaledresolution = new ScaledResolution(mc);
 		int w = scaledresolution.getScaledWidth();
 		int h = scaledresolution.getScaledHeight();
 		drawDefaultBackground();
-		GL11.glEnable(3042 /*GL_BLEND*/);
+		GlStateManager.enableBlend();
 		
 		//Bind the background texture
 		mc.renderEngine.bindTexture(texture);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		//Calculate the gui origin
 		guiOriginX = w / 2 - guiWidth / 2;
 		guiOriginY = h / 2 - guiHeight / 2;
@@ -116,7 +126,7 @@ public class GuiDriveableRepair extends GuiScreen
 		//Render the footer
 		drawTexturedModalRect(guiOriginX, guiOriginY + guiHeight - 8, 0, 65, 202, 8);
 		//Render the title
-		drawString(fontRendererObj, driving.getDriveableType().name + " - Repair", guiOriginX + 7, guiOriginY + 7, 0xffffff);
+		drawString(fontRenderer, driving.getDriveableType().name + " - Repair", guiOriginX + 7, guiOriginY + 7, 0xffffff);
 		
 		//Render each part
 		//Where to start rendering from. Updated with each part
@@ -130,12 +140,12 @@ public class GuiDriveableRepair extends GuiScreen
 			
 			//Render the damage bar
 			float percentHealth = (float)part.health / (float)part.maxHealth;
-			GL11.glColor3f(1 - percentHealth, percentHealth, 0F);
+			GlStateManager.color(1 - percentHealth, percentHealth, 0F);
 			drawTexturedModalRect(guiOriginX + 121, guiOriginY + y + 2, 0, 73, (int)(70 * percentHealth), 16);
 			
 			//Write the part name and percent health
-			drawString(fontRendererObj, part.type.getName(), guiOriginX + 10, guiOriginY + y + 6, 0xffffff);
-			drawCenteredString(fontRendererObj, (int)(percentHealth * 100F) + "%", guiOriginX + 158, guiOriginY + y + 6, 0xffffff);
+			drawString(fontRenderer, part.type.getName(), guiOriginX + 10, guiOriginY + y + 6, 0xffffff);
+			drawCenteredString(fontRenderer, (int)(percentHealth * 100F) + "%", guiOriginX + 158, guiOriginY + y + 6, 0xffffff);
 			
 			//If the part is damaged, draw the parts required to fix it
 			if(broken)
@@ -161,28 +171,28 @@ public class GuiDriveableRepair extends GuiScreen
 						for(int m = 0; m < temporaryInventory.getSizeInventory(); m++)
 						{
 							//Get the stack in each slot
-							ItemStack stackInSlot = temporaryInventory.getStackInSlot(m);
+							ItemStack stackInSlot = temporaryInventory.getStackInSlot(m).copy();
 							//If the stack is what we want
-							if(stackInSlot != null && stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
+							if(stackInSlot.getItem() == stackNeeded.getItem() && stackInSlot.getItemDamage() == stackNeeded.getItemDamage())
 							{
 								//Work out the amount to take from the stack
-								int amountFound = Math.min(stackInSlot.stackSize, stackNeeded.stackSize - totalAmountFound);
+								int amountFound = Math.min(stackInSlot.getCount(), stackNeeded.getCount() - totalAmountFound);
 								//Take it
-								stackInSlot.stackSize -= amountFound;
+								stackInSlot.setCount(stackInSlot.getCount() - amountFound);
 								//Check for empty stacks
-								if(stackInSlot.stackSize <= 0)
-									stackInSlot = null;
+								if(stackInSlot.getCount() <= 0)
+									stackInSlot = ItemStack.EMPTY.copy();
 								//Put the modified stack back in the inventory
 								temporaryInventory.setInventorySlotContents(m, stackInSlot);
 								//Increase the amount found counter
 								totalAmountFound += amountFound;
 								//If we have enough, stop looking
-								if(totalAmountFound == stackNeeded.stackSize)
+								if(totalAmountFound == stackNeeded.getCount())
 									break;
 							}
 						}
 						//If we did not find enough in the inventory
-						if(totalAmountFound < stackNeeded.stackSize)
+						if(totalAmountFound < stackNeeded.getCount())
 						{
 							mc.renderEngine.bindTexture(texture);
 							drawTexturedModalRect(guiOriginX + 67 + 18 * n, guiOriginY + y + 22, 202, 0, 16, 16);
@@ -200,27 +210,29 @@ public class GuiDriveableRepair extends GuiScreen
 
 	@Override
 	protected void mouseClicked(int i, int j, int k) throws IOException
-    {
-        super.mouseClicked(i, j, k);
+	{
+		super.mouseClicked(i, j, k);
 		int m = i - guiOriginX;
 		int n = j - guiOriginY;
 		if(m > 185 && m < 195 && n > 5 && n < 15)
 			if(driving instanceof EntityMecha)
 			{
 				FlansMod.getPacketHandler().sendToServer(new PacketDriveableGUI(4));
-				(driver).openGui(FlansMod.INSTANCE, 10, driver.worldObj, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
+				(driver).openGui(FlansMod.INSTANCE, 10, driver.world, driving.chunkCoordX, driving.chunkCoordY, driving.chunkCoordZ);
 			}
 			else
-			 mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.worldObj, driving));
+				mc.displayGuiScreen(new GuiDriveableMenu(driver.inventory, driver.world, driving));
 	}
 
-	/** Item stack renderering method */
+	/**
+	 * Item stack renderering method
+	 */
 	private void drawSlotInventory(ItemStack itemstack, int i, int j)
 	{
-		if(itemstack == null || itemstack.getItem() == null)
+		if(itemstack == null || itemstack.isEmpty())
 			return;
 		itemRenderer.renderItemIntoGUI(itemstack, i, j);
-		itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, itemstack, i, j, null);
+		itemRenderer.renderItemOverlayIntoGUI(fontRenderer, itemstack, i, j, null);
 	}
 
 	@Override

@@ -13,7 +13,7 @@ RoundsPerItem 1
 //Number of bullet entities to create, useful for shotguns, defaults to 1
 NumBullets 6
 //The damage multiplier caused by the bullet on hitting an entity
-Damage 6
+Damage 4
 //Bullet spread modifier, multiplies by the gun's bulletSpread
 Spread 0.25
 //Size of explosion caused

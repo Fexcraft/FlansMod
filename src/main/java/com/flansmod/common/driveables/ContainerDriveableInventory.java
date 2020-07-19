@@ -27,36 +27,36 @@ public class ContainerDriveableInventory extends Container
 		numItems = 0;
 		switch(i)
 		{
-			case 0 :
+			case 0:
 			{
 				numItems = plane.driveableData.numGuns;
 				maxScroll = (numItems > 3 ? numItems - 3 : 0);
 				break;
 			}
-			case 1 : 
+			case 1:
 			{
 				numItems = plane.getDriveableType().numBombSlots;
 				maxScroll = (((numItems + 7) / 8) > 3 ? ((numItems + 7) / 8) - 3 : 0);
 				break;
 			}
-			case 2 : 
+			case 2:
 			{
 				numItems = plane.getDriveableType().numCargoSlots;
 				maxScroll = (((numItems + 7) / 8) > 3 ? ((numItems + 7) / 8) - 3 : 0);
 				break;
-			}	
-			case 3 : 
+			}
+			case 3:
 			{
 				numItems = plane.getDriveableType().numMissileSlots;
 				maxScroll = (((numItems + 7) / 8) > 3 ? ((numItems + 7) / 8) - 3 : 0);
 				break;
-			}	
+			}
 		}
 		
 		//Add screen specific slots
 		switch(screen)
 		{
-			case 0 : //Guns
+			case 0: //Guns
 			{
 				int slotsDone = 0;
 				for(int j = 0; j < plane.driveableData.numGuns; j++)
@@ -66,12 +66,12 @@ public class ContainerDriveableInventory extends Container
 						yPos = 25 + 19 * slotsDone;
 					addSlotToContainer(new Slot(plane.driveableData, j, 29, yPos));
 					slotsDone++;
-				}	
+				}
 				break;
 			}
-			case 1 : //Bombs
-			case 2 : //Cargo
-			case 3 : //Missiles
+			case 1: //Bombs
+			case 2: //Cargo
+			case 3: //Missiles
 			{
 				int startSlot = plane.driveableData.getBombInventoryStart();
 				if(screen == 2)
@@ -100,7 +100,7 @@ public class ContainerDriveableInventory extends Container
 			{
 				addSlotToContainer(new Slot(inventoryplayer, col + row * 9 + 9, 8 + col * 18, 98 + row * 18));
 			}
-
+			
 		}
 		//Quickbar slots
 		for(int col = 0; col < 9; col++)
@@ -114,7 +114,7 @@ public class ContainerDriveableInventory extends Container
 		scroll = scrololol;
 		switch(screen)
 		{
-			case 0 :
+			case 0:
 			{
 				int slotsDone = 0;
 				for(int i = 0; i < plane.driveableData.numGuns; i++)
@@ -122,14 +122,14 @@ public class ContainerDriveableInventory extends Container
 					int yPos = -1000;
 					if(slotsDone < 3 + scroll && slotsDone >= scroll)
 						yPos = 25 + 19 * (slotsDone - scroll);
-					((Slot)inventorySlots.get(slotsDone)).yDisplayPosition = yPos;
+					inventorySlots.get(slotsDone).yPos = yPos;
 					slotsDone++;
-				}	
+				}
 				break;
 			}
-			case 1 :
-			case 2 :
-			case 3 : 
+			case 1:
+			case 2:
+			case 3:
 			{
 				int m = ((numItems + 7) / 8);
 				for(int row = 0; row < m; row++)
@@ -139,14 +139,14 @@ public class ContainerDriveableInventory extends Container
 						yPos = 25 + 19 * (row - scroll);
 					for(int col = 0; col < ((row + 1) * 8 <= numItems ? 8 : numItems % 8); col++)
 					{
-						((Slot)inventorySlots.get(row * 8 + col)).yDisplayPosition = yPos;
+						inventorySlots.get(row * 8 + col).yPos = yPos;
 					}
 				}
 				break;
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer)
 	{
@@ -156,45 +156,46 @@ public class ContainerDriveableInventory extends Container
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotID)
 	{
-		ItemStack stack = null;
-		Slot currentSlot = (Slot)inventorySlots.get(slotID);
-
+		ItemStack stack = ItemStack.EMPTY.copy();
+		Slot currentSlot = inventorySlots.get(slotID);
+		
 		if(currentSlot != null && currentSlot.getHasStack())
 		{
 			ItemStack slotStack = currentSlot.getStack();
 			stack = slotStack.copy();
-
+			
 			if(slotID >= numItems)
 			{
 				if(!mergeItemStack(slotStack, 0, numItems, false))
 				{
-					return null;
+					return ItemStack.EMPTY.copy();
 				}
 			}
-			else {
+			else
+			{
 				if(!mergeItemStack(slotStack, numItems, inventorySlots.size(), true))
 				{
-					return null;
+					return ItemStack.EMPTY.copy();
 				}
 			}
-
-			if (slotStack.stackSize == 0)
+			
+			if(slotStack.getCount() == 0)
 			{
-				currentSlot.putStack(null);
+				currentSlot.putStack(ItemStack.EMPTY.copy());
 			}
 			else
 			{
 				currentSlot.onSlotChanged();
 			}
-
-			if (slotStack.stackSize == stack.stackSize)
+			
+			if(slotStack.getCount() == stack.getCount())
 			{
-				return null;
+				return ItemStack.EMPTY.copy();
 			}
-
-			currentSlot.onPickupFromSlot(player, slotStack);
+			
+			currentSlot.onTake(player, slotStack);
 		}
-
+		
 		return stack;
 	}
 }

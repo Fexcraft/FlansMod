@@ -6,11 +6,12 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import com.flansmod.common.PlayerData;
 
-public class GametypeTDM extends Gametype 
+public class GametypeTDM extends Gametype
 {
 	public boolean friendlyFire = false;
 	public boolean autoBalance = true;
@@ -18,105 +19,47 @@ public class GametypeTDM extends Gametype
 	public int newRoundTimer = 0;
 	public int time;
 	public int autoBalanceInterval = 1200;
-
-	public GametypeTDM() 
+	
+	public GametypeTDM()
 	{
 		super("Team Deathmatch", "TDM", 2);
 	}
-
+	
 	@Override
-	public void roundStart() 
+	public void roundStart()
 	{
 		
 	}
-
+	
 	@Override
 	public void roundEnd()
 	{
 		
 	}
-
+	
 	@Override
-	public void roundCleanup() 
+	public void roundCleanup()
 	{
 		
 	}
-		
-	@Override
-	public void tick() 
-	{
-		/*
-		if(autoBalance && time % autoBalanceInterval == autoBalanceInterval - 200 && needAutobalance())
-		{
-			TeamsManager.messageAll("\u00a7fAutobalancing teams...");
-		}
-		if(autoBalance && time % autoBalanceInterval == 0 && needAutobalance())
-		{
-			autobalance();
-		}
-		*/
-	}
 	
-	public boolean needAutobalance()
-	{
-		/*
-		if(teamsManager.currentRound == null || teamsManager.currentRound.teams[0] == null || teamsManager.currentRound.teams[1] == null)
-			return false;
-		int membersTeamA = teamsManager.currentRound.teams[0].members.size();
-		int membersTeamB = teamsManager.currentRound.teams[1].members.size();
-		if(Math.abs(membersTeamA - membersTeamB) > 1)
-			return true;
-			*/
-		return false;
-	}
-	
-	public void autobalance()
-	{
-		/*
-		if(teamsManager.currentRound.teams == null || teamsManager.currentRound.teams[0] == null || teamsManager.currentRound.teams[1] == null)
-			return;
-		int membersTeamA = teamsManager.currentRound.teams[0].members.size();
-		int membersTeamB = teamsManager.currentRound.teams[1].members.size();
-		if(membersTeamA - membersTeamB > 1)
-		{
-			for(int i = 0; i < (membersTeamA - membersTeamB) / 2; i++)
-			{
-				//My goodness this is convoluted...
-				EntityPlayerMP player = getPlayer(teamsManager.currentRound.teams[1].addPlayer(teamsManager.currentRound.teams[0].removeWorstPlayer()));
-				if(!player.isDead)
-				{
-					teamsManager.messagePlayer(player, "You have been moved to " + teamsManager.currentRound.teams[1].name);
-					teamsManager.sendClassMenuToPlayer(player);
-				}
-			}
-		}
-		if(membersTeamB - membersTeamA > 1)
-		{
-			for(int i = 0; i < (membersTeamB - membersTeamA) / 2; i++)
-			{
-				EntityPlayerMP player = getPlayer(teamsManager.currentRound.teams[0].addPlayer(teamsManager.currentRound.teams[1].removeWorstPlayer()));
-				if(!player.isDead)
-				{
-					teamsManager.messagePlayer(player, "You have been moved to " + teamsManager.currentRound.teams[0].name);
-					teamsManager.sendClassMenuToPlayer(player);
-				}
-			}
-		}
-		*/
-	}
-
 	@Override
-	public void playerJoined(EntityPlayerMP player) 
+	public void tick()
 	{
 	}
 	
 	@Override
-	public void playerQuit(EntityPlayerMP player) 
+	public void playerJoined(EntityPlayerMP player)
 	{
 	}
-
+	
 	@Override
-	public boolean playerAttacked(EntityPlayerMP player, DamageSource source) 
+	public void playerQuit(EntityPlayerMP player)
+	{
+	}
+	
+	@Override
+	public boolean playerAttacked(EntityPlayerMP player, DamageSource source)
 	{
 		if(getPlayerData(player) == null || getPlayerData(player).team == null)
 			return false;
@@ -134,14 +77,15 @@ public class GametypeTDM extends Gametype
 			return false;
 		return true;
 	}
-
+	
 	@Override
-	public boolean playerCanAttack(EntityPlayerMP attacker, Team attackerTeam, EntityPlayerMP victim, Team victimTeam) {
+	public boolean playerCanAttack(EntityPlayerMP attacker, Team attackerTeam, EntityPlayerMP victim, Team victimTeam)
+	{
 		return attackerTeam != victimTeam || friendlyFire;
 	}
 	
 	@Override
-	public void playerKilled(EntityPlayerMP player, DamageSource source) 
+	public void playerKilled(EntityPlayerMP player, DamageSource source)
 	{
 		EntityPlayerMP attacker = getPlayerFromDamageSource(source);
 		if(attacker != null)
@@ -149,14 +93,14 @@ public class GametypeTDM extends Gametype
 			//They killed themself. -1 point.
 			if(attacker == player)
 				getPlayerData(player).score--;
-			//They teamkilled. -1 point.
+				//They teamkilled. -1 point.
 			else if(getPlayerData(attacker).team == getPlayerData(player).team)
 			{
 				getPlayerData(attacker).score--;
 			}
 			//They killed an enemy. +1 point to them and their team
-			else 
-			{	
+			else
+			{
 				givePoints(attacker, 1);
 				getPlayerData(attacker).kills++;
 			}
@@ -167,68 +111,60 @@ public class GametypeTDM extends Gametype
 		}
 		getPlayerData(player).deaths++;
 	}
-
+	
 	@Override
-	public void baseAttacked(ITeamBase base, DamageSource source) 
+	public void baseAttacked(ITeamBase base, DamageSource source)
 	{
-
+	
 	}
-
+	
 	@Override
 	public void objectAttacked(ITeamObject object, DamageSource source)
 	{
-
+	
 	}
-
+	
 	@Override
-	public void baseClickedByPlayer(ITeamBase base, EntityPlayerMP player) 
+	public void baseClickedByPlayer(ITeamBase base, EntityPlayerMP player)
 	{
-
+	
 	}
-
+	
 	@Override
-	public void objectClickedByPlayer(ITeamObject object, EntityPlayerMP player) 
+	public void objectClickedByPlayer(ITeamObject object, EntityPlayerMP player)
 	{
-
+	
 	}
-
+	
 	@Override
-	public Vec3 getSpawnPoint(EntityPlayerMP player) 
+	public Vec3d getSpawnPoint(EntityPlayerMP player)
 	{
 		if(teamsManager.currentRound == null)
 			return null;
 		PlayerData data = getPlayerData(player);
-		List<ITeamObject> validSpawnPoints = new ArrayList<ITeamObject>();
+		List<BlockPos> validSpawnPoints = new ArrayList<>();
 		if(data.newTeam == null)
 			return null;
 		
-		ArrayList<ITeamBase> bases = teamsManager.currentRound.map.getBasesPerTeam(teamsManager.currentRound.getTeamID(data.newTeam));
-		for (ITeamBase base : bases) {
-			if (base.getMap() != teamsManager.currentRound.map)
-				continue;
-			for (int i = 0; i < base.getObjects().size(); i++) {
-				if (base.getObjects().get(i).isSpawnPoint())
-					validSpawnPoints.add(base.getObjects().get(i));
-			}
-		}
+		teamsManager.currentRound.map.getValidSpawnPoints(teamsManager.currentRound.getTeamID(data.newTeam), validSpawnPoints);
 		
 		if(validSpawnPoints.size() > 0)
 		{
-			ITeamObject spawnPoint = validSpawnPoints.get(rand.nextInt(validSpawnPoints.size()));
-			return new Vec3(spawnPoint.getPosX(), spawnPoint.getPosY(), spawnPoint.getPosZ());
+			BlockPos spawnPoint = validSpawnPoints.get(rand.nextInt(validSpawnPoints.size()));
+			return new Vec3d(spawnPoint.getX() + 0.5D, spawnPoint.getY(), spawnPoint.getZ() + 0.5D);
 		}
 		
 		return null;
 	}
-
+	
 	@Override
-	public void playerRespawned(EntityPlayerMP player) 
+	public void playerRespawned(EntityPlayerMP player)
 	{
 		
 	}
-
+	
 	@Override
-	public boolean setVariable(String variable, String value) 
+	public boolean setVariable(String variable, String value)
 	{
 		if(variable.toLowerCase().equals("scorelimit"))
 		{
@@ -247,17 +183,17 @@ public class GametypeTDM extends Gametype
 		}
 		return false;
 	}
-
+	
 	@Override
-	public void readFromNBT(NBTTagCompound tags) 
+	public void readFromNBT(NBTTagCompound tags)
 	{
 		scoreLimit = tags.getInteger("TDMScoreLimit");
 		friendlyFire = tags.getBoolean("TDMFriendlyFire");
 		autoBalance = tags.getBoolean("TDMAutoBalance");
 	}
-
+	
 	@Override
-	public void saveToNBT(NBTTagCompound tags) 
+	public void saveToNBT(NBTTagCompound tags)
 	{
 		tags.setInteger("TDMScoreLimit", scoreLimit);
 		tags.setBoolean("TDMFriendlyFire", friendlyFire);
@@ -269,10 +205,10 @@ public class GametypeTDM extends Gametype
 	{
 		return true;
 	}
-
+	
 	@Override
-	public boolean teamHasWon(Team team) 
+	public boolean teamHasWon(Team team)
 	{
-		return teamsManager.currentRound != null && team.score == teamsManager.currentRound.scoreLimit;
+		return teamsManager.currentRound != null && team != null && team.score == teamsManager.currentRound.scoreLimit;
 	}
 }

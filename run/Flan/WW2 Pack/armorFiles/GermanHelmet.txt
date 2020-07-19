@@ -1,7 +1,40 @@
-Name German WW2 Helmet
+//---Standard Armor Config for Flans Mod----------
+//Created by Minecraft-SMP Toolbox 2.2.0.0
+
+
+//---Standard-------------------------------------
+// Naming
+Name GermanHelmet
 ShortName germanHelmet
+ItemID Your ID
+
+
+// Visuals
+ModelScale 1
 Icon GermanHelmet
-Colour 255 255 255
+
+
+// Recipe
+
+
+//Misc
+
+//------------------------------------------------
+
+//---Armor----------------------------------------
+//Type
 Type Helmet
-Defence 0.1
-ArmourTexture German
+
+
+//Visuals
+Model ww2.GermanHelmet
+ArmorTexture GSupport
+
+
+//Armor Settings
+
+
+//Helmet Settings
+SmokeProtection false
+
+//------------------------------------------------

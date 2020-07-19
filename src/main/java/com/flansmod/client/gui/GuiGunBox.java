@@ -2,43 +2,35 @@ package com.flansmod.client.gui;
 
 import java.io.IOException;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.client.FMLClientHandler;
 
 import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.ContainerDriveableMenu;
-import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.guns.boxes.ContainerGunBox;
 import com.flansmod.common.guns.boxes.GunBoxType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntryTopLevel;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxPage;
 import com.flansmod.common.network.PacketBuyWeapon;
-import com.flansmod.common.network.PacketDriveableGUI;
 import com.flansmod.common.types.InfoType;
 
 public class GuiGunBox extends GuiContainer
 {
 	private static final int numCategories = 3;
-	/** Texture location */
+	/**
+	 * Texture location
+	 */
 	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/weaponBoxNew.png");
-	/** Texture sizes */
+	/**
+	 * Texture sizes
+	 */
 	private final int textureX = 512, textureY = 256;
 	private InventoryPlayer inventory;
 	private static RenderItem itemRenderer;
@@ -88,7 +80,7 @@ public class GuiGunBox extends GuiContainer
 			}
 		}
 		
-	
+
 	}
 
 	
@@ -111,7 +103,7 @@ public class GuiGunBox extends GuiContainer
 		buttonList.add(categoryLeft);
 		
 		categoryRight = new GuiButton(3, width / 2 + 99, height / 2 - 122, 20, 20, ">");
-		categoryRight.enabled = type.pages.size() > (pageScroller + 1) * 5;
+		categoryRight.enabled = type.pages.size() > (pageScroller + 1) * numCategories;
 		buttonList.add(categoryRight);
 		
 		for(int i = 0; i < numCategories; i++)
@@ -140,25 +132,25 @@ public class GuiGunBox extends GuiContainer
 		}
 		switch(button.id)
 		{
-		case 0: //Left
-			FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentEntry.type));
-			break;
-		case 1: //Right
-			FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentSubEntry.type));
-			break;
-		case 2: //Left
-			if(pageScroller > 0)
-				pageScroller--;
-			break;
-		case 3: //Right
-			if(type.pages.size() > (pageScroller + 1) * numCategories)
-				pageScroller++;
-			break;
-		default:
-			currentPage = type.pages.get(pageScroller * numCategories + button.id - 4);
-			currentEntry = null;
-			currentSubEntry = null;
-				
+			case 0: //Left
+				FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentEntry.type));
+				break;
+			case 1: //Right
+				FlansMod.getPacketHandler().sendToServer(new PacketBuyWeapon(type, currentSubEntry.type));
+				break;
+			case 2: //Left
+				if(pageScroller > 0)
+					pageScroller--;
+				break;
+			case 3: //Right
+				if(type.pages.size() > (pageScroller + 1) * numCategories)
+					pageScroller++;
+				break;
+			default:
+				currentPage = type.pages.get(pageScroller * numCategories + button.id - 4);
+				currentEntry = null;
+				currentSubEntry = null;
+
 		}
 		
 		categoryLeft.enabled = pageScroller > 0;
@@ -168,7 +160,7 @@ public class GuiGunBox extends GuiContainer
 		{
 			if(pageScroller * numCategories + i < type.pages.size())
 			{
-				 categories[i].visible = true;
+				categories[i].visible = true;
 				categories[i].displayString = type.pages.get(pageScroller * numCategories + i).name;
 			}
 			else categories[i].visible = false;
@@ -229,7 +221,6 @@ public class GuiGunBox extends GuiContainer
 				}
 				
 				
-				
 				for(int i = 0; i < 5; i++)
 				{
 					if(i >= currentEntry.childEntries.size())
@@ -249,16 +240,23 @@ public class GuiGunBox extends GuiContainer
 				renderInfoType(entry.type, originX + 106, originY + 58 + i * 22);
 			}
 		}
-		int stringWidth = mc.fontRendererObj.getStringWidth(type.name);
-		mc.fontRendererObj.drawString(type.name, originX + xSize / 2 - stringWidth / 2, originY + 8, 0x00000000);
-		mc.fontRendererObj.drawString(type.name, originX + xSize / 2 - stringWidth / 2 + 1, originY + 7, 0xffffffff);
+		int stringWidth = mc.fontRenderer.getStringWidth(type.name);
+		mc.fontRenderer.drawString(type.name, originX + xSize / 2 - stringWidth / 2, originY + 8, 0x00000000);
+		mc.fontRenderer.drawString(type.name, originX + xSize / 2 - stringWidth / 2 + 1, originY + 7, 0xffffffff);
+	}
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+	{
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		renderHoveredToolTip(mouseX, mouseY);
 	}
 	
 	private void renderInfoType(InfoType type, int x, int y)
 	{
 		if(type == null)
 		{
-			FlansMod.log("Null type when rendering!");
+			FlansMod.log.warn("Null type when rendering!");
 			return;
 		}
 		drawSlotInventory(new ItemStack(type.item), x, y);
@@ -269,7 +267,7 @@ public class GuiGunBox extends GuiContainer
 		int numParts = entry.requiredParts.size();
 		
 		int numPartsOnLine1 = Math.min(numParts, 4);
-		int numPartsOnLine2 = numParts > 4 ?  Math.min(numParts - 4, 4) : 0;
+		int numPartsOnLine2 = numParts > 4 ? Math.min(numParts - 4, 4) : 0;
 		
 		if(numPartsOnLine1 > 0)
 			drawModalRectWithCustomSizedTexture(x + 5, y + 44, 276, 122, 18 + 20 * (numPartsOnLine1 - 1), 18, textureX, textureY);
@@ -283,18 +281,18 @@ public class GuiGunBox extends GuiContainer
 		{
 			return;
 		}
-		FontRenderer fr = mc.fontRendererObj;
+		FontRenderer fr = mc.fontRenderer;
 		
 		String bufferLine = "";
 		String bufferLine2 = "";
 		String bufferArray[] = entry.type.name.split(" ");
-
-		for (int i = 0; i < bufferArray.length; i++)
+		
+		for(String aBufferArray : bufferArray)
 		{
-			if ((bufferLine.length() + bufferArray[i].length()) <= 16)
-				bufferLine += bufferArray[i] + " ";
+			if((bufferLine.length() + aBufferArray.length()) <= 16)
+				bufferLine += aBufferArray + " ";
 			else
-				bufferLine2 += bufferArray[i] + " ";
+				bufferLine2 += aBufferArray + " ";
 		}
 
 		fr.drawString(bufferLine, x + 5, y + 5, 0x00000000);
@@ -305,7 +303,7 @@ public class GuiGunBox extends GuiContainer
 		int numParts = entry.requiredParts.size();
 		
 		int numPartsOnLine1 = Math.min(numParts, 4);
-		int numPartsOnLine2 = numParts > 4 ?  Math.min(numParts - 4, 4) : 0;
+		int numPartsOnLine2 = numParts > 4 ? Math.min(numParts - 4, 4) : 0;
 		
 		for(int i = 0; i < numPartsOnLine1; i++)
 		{
@@ -319,12 +317,12 @@ public class GuiGunBox extends GuiContainer
 
 	private void drawSlotInventory(ItemStack itemstack, int i, int j)
 	{
-		if(itemstack == null || itemstack.getItem() == null)
+		if(itemstack == null || itemstack.isEmpty())
 			return;
 		RenderHelper.enableGUIStandardItemLighting();
 		
 		itemRenderer.renderItemIntoGUI(itemstack, i, j);
-		itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, itemstack, i, j, null);
+		itemRenderer.renderItemOverlayIntoGUI(fontRenderer, itemstack, i, j, null);
 	}
 
 	@Override
@@ -333,15 +331,15 @@ public class GuiGunBox extends GuiContainer
 		super.mouseClicked(i, j, k);
 		int m = i - guiOriginX;
 		int n = j - guiOriginY;
-		if (k == 0 || k == 1)
+		if(k == 0 || k == 1)
 		{
 			if(currentPage != null)
 			{
 				for(int e = 0; e < 5; e++)
 				{
-					if (e < currentPage.entries.size() && 105 < m && m < 123 && 57 + e * 22 < n && n < 76 + e * 22)
-					{	
-						currentEntry = currentPage.entries.get(e);	
+					if(e < currentPage.entries.size() && 105 < m && m < 123 && 57 + e * 22 < n && n < 76 + e * 22)
+					{
+						currentEntry = currentPage.entries.get(e);
 						currentSubEntry = currentEntry.childEntries.size() > 0 ? currentEntry.childEntries.get(0) : null;
 					}
 				}
@@ -351,9 +349,9 @@ public class GuiGunBox extends GuiContainer
 			{
 				for(int e = 0; e < 5; e++)
 				{
-					if (e < currentEntry.childEntries.size() && 133 < m && m < 151 && 57 + e * 22 < n && n < 76 + e * 22)
-					{	
-						currentSubEntry = currentEntry.childEntries.get(e);					
+					if(e < currentEntry.childEntries.size() && 133 < m && m < 151 && 57 + e * 22 < n && n < 76 + e * 22)
+					{
+						currentSubEntry = currentEntry.childEntries.get(e);
 					}
 				}
 			}
@@ -364,9 +362,9 @@ public class GuiGunBox extends GuiContainer
 	@Override
 	protected void keyTyped(char c, int i)
 	{
-		if (i == 1 || i == mc.gameSettings.keyBindInventory.getKeyCode())
+		if(i == 1 || i == mc.gameSettings.keyBindInventory.getKeyCode())
 		{
-			mc.thePlayer.closeScreen();
+			mc.player.closeScreen();
 		}
 	}
 

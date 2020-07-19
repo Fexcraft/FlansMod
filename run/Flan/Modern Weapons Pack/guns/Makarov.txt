@@ -17,13 +17,13 @@ Recoil 1
 //Number of bullet entities to create, useful for shotguns, defaults to 1
 NumBullets 1
 //Damage in half hearts
-Damage 7
+Damage 4
 //The higher this value, the more the bullets spread
-Accuracy 8
+Accuracy 1
 //Time in ticks between rounds
 ShootDelay 1
 ShootSound MakarovShoot
-ReloadSound ColtReload
+ReloadSound MWColtReload
 Mode SemiAuto
 OneHanded true
 //Bullet speed, default 3.0
@@ -47,5 +47,10 @@ AllowScopeAttachments true
 AllowStockAttachments false
 AllowGripAttachments false
 NumGenericAttachmentSlots 1
+//Paintjob Settings
+//Format is "Paintjob iconName textureName requiredDyeAmount requiredDyeColour" Multiple colours may be listed in order, seperated by a space
+//Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
+Paintjob Makarov_Brown Makarov_Brown brown 1
+Paintjob Makarov_Cobra Makarov_Cobra green 1
 //Description - note the ammo type
 Description Ammo Type : Pistol

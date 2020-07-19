@@ -23,7 +23,9 @@ public class PacketDriveableControl extends PacketBase
 	public float fuelInTank;
 	public float steeringYaw;
 	
-	public PacketDriveableControl() {}
+	public PacketDriveableControl()
+	{
+	}
 	
 	public PacketDriveableControl(EntityDriveable driveable)
 	{
@@ -53,9 +55,9 @@ public class PacketDriveableControl extends PacketBase
 			steeringYaw = plane.flapsYaw;
 		}
 	}
-		
+	
 	@Override
-	public void encodeInto(ChannelHandlerContext ctx, ByteBuf data) 
+	public void encodeInto(ChannelHandlerContext ctx, ByteBuf data)
 	{
 		data.writeInt(entityId);
 		data.writeDouble(posX);
@@ -74,9 +76,9 @@ public class PacketDriveableControl extends PacketBase
 		data.writeFloat(fuelInTank);
 		data.writeFloat(steeringYaw);
 	}
-
+	
 	@Override
-	public void decodeInto(ChannelHandlerContext ctx, ByteBuf data) 
+	public void decodeInto(ChannelHandlerContext ctx, ByteBuf data)
 	{
 		entityId = data.readInt();
 		posX = data.readDouble();
@@ -95,15 +97,17 @@ public class PacketDriveableControl extends PacketBase
 		fuelInTank = data.readFloat();
 		steeringYaw = data.readFloat();
 	}
-
+	
 	@Override
-	public void handleServerSide(EntityPlayerMP playerEntity) 
+	public void handleServerSide(EntityPlayerMP playerEntity)
 	{
+		if(playerEntity == null || playerEntity.world == null || playerEntity.world.loadedEntityList == null)
+			return;
 		EntityDriveable driveable = null;
-		for(int i = 0; i < playerEntity.worldObj.loadedEntityList.size(); i++)
+		for(int i = 0; i < playerEntity.world.loadedEntityList.size(); i++)
 		{
-			Object obj = playerEntity.worldObj.loadedEntityList.get(i);
-			if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == entityId)
+			Entity obj = playerEntity.world.loadedEntityList.get(i);
+			if(obj instanceof EntityDriveable && obj.getEntityId() == entityId)
 			{
 				driveable = (EntityDriveable)obj;
 				break;
@@ -118,21 +122,21 @@ public class PacketDriveableControl extends PacketBase
 		driveable.setPositionRotationAndMotion(posX, posY, posZ, yaw, pitch, roll, motX, motY, motZ, avelx, avely, avelz, throttle, steeringYaw);
 		driveable.driveableData.fuelInTank = fuelInTank;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void handleClientSide(EntityPlayer clientPlayer) 
+	public void handleClientSide(EntityPlayer clientPlayer)
 	{
-		if(clientPlayer == null || clientPlayer.worldObj == null)
+		if(clientPlayer == null || clientPlayer.world == null)
 			return;
 		EntityDriveable driveable = null;
-		for(Object obj : clientPlayer.worldObj.loadedEntityList)
+		for(Object obj : clientPlayer.world.loadedEntityList)
 		{
 			if(obj instanceof EntityDriveable && ((Entity)obj).getEntityId() == entityId)
 			{
 				driveable = (EntityDriveable)obj;
 				driveable.driveableData.fuelInTank = fuelInTank;
-				if(driveable.seats[0] != null && driveable.seats[0].riddenByEntity == clientPlayer)
+				if(driveable.getSeat(0) != null && driveable.getSeat(0).getControllingPassenger() == clientPlayer)
 					return;
 				break;
 			}

@@ -12,35 +12,39 @@ import java.util.UUID;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class ApocalypseData 
+import com.flansmod.common.FlansMod;
+
+public class ApocalypseData
 {
-	/** The point at which each player entered the apocalypse. For deciding where they should come out */
-	public HashMap<UUID, BlockPos> entryPoints = new HashMap<UUID, BlockPos>();
+	/**
+	 * The point at which each player entered the apocalypse. For deciding where they should come out
+	 */
+	public HashMap<UUID, BlockPos> entryPoints = new HashMap<>();
 	
 	@SubscribeEvent
 	public void worldData(WorldEvent event)
 	{
-		if(event.world.isRemote)
+		if(event.getWorld().isRemote)
 			return;
 		if(event instanceof WorldEvent.Load)
 		{
-			loadPerWorldData(event, event.world);
-			savePerWorldData(event, event.world);
+			loadPerWorldData(event, event.getWorld());
+			savePerWorldData(event, event.getWorld());
 		}
 		if(event instanceof WorldEvent.Save)
 		{
-			savePerWorldData(event, event.world);
+			savePerWorldData(event, event.getWorld());
 		}
 	}
 
-	private void savePerWorldData(WorldEvent event, World world) 
+	private void savePerWorldData(WorldEvent event, World world)
 	{
-		if(world.provider.getDimensionId() == 0)
+		if(world.provider.getDimension() == 0)
 		{
 			try
 			{
@@ -59,31 +63,30 @@ public class ApocalypseData
 				
 				
 				//Save per-player file
-				Iterator iterator = entryPoints.entrySet().iterator();
-				while(iterator.hasNext())
+				for(Map.Entry<UUID, BlockPos> uuidBlockPosEntry : entryPoints.entrySet())
 				{
-					UUID uuid = ((Map.Entry<UUID, BlockPos>)iterator.next()).getKey();
+					UUID uuid = (uuidBlockPosEntry).getKey();
 					File playerFile = new File(dir, uuid.toString() + ".dat");
 					NBTTagCompound playerTags = new NBTTagCompound();
 					if(!playerFile.exists())
 						playerFile.createNewFile();
 					
 					BlockPos pos = entryPoints.get(uuid);
-					playerTags.setIntArray("EntryPoint", new int[] { pos.getX(), pos.getY(), pos.getZ() });
+					playerTags.setIntArray("EntryPoint", new int[]{pos.getX(), pos.getY(), pos.getZ()});
 					
 					CompressedStreamTools.write(playerTags, new DataOutputStream(new FileOutputStream(playerFile)));
 				}
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				FlansMod.log.throwing(e);
 			}
 		}
 	}
 
-	private void loadPerWorldData(WorldEvent event, World world) 
+	private void loadPerWorldData(WorldEvent event, World world)
 	{
-		if(world.provider.getDimensionId() == 0)
+		if(world.provider.getDimension() == 0)
 		{
 			try
 			{
@@ -113,7 +116,7 @@ public class ApocalypseData
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				FlansMod.log.throwing(e);
 			}
 		}
 	}

@@ -1,18 +1,21 @@
 package com.flansmod.apocalypse.common.entity;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
-import com.flansmod.apocalypse.common.world.BiomeGenApocalypse;
+import com.flansmod.apocalypse.common.world.BiomeApocalypse;
 import com.flansmod.common.driveables.DriveableData;
 import com.flansmod.common.driveables.EntityPlane;
 import com.flansmod.common.driveables.PlaneType;
 
-public class EntityFlyByPlane extends EntityPlane 
+public class EntityFlyByPlane extends EntityPlane
 {
-	public EntityFlyByPlane(World world, double x, double y, double z, PlaneType type, DriveableData data) 
+	public EntityFlyByPlane(World world)
+	{
+		super(world);
+	}
+	
+	public EntityFlyByPlane(World world, double x, double y, double z, PlaneType type, DriveableData data)
 	{
 		super(world, x, y, z, type, data);
 	}
@@ -24,8 +27,8 @@ public class EntityFlyByPlane extends EntityPlane
 
 		//float lookAheadDist = 20F;
 		
-		//float targetHeight = getBiomeHeight(worldObj.getBiomeGenForCoords(new BlockPos((int)(posX + motionX * lookAheadDist), (int)(posY + motionY * lookAheadDist), (int)(posZ + motionZ * lookAheadDist))));
-		//float currentTargetHeight = getBiomeHeight(worldObj.getBiomeGenForCoords(new BlockPos((int)(posX), (int)(posY), (int)(posZ))));
+		//float targetHeight = getBiomeHeight(world.getBiomeGenForCoords(new BlockPos((int)(posX + motionX * lookAheadDist), (int)(posY + motionY * lookAheadDist), (int)(posZ + motionZ * lookAheadDist))));
+		//float currentTargetHeight = getBiomeHeight(world.getBiomeGenForCoords(new BlockPos((int)(posX), (int)(posY), (int)(posZ))));
 		
 
 		//flapsPitchLeft = flapsPitchRight += (Math.max(currentTargetHeight, targetHeight) - (float)posY) * 0.1F;
@@ -33,35 +36,33 @@ public class EntityFlyByPlane extends EntityPlane
 		super.onUpdate();
 		
 		
-		
-		
 	}
 	
-	private float getBiomeHeight(BiomeGenBase biome)
+	private float getBiomeHeight(Biome biome)
 	{
-		if(biome == BiomeGenApocalypse.desert)
+		if(biome == BiomeApocalypse.desert)
 			return 80F;
-		else if(biome == BiomeGenApocalypse.deepCanyon || biome == BiomeGenApocalypse.sulphurPits)
+		else if(biome == BiomeApocalypse.deepCanyon || biome == BiomeApocalypse.sulphurPits)
 			return 80F;
-		else if(biome == BiomeGenApocalypse.highPlateau)
+		else if(biome == BiomeApocalypse.highPlateau)
 			return 120F;
 		return 128F;
 	}
 
 	@Override
-	public boolean canThrust() 
+	public boolean canThrust()
 	{
 		return true;
 	}
 	
 	@Override
-	public boolean hasFuel() 
+	public boolean hasFuel()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean hasEnoughFuel() 
+	public boolean hasEnoughFuel()
 	{
 		return true;
 	}

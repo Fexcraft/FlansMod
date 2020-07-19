@@ -17,13 +17,13 @@ Recoil 1
 //Number of bullet entities to create, useful for shotguns, defaults to 1
 NumBullets 1
 //Damage in half hearts
-Damage 6
+Damage 5
 //The higher this value, the more the bullets spread
-Accuracy 8
+Accuracy 10
 //Time in ticks between rounds
 ShootDelay 1
 ShootSound M9Shoot
-ReloadSound ColtReload
+ReloadSound MWColtReload
 Mode SemiAuto
 OneHanded true
 //Bullet speed, default 3.0
@@ -51,5 +51,7 @@ NumGenericAttachmentSlots 1
 //Format is "Paintjob iconName textureName requiredDyeAmount requiredDyeColour" Multiple colours may be listed in order, seperated by a space
 //Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
 Paintjob M9_Sand M9_Sand yellow 1
+Paintjob M9_Venom M9_Venom lime 1
+Paintjob M9_Midnight M9_Midnight blue 1 yellow 1
 //Description - note the ammo type
 Description Ammo Type : Pistol

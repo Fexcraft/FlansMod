@@ -4,21 +4,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
-
 import org.lwjgl.input.Mouse;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -26,6 +24,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.flansmod.client.handlers.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.network.PacketMGFire;
@@ -34,17 +33,18 @@ import com.flansmod.common.network.PacketPlaySound;
 import com.flansmod.common.teams.EntityGunItem;
 import com.flansmod.common.teams.Team;
 import com.flansmod.common.teams.TeamsManager;
+import com.flansmod.common.vector.Vector3f;
 
 public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 {
 	public int blockX, blockY, blockZ;
 	public int direction;
 	public GunType type;
-	public ItemStack ammo;
+	public ItemStack ammo = ItemStack.EMPTY.copy();
 	public int reloadTimer;
 	public int soundDelay;
 	public float shootDelay;
-	public static List<EntityMG> mgs = new ArrayList<EntityMG>();
+	public static List<EntityMG> mgs = new ArrayList<>();
 	public EntityPlayer gunner;
 	//Server side
 	public boolean isShooting;
@@ -59,7 +59,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		setSize(1.0F, 1.0F);
 		ignoreFrustumCheck = true;
 	}
-
+	
 	public EntityMG(World world, int x, int y, int z, int dir, GunType gunType)
 	{
 		super(world);
@@ -78,13 +78,13 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		ignoreFrustumCheck = true;
 		mgs.add(this);
 	}
-
+	
 	@Override
 	public boolean canBeCollidedWith()
 	{
 		return !isDead;
 	}
-
+	
 	@Override
 	public void onUpdate()
 	{
@@ -99,32 +99,32 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		{
 			setDead();
 		}
-		if (worldObj.getBlockState(new BlockPos(blockX, blockY - 1, blockZ)).getBlock() == Blocks.air)
+		if(world.getBlockState(new BlockPos(blockX, blockY - 1, blockZ)).getBlock() == Blocks.AIR)
 		{
-			if(!worldObj.isRemote)
+			if(!world.isRemote)
 			{
 				setDead();
 			}
 		}
 		prevRotationYaw = rotationYaw;
 		prevRotationPitch = rotationPitch;
-		if (gunner != null)
+		if(gunner != null)
 		{
 			ticksSinceUsed = 0;
 			rotationYaw = gunner.rotationYaw - direction * 90;
-			for (; rotationYaw < -180; rotationYaw += 360)
+			for(; rotationYaw < -180; rotationYaw += 360)
 			{
 			}
-			for (; rotationYaw > 180; rotationYaw -= 360)
+			for(; rotationYaw > 180; rotationYaw -= 360)
 			{
 			}
 			rotationPitch = gunner.rotationPitch;
 			// Keep it within reasonable angles
-			if (rotationYaw > type.sideViewLimit)
+			if(rotationYaw > type.sideViewLimit)
 				prevRotationYaw = rotationYaw = type.sideViewLimit;
-			if (rotationYaw < -type.sideViewLimit)
+			if(rotationYaw < -type.sideViewLimit)
 				prevRotationYaw = rotationYaw = -type.sideViewLimit;
-
+			
 			// Keep user standing behind the gun
 			float angle = direction * 90F + rotationYaw;
 			double dX = (type.standBackDist * Math.sin(angle * 3.1415926535F / 180F));
@@ -134,74 +134,50 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			// (direction == 3 ? 1 : 0)) + 0.5D, blockY + gunner.getYOffset() -
 			// 0.5D, (double)(blockZ - (direction == 0 ? 1 : 0) + (direction ==
 			// 2 ? 1 : 0)) + 0.5D);
-		} else
+		}
+		else
 		{
 			rotationPitch--;
 		}
-
-		if (rotationPitch < type.topViewLimit)
-			rotationPitch = type.topViewLimit;
-		if (rotationPitch > type.bottomViewLimit)
+		
+		if(rotationPitch < -type.topViewLimit)
+			rotationPitch = -type.topViewLimit;
+		if(rotationPitch > type.bottomViewLimit)
 			rotationPitch = type.bottomViewLimit;
 		
 		if(shootDelay > 0)
 			shootDelay--;
-
+		
 		// Decrement the reload timer and reload
-		if (reloadTimer > 0)
+		if(reloadTimer > 0)
 			reloadTimer--;
-		if (ammo != null && ammo.getItemDamage() == ammo.getMaxDamage())
+		if(!ammo.isEmpty() && ammo.getItemDamage() == ammo.getMaxDamage())
 		{
-			ammo = null;
+			ammo = ItemStack.EMPTY.copy();
 			// Scrap metal output?
 		}
-		if (ammo == null && gunner != null)
+		if(ammo.isEmpty() && gunner != null)
 		{
 			int slot = findAmmo(gunner);
-			if (slot >= 0)
+			if(slot >= 0)
 			{
 				ammo = gunner.inventory.getStackInSlot(slot);
-				if (!gunner.capabilities.isCreativeMode)
-					gunner.inventory.setInventorySlotContents(slot, null);
+				if(!gunner.capabilities.isCreativeMode)
+					gunner.inventory.setInventorySlotContents(slot, ItemStack.EMPTY.copy());
 				reloadTimer = type.reloadTime;
 				PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.reloadSound, false);
 			}
 		}
-		if (worldObj.isRemote && gunner != null && gunner == FMLClientHandler.instance().getClient().thePlayer && type.mode == EnumFireMode.FULLAUTO)
+		if(world.isRemote && gunner != null && gunner == FMLClientHandler.instance().getClient().player && type.mode == EnumFireMode.FULLAUTO)
 		{
 			//Send a packet!
 			checkForShooting();
 		}
-		if(!worldObj.isRemote && isShooting)
+		if(!world.isRemote && isShooting)
 		{
-			if(gunner == null || gunner.isDead)
-				isShooting = false;
-			// Check for ammo / reloading
-			if (ammo == null || reloadTimer > 0 || shootDelay > 0)
-			{
-				return;
-			}
-			// Fire
-			BulletType bullet = BulletType.getBullet(ammo.getItem());
-			if (gunner != null && !gunner.capabilities.isCreativeMode)
-				ammo.damageItem(1, gunner);
-			shootDelay = type.shootDelay;
-			worldObj.spawnEntityInWorld(((ItemBullet)ammo.getItem()).getEntity(worldObj, 
-					new Vec3(blockX + 0.5D, blockY + type.pivotHeight, blockZ + 0.5D), 
-					(direction * 90F + rotationYaw), 
-					rotationPitch, 
-					gunner, 
-					bullet.bulletSpread * type.bulletSpread, 
-					type.damage, 
-					type));
-			
-			if (soundDelay <= 0)
-			{
-				soundDelay = type.shootSoundLength;
-				PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.shootSound, type.distortSound);
-			}
+			fire();
 		}
-		if (soundDelay > 0)
+		if(soundDelay > 0)
 			soundDelay--;
 	}
 	
@@ -225,67 +201,79 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	{
 		isShooting = held;
 	}
+	
+	private void fire()
+	{
+		if(gunner == null || gunner.isDead)
+			isShooting = false;
+		// Check for ammo / reloading
+		if(ammo.isEmpty() || reloadTimer > 0 || shootDelay > 0)
+		{
+			return;
+		}
+		// Fire
+		BulletType bullet = BulletType.getBullet(ammo.getItem());
+		ShootBulletHandler handler = (Boolean isExtraBullet) ->
+		{
+			if(gunner != null && !gunner.capabilities.isCreativeMode)
+				ammo.damageItem(1, gunner);
+		};
+		shootDelay = type.shootDelay;
+		ItemShootable shootableItem = (ItemShootable)ammo.getItem();
+		ShootableType shootableType = shootableItem.type;
+		
+		Vector3f position = new Vector3f(blockX + 0.5D, blockY + type.pivotHeight, blockZ + 0.5D);
+		FireableGun gun = new FireableGun(type, type.damage, type.bulletSpread, type.bulletSpeed);
+		FiredShot shot = new FiredShot(gun, bullet, this, (EntityPlayerMP) gunner);
 
+		Double radianYaw = Math.toRadians(direction * 90F + rotationYaw);
+		Double radianPitch = Math.toRadians(rotationPitch);
+		Vector3f shootingDirection = new Vector3f(-Math.sin(radianYaw), Math.cos(radianYaw)*-Math.sin(radianPitch), Math.cos(radianYaw)*Math.cos(radianPitch));
+		ShotHandler.fireGun(world, shot, type.numBullets*shootableType.numBullets, position, shootingDirection, handler);
+		
+		if(soundDelay <= 0)
+		{
+			soundDelay = type.shootSoundLength;
+			PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.shootSound, type.distortSound);
+		}
+	}
+	
 	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float i)
 	{
-		if (damagesource.damageType.equals("player"))
+		if(damagesource.damageType.equals("player"))
 		{
-			Entity player = damagesource.getEntity();
-			if (player == gunner)
+			Entity player = damagesource.getTrueSource();
+			if(player == gunner)
 			{
 				// Player left clicked on the gun
-				if (type.mode == EnumFireMode.FULLAUTO)
+				if(type.mode == EnumFireMode.FULLAUTO)
 					return true;
-				// Check for ammo / reloading
-				if (ammo == null || reloadTimer > 0 || shootDelay > 0)
-				{
-					return true;
-				}
-				// Fire
-				BulletType bullet = BulletType.getBullet(ammo.getItem());
-				if (gunner != null && !gunner.capabilities.isCreativeMode)
-					ammo.damageItem(1, (EntityLiving) player);
-				shootDelay = type.shootDelay;
-				if (!worldObj.isRemote)
-				{
-					worldObj.spawnEntityInWorld(((ItemBullet)ammo.getItem()).getEntity(worldObj, 
-							(EntityLivingBase) player, 
-							bullet.bulletSpread * type.bulletSpread, 
-							type.damage, 
-							type.bulletSpeed, 
-							false, 
-							type));
-				}
-				if (soundDelay <= 0)
-				{
-					float distortion = type.distortSound ? 1.0F / (rand.nextFloat() * 0.4F + 0.8F) : 1F;
-					//worldObj.playSoundAtEntity(this, type.shootSound, 1.0F, distortion);
-					PacketPlaySound.sendSoundPacket(posX, posY, posZ, FlansMod.soundRange, dimension, type.shootSound, type.distortSound);
-
-					soundDelay = type.shootSoundLength;
-				}
-			} else if(gunner != null)
+				
+				fire();
+			}
+			else if(gunner != null)
 			{
 				return gunner.attackEntityFrom(damagesource, i);
-			} else if(TeamsManager.canBreakGuns)
+			}
+			else if(TeamsManager.canBreakGuns)
 			{
 				setDead();
 			}
 		}
 		return true;
 	}
-
+	
 	@Override
-	public boolean interactFirst(EntityPlayer player) //interact : change back when Forge updates
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
 	{
 		// Player right clicked on gun
 		// Mount gun
-		if (gunner != null && (gunner instanceof EntityPlayer) && gunner != player)
+		if(gunner != null && gunner != player)
 		{
 			return true;
 		}
-		if (!worldObj.isRemote)
+		if(!world.isRemote)
 		{
 			//If this is the player currently using this MG, dismount
 			if(gunner == player)
@@ -305,19 +293,18 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 			//Spectators can't mount guns
 			if(TeamsManager.instance.currentRound != null && PlayerHandler.getPlayerData(player).team == Team.spectators)
 				return true;
-
+			
 			//None of the above applied, so mount the gun
 			mountGun(player, true);
 			FlansMod.getPacketHandler().sendToAllAround(new PacketMGMount(player, this, true), posX, posY, posZ, FlansMod.driveableUpdateRange, dimension);
-			if (ammo == null)
+			if(ammo.isEmpty())
 			{
 				int slot = findAmmo(player);
-				if (slot >= 0)
+				if(slot >= 0)
 				{
-					ammo = player.inventory.getStackInSlot(slot);
-					player.inventory.setInventorySlotContents(slot, null);
+					ammo = player.inventory.getStackInSlot(slot).splitStack(1);
 					reloadTimer = type.reloadTime;
-					worldObj.playSoundAtEntity(this, type.reloadSound, 1.0F, 1.0F / (rand.nextFloat() * 0.4F + 0.8F));
+					playSound(FlansModResourceHandler.getSoundEvent(type.reloadSound), 1.0F, 1.0F / (rand.nextFloat() * 0.4F + 0.8F));
 				}
 			}
 			
@@ -329,7 +316,7 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	{
 		if(player == null)
 			return;
-		Side side = worldObj.isRemote ? Side.CLIENT : Side.SERVER;
+		Side side = world.isRemote ? Side.CLIENT : Side.SERVER;
 		if(PlayerHandler.getPlayerData(player, side) == null)
 			return;
 		if(mounting)
@@ -346,54 +333,51 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 	
 	public int findAmmo(EntityPlayer player)
 	{
-		for (int i = 0; i < player.inventory.getSizeInventory(); i++)
+		for(int i = 0; i < player.inventory.getSizeInventory(); i++)
 		{
 			ItemStack stack = player.inventory.getStackInSlot(i);
-			if (type.isAmmo(stack))
+			if(type.isAmmo(stack))
 			{
 				return i;
 			}
 		}
 		return -1;
 	}
-
+	
 	@Override
 	public void setDead()
 	{
 		// Drop gun
-		if(!worldObj.isRemote)
+		if(!world.isRemote)
 		{
 			if(TeamsManager.weaponDrops == 2)
 			{
-				EntityGunItem gunEntity = new EntityGunItem(worldObj, posX, posY, posZ, new ItemStack(type.getItem()), Arrays.asList(ammo));
-				worldObj.spawnEntityInWorld(gunEntity);
+				EntityGunItem gunEntity = new EntityGunItem(world, posX, posY, posZ, new ItemStack(type.getItem()), Arrays.asList(ammo));
+				world.spawnEntity(gunEntity);
 			}
 			else if(TeamsManager.weaponDrops == 1)
 			{
 				dropItem(type.getItem(), 1);
 				// Drop ammo box
-				if (ammo != null)
+				if(!ammo.isEmpty())
 					entityDropItem(ammo, 0.5F);
 			}
 		}
-		if (gunner != null && PlayerHandler.getPlayerData(gunner) != null)
+		if(gunner != null && PlayerHandler.getPlayerData(gunner) != null)
 			PlayerHandler.getPlayerData(gunner).mountingGun = null;
 		
 		super.setDead();
 	}
-
+	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
 	{
 		nbttagcompound.setString("Type", type.shortName);
-		if (ammo != null)
-		{
-			nbttagcompound.setTag("Ammo", ammo.writeToNBT(new NBTTagCompound()));
-		}
+		nbttagcompound.setTag("Ammo", ammo.writeToNBT(new NBTTagCompound()));
 		nbttagcompound.setInteger("BlockX", blockX);
 		nbttagcompound.setInteger("BlockY", blockY);
 		nbttagcompound.setInteger("BlockZ", blockZ);
-		nbttagcompound.setByte("Dir", (byte) direction);
+		nbttagcompound.setByte("Dir", (byte)direction);
 	}
 	
 	@Override
@@ -404,16 +388,16 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		blockY = nbttagcompound.getInteger("BlockY");
 		blockZ = nbttagcompound.getInteger("BlockZ");
 		direction = nbttagcompound.getByte("Dir");
-		ammo = ItemStack.loadItemStackFromNBT(nbttagcompound.getCompoundTag("Ammo"));
+		ammo = new ItemStack(nbttagcompound.getCompoundTag("Ammo"));
 	}
-
+	
 	@Override
 	protected void entityInit()
 	{
 	}
 	
 	@Override
-	public void writeSpawnData(ByteBuf data) 
+	public void writeSpawnData(ByteBuf data)
 	{
 		ByteBufUtils.writeUTF8String(data, type.shortName);
 		data.writeInt(direction);
@@ -422,9 +406,9 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		data.writeInt(blockZ);
 		ByteBufUtils.writeItemStack(data, ammo);
 	}
-
+	
 	@Override
-	public void readSpawnData(ByteBuf data) 
+	public void readSpawnData(ByteBuf data)
 	{
 		try
 		{
@@ -437,16 +421,15 @@ public class EntityMG extends Entity implements IEntityAdditionalSpawnData
 		}
 		catch(Exception e)
 		{
-			FlansMod.log("Failed to retreive gun type from server.");
+			FlansMod.log.error("Failed to retreive gun type from server.");
 			super.setDead();
-			e.printStackTrace();
+			FlansMod.log.throwing(e);
 		}
 	}
 	
 	@Override
-	public ItemStack getPickedResult(MovingObjectPosition target)
+	public ItemStack getPickedResult(RayTraceResult target)
 	{
-		ItemStack stack = new ItemStack(type.item, 1, 0);
-		return stack;
+		return new ItemStack(type.item, 1, 0);
 	}
 }

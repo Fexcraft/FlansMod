@@ -56,14 +56,14 @@ EngineSoundLength 20
 //Each section of the plane may have many parts
 //The sections are tailWheel, tail, bay, topWing, leftWingWheel, leftWing, rightWingWheel,
 //rightWing, nose, turret, coreWheel, core
-AddRecipeParts core 1 tankBody 1 vehicleSeat
+AddRecipeParts core 1 mediumTankBody 1 vehicleSeat
 AddRecipeParts leftTrack 1 catTrack
 AddRecipeParts rightTrack 1 catTrack
 //Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
 AddDye 10 yellow
 //Health and collision
 SetupPart core 400 -32 8 -24 80 16 48
-SetupPart harvester 1200 48 -8 -24 32 48 48
+SetupPart harvester 1200 48 -8 -32 32 48 64
 SetupPart leftTrack 200 -32 -8 -24 64 16 8
 SetupPart rightTrack 200 -32 -8 16 64 16 8
 BulletDetection 5

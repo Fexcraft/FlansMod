@@ -3,12 +3,10 @@ package com.flansmod.common.driveables.mechas;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.types.IFlanItem;
@@ -23,28 +21,21 @@ public class ItemMechaAddon extends Item implements IFlanItem
 		type = type1;
 		setMaxStackSize(1);
 		type.item = this;
+		setRegistryName(type.shortName);
 		setCreativeTab(FlansMod.tabFlanMechas);
-		GameRegistry.registerItem(this, type.shortName, FlansMod.MODID);
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b)
+	public void addInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag b)
 	{
 		if(type.description != null)
 		{
-			Collections.addAll(list, type.description.split("_"));
+			Collections.addAll(lines, type.description.split("_"));
 		}
 	}
-
+	
 	@Override
-	@SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack par1ItemStack, int par2)
-    {
-    	return type.colour;
-    }
-    
-	@Override
-	public InfoType getInfoType() 
+	public InfoType getInfoType()
 	{
 		return type;
 	}

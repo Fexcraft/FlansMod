@@ -2,23 +2,24 @@ package com.flansmod.common.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-
 import net.minecraft.item.ItemStack;
-
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
+import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.driveables.mechas.EnumMechaSlotType;
 
-public class PacketMechaControl extends PacketDriveableControl 
+public class PacketMechaControl extends PacketDriveableControl
 {
 	public float legYaw, legSwing;
 	public ItemStack leftStack, rightStack;
 	
-	public PacketMechaControl() {}
-
-	public PacketMechaControl(EntityDriveable driveable) 
+	public PacketMechaControl()
+	{
+	}
+	
+	public PacketMechaControl(EntityDriveable driveable)
 	{
 		super(driveable);
 		EntityMecha mecha = (EntityMecha)driveable;
@@ -29,7 +30,7 @@ public class PacketMechaControl extends PacketDriveableControl
 	}
 	
 	@Override
-	public void encodeInto(ChannelHandlerContext ctx, ByteBuf data) 
+	public void encodeInto(ChannelHandlerContext ctx, ByteBuf data)
 	{
 		super.encodeInto(ctx, data);
 		data.writeFloat(legYaw);
@@ -37,15 +38,17 @@ public class PacketMechaControl extends PacketDriveableControl
 		ByteBufUtils.writeItemStack(data, leftStack);
 		ByteBufUtils.writeItemStack(data, rightStack);
 	}
-
+	
 	@Override
-	public void decodeInto(ChannelHandlerContext ctx, ByteBuf data) 
+	public void decodeInto(ChannelHandlerContext ctx, ByteBuf data)
 	{
 		super.decodeInto(ctx, data);
 		legYaw = data.readFloat();
 		legSwing = data.readFloat();
 		leftStack = ByteBufUtils.readItemStack(data);
 		rightStack = ByteBufUtils.readItemStack(data);
+		
+		data.release();
 	}
 	
 	@Override
@@ -59,6 +62,15 @@ public class PacketMechaControl extends PacketDriveableControl
 		{
 			mecha.inventory.setInventorySlotContents(EnumMechaSlotType.leftTool, leftStack);
 			mecha.inventory.setInventorySlotContents(EnumMechaSlotType.rightTool, rightStack);
+		}
+		else
+		{
+			FlansMod.getPacketHandler().sendToAllAround(new PacketMechaControl(mecha),
+					posX,
+					posY,
+					posZ,
+					FlansMod.driveableUpdateRange,
+					mecha.dimension);
 		}
 	}
 }

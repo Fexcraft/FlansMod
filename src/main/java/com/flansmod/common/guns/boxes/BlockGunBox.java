@@ -5,26 +5,18 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.flansmod.client.FlansModResourceHandler;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.boxes.GunBoxType.GunBoxEntry;
@@ -36,18 +28,16 @@ public class BlockGunBox extends Block
 	
 	public BlockGunBox(GunBoxType t)
 	{
-		super(Material.wood);
+		super(Material.WOOD);
 		setHardness(2F);
 		setResistance(4F);
 		type = t;
-
-	    setUnlocalizedName(type.shortName);
-	    GameRegistry.registerBlock(this, type.shortName);
+		setRegistryName(type.shortName);
+		setTranslationKey(type.shortName);
 		setCreativeTab(FlansMod.tabFlanGuns);
 		type.block = this;
-		type.item = Item.getItemFromBlock(this);
 	}
-		
+
 	public void buyGun(InfoType gun, InventoryPlayer inventory, GunBoxType type)
 	{
 		//FlansMod.proxy.buyGun(type, gun);
@@ -55,33 +45,33 @@ public class BlockGunBox extends Block
 		if(entry != null)
 		{
 			boolean canBuy = true;
-			for (ItemStack check : entry.requiredParts)
+			for(ItemStack check : entry.requiredParts)
 			{
 				int numMatchingStuff = 0;
-				for (int j = 0; j < inventory.getSizeInventory(); j++)
+				for(int j = 0; j < inventory.getSizeInventory(); j++)
 				{
 					ItemStack stack = inventory.getStackInSlot(j);
-					if (stack != null && stack.getItem() == check.getItem() && stack.getItemDamage() == check.getItemDamage())
+					if(stack != null && !stack.isEmpty() && stack.getItem() == check.getItem() && stack.getItemDamage() == check.getItemDamage())
 					{
-						numMatchingStuff += stack.stackSize;
+						numMatchingStuff += stack.getCount();
 					}
 				}
-				if (numMatchingStuff < check.stackSize)
+				if(numMatchingStuff < check.getCount())
 				{
 					canBuy = false;
 				}
 			}
-			if (canBuy)
+			if(canBuy)
 			{
-				for (ItemStack remove : entry.requiredParts)
+				for(ItemStack remove : entry.requiredParts)
 				{
-					int amountLeft = remove.stackSize;
-					for (int j = 0; j < inventory.getSizeInventory(); j++)
+					int amountLeft = remove.getCount();
+					for(int j = 0; j < inventory.getSizeInventory(); j++)
 					{
 						ItemStack stack = inventory.getStackInSlot(j);
-						if (amountLeft > 0 && stack != null && stack.getItem() == remove.getItem() && stack.getItemDamage() == remove.getItemDamage())
+						if(amountLeft > 0 && stack != null && !stack.isEmpty() && stack.getItem() == remove.getItem() && stack.getItemDamage() == remove.getItemDamage())
 						{
-							amountLeft -= inventory.decrStackSize(j, amountLeft).stackSize;
+							amountLeft -= inventory.decrStackSize(j, amountLeft).getCount();
 						}
 					}
 				}
@@ -101,12 +91,13 @@ public class BlockGunBox extends Block
 					
 					gunStack.setTagCompound(tags);
 				}
-				if (!inventory.addItemStackToInventory(gunStack))
+				if(!inventory.addItemStackToInventory(gunStack))
 				{
 					// Drop gun on floor
-					inventory.player.dropPlayerItemWithRandomChoice(gunStack, false);
+					inventory.player.dropItem(gunStack, false);
 				}
-			} else
+			}
+			else
 			{
 				// Cant buy
 				// TODO : Add flashing red squares around the items you lack
@@ -115,19 +106,19 @@ public class BlockGunBox extends Block
 	}
 	
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float par7, float par8, float par9)
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float par7, float par8, float par9)
 	{
 		if(player.isSneaking())
 			return false;
 		if(!world.isRemote)
-		player.openGui(FlansMod.INSTANCE, 5, world, pos.getX(), pos.getY(), pos.getZ());
+			player.openGui(FlansMod.INSTANCE, 5, world, pos.getX(), pos.getY(), pos.getZ());
 		return true;
 	}
 	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
-    {
-        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+	{
+		ArrayList<ItemStack> ret = new ArrayList<>();
 		ret.add(new ItemStack(this, 1, 0));
 		return ret;
 	}

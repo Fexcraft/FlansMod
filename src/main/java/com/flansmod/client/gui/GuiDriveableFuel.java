@@ -2,9 +2,8 @@ package com.flansmod.client.gui;
 
 import java.io.IOException;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -35,21 +34,21 @@ public class GuiDriveableFuel extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j)
 	{
-		fontRendererObj.drawString(plane.getDriveableType().name + " - Fuel", 6, 6, 0x404040);
-		fontRendererObj.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
+		fontRenderer.drawString(plane.getDriveableType().name + " - Fuel", 6, 6, 0x404040);
+		fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i1, int j1)
 	{
-		long newTime = mc.theWorld.getWorldInfo().getWorldTime();
+		long newTime = mc.world.getWorldInfo().getWorldTime();
 		if(newTime > lastTime)
 		{
 			lastTime = newTime;
 			if(newTime % 5 == 0)
 				anim++;
 		}
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
 		mc.renderEngine.bindTexture(texture);
 
@@ -67,15 +66,27 @@ public class GuiDriveableFuel extends GuiContainer
 	}
 	
 	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+	{
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		renderHoveredToolTip(mouseX, mouseY);
+	}
+	
+	@Override
 	protected void mouseClicked(int i, int j, int k) throws IOException
-    {
+	{
 		super.mouseClicked(i, j, k);
 		int m = i - (width - xSize) / 2;
 		int n = j - (height - ySize) / 2;
 		if(m > 161 && m < 171 && n > 5 && n < 15)
 		{
-			 mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, plane));
+			mc.displayGuiScreen(new GuiDriveableMenu(inventory, world, plane));
 		}
 	}
-
+	
+	@Override
+	public boolean doesGuiPauseGame()
+	{
+		return false;
+	}
 }

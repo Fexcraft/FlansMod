@@ -5,28 +5,48 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.PlayerHandler;
 
-public class EntityFlag extends Entity implements ITeamObject {
+public class EntityFlag extends Entity implements ITeamObject
+{
+	private static final DataParameter<Byte> TEAMID = EntityDataManager.createKey(EntityFlag.class, DataSerializers.BYTE);
 	
 	public int baseID;
 	public EntityFlagpole base;
 	public boolean isHome = true;
 	public int timeUntilReturn;
-
-	public EntityFlag(World world) 
+	
+	public EntityFlag(World world)
 	{
 		super(world);
 		setSize(1F, 1F);
-		renderDistanceWeight = 100D;
 		ignoreFrustumCheck = true;
 	}
 	
-	public EntityFlag(World world, EntityFlagpole pole) 
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public boolean isInRangeToRender3d(double x, double y, double z)
+	{
+		double dX = this.posX - x;
+		double dY = this.posY - y;
+		double dZ = this.posZ - z;
+		double distSq = dX * dX + dY * dY + dZ * dZ;
+		double maxDist = 128.0D * getRenderDistanceWeight();
+		return distSq < maxDist * maxDist;
+	}
+	
+	public EntityFlag(World world, EntityFlagpole pole)
 	{
 		this(world);
 		setPosition(pole.posX, pole.posY + 2F, pole.posZ);
@@ -38,11 +58,11 @@ public class EntityFlag extends Entity implements ITeamObject {
 	{
 		return true;
 	}
-
+	
 	@Override
-	protected void entityInit() 
+	protected void entityInit()
 	{
-		dataWatcher.addObject(5, new Byte((byte)0));
+		getDataManager().register(TEAMID, (byte)0);
 	}
 	
 	@Override
@@ -51,28 +71,31 @@ public class EntityFlag extends Entity implements ITeamObject {
 		super.onUpdate();
 		//If the base is null, maybe because the flag loaded before the base, check again to see if it exists.
 		//Do not do this client side
-		if(base == null && !worldObj.isRemote)
+		if(base == null && !world.isRemote)
 		{
 			setBase(TeamsManager.getInstance().getBase(baseID));
 		}
-		if(ridingEntity != null && ridingEntity.isDead)
+		if(getRidingEntity() != null && getRidingEntity().isDead)
 		{
-			if(ridingEntity instanceof EntityPlayerMP)
+			if(getRidingEntity() instanceof EntityPlayerMP)
 			{
-				EntityPlayerMP player = ((EntityPlayerMP)ridingEntity);
+				EntityPlayerMP player = ((EntityPlayerMP)getRidingEntity());
 				Team team = PlayerHandler.getPlayerData(player.getName()).team;
 				TeamsManager.getInstance();
 				TeamsManager.messageAll("\u00a7f" + player.getName() + " dropped the \u00a7" + team.textColour + team.name + "\u00a7f flag");
 			}
-			mountEntity(null);
-			
+			else if(getRidingEntity() instanceof EntityFlagpole)
+			{
+				setDead();
+			}
+			dismountRidingEntity();
 		}
 		if(!addedToChunk)
-			worldObj.spawnEntityInWorld(this);
+			world.spawnEntity(this);
 		
 		if(timeUntilReturn > 0)
 		{
-			if(ridingEntity != null || isHome)
+			if(getRidingEntity() instanceof EntityPlayerMP || isHome)
 				timeUntilReturn = 0;
 			else
 			{
@@ -87,32 +110,34 @@ public class EntityFlag extends Entity implements ITeamObject {
 		}
 		
 		//Temporary fire glitch fix
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			extinguish();
 	}
 	
 	@Override
-	public void mountEntity(Entity entity)
+	public void dismountRidingEntity()
 	{
-		if(entity == null)
+		if(TeamsManager.getInstance().currentRound != null && TeamsManager.getInstance().currentRound.gametype instanceof GametypeCTF)
 		{
-			if(TeamsManager.getInstance().currentRound != null && TeamsManager.getInstance().currentRound.gametype instanceof GametypeCTF)
-			{
-				timeUntilReturn = ((GametypeCTF)TeamsManager.getInstance().currentRound.gametype).flagReturnTime * 20;
-			}
-			else timeUntilReturn = 600; //30 seconds
+			timeUntilReturn = ((GametypeCTF)TeamsManager.getInstance().currentRound.gametype).flagReturnTime * 20;
 		}
-		
-		super.mountEntity(entity);
+		else timeUntilReturn = 600; //30 seconds
 	}
 	
 	public void reset()
 	{
-		mountEntity(null);
-		setPosition(base.posX, base.posY + 2F, base.posZ);
+		if(base == null)
+		{
+			if(getRidingEntity() instanceof EntityFlagpole)
+				base = (EntityFlagpole)getRidingEntity();
+		}
+		dismountRidingEntity();
+		if(base != null)
+			setPosition(base.posX, base.posY + 2F, base.posZ);
+		//startRiding(base);
 		isHome = true;
 	}
-
+	
 	@Override
 	public boolean writeToNBTOptional(NBTTagCompound tags)
 	{
@@ -120,45 +145,47 @@ public class EntityFlag extends Entity implements ITeamObject {
 	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound tags) 
+	protected void readEntityFromNBT(NBTTagCompound tags)
 	{
 		//baseID = tags.getInteger("Base");
 		//setBase(TeamsManager.getInstance().getBase(baseID));
 	}
-
+	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound tags) 
+	protected void writeEntityToNBT(NBTTagCompound tags)
 	{
 		//tags.setInteger("Base", base == null ? -1 : base.getBaseID());
 		
 	}
-
+	
 	@Override
-	public ITeamBase getBase() 
+	public ITeamBase getBase()
 	{
 		return base;
 	}
-
+	
 	@Override
-	public void onBaseSet(int newTeamID) 
+	public void onBaseSet(int newTeamID)
 	{
-		dataWatcher.updateObject(5, (byte)newTeamID);
+		getDataManager().set(TEAMID, (byte)newTeamID);
 		setPosition(base.posX, base.posY + 2F, base.posZ);
+		//startRiding(base);
 	}
-
+	
 	@Override
-	public void onBaseCapture(int newTeamID) 
+	public void onBaseCapture(int newTeamID)
 	{
 		onBaseSet(newTeamID);
 	}
-
+	
 	@Override
-	public void tick() {
-
+	public void tick()
+	{
+	
 	}
-
+	
 	@Override
-	public void setBase(ITeamBase b) 
+	public void setBase(ITeamBase b)
 	{
 		base = (EntityFlagpole)b;
 		if(base != null)
@@ -167,36 +194,36 @@ public class EntityFlag extends Entity implements ITeamObject {
 			onBaseSet(base.getOwnerID());
 		}
 	}
-
+	
 	@Override
-	public void destroy() 
+	public void destroy()
 	{
 		setDead();
 	}
-
+	
 	@Override
-	public double getPosX() 
+	public double getPosX()
 	{
 		return posX;
 	}
-
+	
 	@Override
-	public double getPosY() 
+	public double getPosY()
 	{
 		return posY;
 	}
-
+	
 	@Override
-	public double getPosZ() 
+	public double getPosZ()
 	{
 		return posZ;
 	}
-
+	
 	public int getTeamID()
 	{
-		return dataWatcher.getWatchableObjectByte(5);
+		return getDataManager().get(TEAMID);
 	}
-		
+	
 	@Override
 	public boolean isSpawnPoint()
 	{
@@ -204,7 +231,7 @@ public class EntityFlag extends Entity implements ITeamObject {
 	}
 	
 	@Override
-	public boolean interactFirst(EntityPlayer player) //interact
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
 	{
 		/* TODO : Check the generalised code in TeamsManager works
 		if(player instanceof EntityPlayerMP && TeamsManager.getInstance().currentGametype != null)
@@ -214,14 +241,13 @@ public class EntityFlag extends Entity implements ITeamObject {
 	}
 	
 	@Override
-	public ItemStack getPickedResult(MovingObjectPosition target)
+	public ItemStack getPickedResult(RayTraceResult target)
 	{
-		ItemStack stack = new ItemStack(FlansMod.flag, 1, 0);
-		return stack;
+		return new ItemStack(FlansMod.flag, 1, 0);
 	}
-
+	
 	@Override
-	public boolean forceChunkLoading() 
+	public boolean forceChunkLoading()
 	{
 		return false;
 	}

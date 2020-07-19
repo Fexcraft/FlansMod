@@ -7,15 +7,15 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-import com.flansmod.client.FlansModResourceHandler;
+import com.flansmod.client.FlansModClient;
+import com.flansmod.client.handlers.FlansModResourceHandler;
 import com.flansmod.client.model.RenderMecha;
+import com.flansmod.client.util.WorldRenderer;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.driveables.mechas.ContainerMechaInventory;
 import com.flansmod.common.driveables.mechas.EntityMecha;
@@ -25,6 +25,7 @@ public class GuiMechaInventory extends GuiContainer
 {
 	private static final ResourceLocation texture = new ResourceLocation("flansmod", "gui/mechaInventory.png");
 	private static final RenderMecha mechaRenderer;
+	
 	static
 	{
 		mechaRenderer = new RenderMecha(Minecraft.getMinecraft().getRenderManager());
@@ -52,29 +53,28 @@ public class GuiMechaInventory extends GuiContainer
 		maxScroll = container.maxScroll;
 		numItems = container.numItems;
 	}
-
+	
 	@Override
-	public void drawScreen(int i, int j, float f)
+	public void drawScreen(int mouseX, int mouseY, float partialTicks)
 	{
-		super.drawScreen(i, j, f);
-
-		
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		renderHoveredToolTip(mouseX, mouseY);
 	}
-
+	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int x, int y)
 	{
-		fontRendererObj.drawString(mecha.getMechaType().name, 9, 9, 0x404040);
-		fontRendererObj.drawString("Inventory", 181, (ySize - 96) + 2, 0x404040);
+		fontRenderer.drawString(mecha.getMechaType().name, 9, 9, 0x404040);
+		fontRenderer.drawString("Inventory", 181, (ySize - 96) + 2, 0x404040);
 	}
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i1, int j1)
 	{
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		
 		mc.renderEngine.bindTexture(texture);
-
+		
 		int j = (width - xSize) / 2;
 		int k = (height - ySize) / 2;
 		drawTexturedModalRect(j, k, 0, 0, xSize, ySize);
@@ -87,8 +87,8 @@ public class GuiMechaInventory extends GuiContainer
 			drawTexturedModalRect(j + 336, k + 41, 350, 0, 10, 10);
 		if(scroll == maxScroll)
 			drawTexturedModalRect(j + 336, k + 53, 350, 10, 10, 10);
-	
-		long newTime = mc.theWorld.getWorldInfo().getWorldTime();
+		
+		long newTime = mc.world.getWorldInfo().getWorldTime();
 		if(newTime > lastTime)
 		{
 			lastTime = newTime;
@@ -104,38 +104,37 @@ public class GuiMechaInventory extends GuiContainer
 		
 		MechaType type = mecha.getMechaType();
 		//Render rotating mecha model
-		GL11.glPushMatrix();
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		GL11.glTranslatef(j + 92, k + 105, 100);
-		GL11.glScalef(-50F / type.cameraDistance, 50F / type.cameraDistance, 50F / type.cameraDistance);
-		GL11.glRotatef(180F, 0F, 0F, 1F);
-		GL11.glRotatef(30F, 1F, 0F, 0F);
-		GL11.glRotatef(FlansMod.ticker, 0F, 1F, 0F);
+		GlStateManager.pushMatrix();
+		GlStateManager.enableDepth();
+		GlStateManager.enableLighting();
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.translate(j + 92, k + 105, 100);
+		GlStateManager.scale(-50F / type.cameraDistance, 50F / type.cameraDistance, 50F / type.cameraDistance);
+		GlStateManager.rotate(180F, 0F, 0F, 1F);
+		GlStateManager.rotate(30F, 1F, 0F, 0F);
+		GlStateManager.rotate(FlansMod.ticker, 0F, 1F, 0F);
 		mc.renderEngine.bindTexture(FlansModResourceHandler.getTexture(type));
-		mechaRenderer.render(mecha, 0, 0, 0, 0F, 0F);
+		mechaRenderer.doRender(mecha, 0, 0, 0, 0F, 0F);
 		//type.model.render(type);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glPopMatrix();
+		GlStateManager.disableLighting();
+		GlStateManager.disableDepth();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
-    public void drawTexturedModalRect(int par1, int par2, int par3, int par4, int par5, int par6)
-    {
-        float f = 1F / 512F;
-        float f1 = 1F / 256F;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.startDrawingQuads();
-        worldrenderer.addVertexWithUV((double)(par1), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3) * f), (double)((float)(par4 + par6) * f1));
-        worldrenderer.addVertexWithUV((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4 + par6) * f1));
-        worldrenderer.addVertexWithUV((double)(par1 + par5), (double)(par2), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4) * f1));
-        worldrenderer.addVertexWithUV((double)(par1), (double)(par2), (double)this.zLevel, (double)((float)(par3) * f), (double)((float)(par4) * f1));
-        tessellator.draw();
-    }
-
+	public void drawTexturedModalRect(int par1, int par2, int par3, int par4, int par5, int par6)
+	{
+		float f = 1F / 512F;
+		float f1 = 1F / 256F;
+		WorldRenderer worldrenderer = FlansModClient.getWorldRenderer();
+		worldrenderer.startDrawingQuads();
+		worldrenderer.addVertexWithUV((double)(par1), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3) * f), (double)((float)(par4 + par6) * f1));
+		worldrenderer.addVertexWithUV((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4 + par6) * f1));
+		worldrenderer.addVertexWithUV((double)(par1 + par5), (double)(par2), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4) * f1));
+		worldrenderer.addVertexWithUV((double)(par1), (double)(par2), (double)this.zLevel, (double)((float)(par3) * f), (double)((float)(par4) * f1));
+		worldrenderer.draw();
+	}
+	
 	@Override
 	public void initGui()
 	{
@@ -156,7 +155,7 @@ public class GuiMechaInventory extends GuiContainer
 			inventory.player.openGui(FlansMod.INSTANCE, 1, world, mecha.chunkCoordX, mecha.chunkCoordY, mecha.chunkCoordZ);
 		}
 	}
-
+	
 	@Override
 	protected void mouseClicked(int i, int j, int k) throws IOException
 	{

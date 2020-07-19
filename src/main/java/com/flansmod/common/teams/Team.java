@@ -1,7 +1,6 @@
 package com.flansmod.common.teams;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,13 +20,13 @@ import com.flansmod.common.types.TypeFile;
 
 public class Team extends InfoType
 {
-	public static List<Team> teams = new ArrayList<Team>();
-	public List<String> members = new ArrayList<String>();
+	public static List<Team> teams = new ArrayList<>();
+	public List<String> members = new ArrayList<>();
 	//public List<ITeamBase> bases = new ArrayList<ITeamBase>();
-	public List<PlayerClass> classes = new ArrayList<PlayerClass>();
+	public List<PlayerClass> classes = new ArrayList<>();
 	
 	public static Team spectators;
-
+	
 	public int score = 0;
 	
 	public int teamColour = 0xffffff;
@@ -60,11 +59,11 @@ public class Team extends InfoType
 		super.read(split, file);
 		try
 		{
-			if (split[0].equals("TeamColour"))
+			if(split[0].equals("TeamColour"))
 			{
 				teamColour = (Integer.parseInt(split[1]) << 16) + ((Integer.parseInt(split[2])) << 8) + ((Integer.parseInt(split[3])));
-			}			
-			if (split[0].equals("TextColour"))
+			}
+			if(split[0].equals("TextColour"))
 			{
 				if(split[1].equals("Black"))
 					textColour = '0';
@@ -147,10 +146,11 @@ public class Team extends InfoType
 			{
 				classes.add(PlayerClass.getClass(split[1]));
 			}
-		} catch (Exception e)
+		}
+		catch(Exception e)
 		{
-			System.out.println("Reading team file failed.");
-			e.printStackTrace();
+			FlansMod.log.error("Reading team file failed.");
+			FlansMod.log.throwing(e);
 		}
 	}
 	
@@ -159,6 +159,16 @@ public class Team extends InfoType
 		for(Team team : teams)
 		{
 			if(team.shortName.equals(s))
+				return team;
+		}
+		return null;
+	}
+	
+	public static Team getTeam(int iHash)
+	{
+		for(Team team : teams)
+		{
+			if(team.shortName.hashCode() == iHash)
 				return team;
 		}
 		return null;
@@ -199,7 +209,7 @@ public class Team extends InfoType
 	
 	public String addPlayer(String username)
 	{
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(username);
 		for(Team team : teams)
 		{
@@ -213,40 +223,40 @@ public class Team extends InfoType
 	public String removeWorstPlayer()
 	{
 		sortPlayers();
-		if(members.size() == 0)
+		if(members.isEmpty())
 			return null;
 		else return removePlayer(members.get(members.size() - 1));
 	}
 	
 	public void sortPlayers()
 	{
-		Collections.sort(members, new ComparatorScore());
+		members.sort(new ComparatorScore());
 	}
 	
 	public static class ComparatorScore implements Comparator<String>
 	{
 		@Override
-		public int compare(String a, String b) 
+		public int compare(String a, String b)
 		{
 			PlayerData dataA = PlayerHandler.getPlayerData(a);
 			PlayerData dataB = PlayerHandler.getPlayerData(b);
 			if(dataA == null || dataB == null)
-				return 0;			
+				return 0;
 			return dataB.score - dataA.score;
 		}
 		
 	}
-
+	
 	@Override
 	protected void preRead(TypeFile file)
 	{
 	}
-
+	
 	@Override
 	protected void postRead(TypeFile file)
 	{
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public ModelBase GetModel()

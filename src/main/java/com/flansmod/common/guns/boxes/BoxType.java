@@ -1,20 +1,20 @@
 package com.flansmod.common.guns.boxes;
 
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.types.InfoType;
-import com.flansmod.common.types.TypeFile;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class BoxType extends InfoType 
+import com.flansmod.common.FlansMod;
+import com.flansmod.common.types.InfoType;
+import com.flansmod.common.types.TypeFile;
+
+public abstract class BoxType extends InfoType
 {
 	public String topTexturePath;
 	public String sideTexturePath;
 	public String bottomTexturePath;
 	
-	public BoxType(TypeFile file) 
+	public BoxType(TypeFile file)
 	{
 		super(file);
 	}
@@ -24,17 +24,15 @@ public abstract class BoxType extends InfoType
 	{
 		super.read(split, file);
 		try
-		{		
-			if (split[0].equals("TopTexture"))
-				topTexturePath = split[1];
-			if (split[0].equals("BottomTexture"))
-				bottomTexturePath = split[1];
-			if (split[0].equals("SideTexture"))
-				sideTexturePath = split[1];
-		} catch (Exception e)
 		{
-			FlansMod.log("Reading box file failed : " + shortName);
-			e.printStackTrace();
+			topTexturePath = Read(split, "TopTexture", topTexturePath);
+			bottomTexturePath = Read(split, "BottomTexture", bottomTexturePath);
+			sideTexturePath = Read(split, "SideTexture", sideTexturePath);
+		}
+		catch(Exception e)
+		{
+			FlansMod.log.error("Reading box file failed : " + shortName);
+			FlansMod.log.throwing(e);
 		}
 	}
 

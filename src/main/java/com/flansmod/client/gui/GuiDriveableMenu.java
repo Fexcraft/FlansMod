@@ -1,9 +1,8 @@
 package com.flansmod.client.gui;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -47,7 +46,7 @@ public class GuiDriveableMenu extends GuiContainer
 		buttonList.add(gunsButton);
 		
 		//Fuel button
-		GuiButton fuelButton = new GuiButton(2, width / 2 -60, height / 2 - 49, 58, 20, "Fuel");
+		GuiButton fuelButton = new GuiButton(2, width / 2 - 60, height / 2 - 49, 58, 20, "Fuel");
 		fuelButton.enabled = type.fuelTankSize > 0;
 		buttonList.add(fuelButton);
 		
@@ -105,17 +104,30 @@ public class GuiDriveableMenu extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j)
 	{
-		fontRendererObj.drawString(entity.getDriveableType().name, 6, 6, 0x404040);
-		fontRendererObj.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
+		fontRenderer.drawString(entity.getDriveableType().name, 6, 6, 0x404040);
+		fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i1, int j1)
 	{
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		mc.renderEngine.bindTexture(texture);
 		int j = (width - xSize) / 2;
 		int k = (height - ySize) / 2;
 		drawTexturedModalRect(j, k, 0, 0, xSize, ySize);
+	}
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+	{
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		renderHoveredToolTip(mouseX, mouseY);
+	}
+	
+	@Override
+	public boolean doesGuiPauseGame()
+	{
+		return false;
 	}
 }

@@ -12,11 +12,11 @@ Recoil 3
 //Damage in half hearts
 Damage 5
 //The higher this value, the more the bullets spread
-Accuracy 2
+Accuracy 8
 //Time in ticks between rounds
 ShootDelay 1
 ShootSound P90Shoot
-ReloadSound MP40Reload
+ReloadSound MWMP40Reload
 Mode FullAuto
 //Bullet speed, default 3.0
 BulletSpeed 10.0
@@ -45,3 +45,4 @@ NumGenericAttachmentSlots 1
 //Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
 Paintjob Bizon_Orange Bizon_Orange orange 2
 Paintjob Bizon_Blue Bizon_Blue blue 1 lightBlue 1 cyan 1
+Paintjob Bizon_Newspaper Bizon_Newspaper red 1 white 1

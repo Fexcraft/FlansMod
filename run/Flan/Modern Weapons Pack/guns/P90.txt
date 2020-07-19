@@ -10,9 +10,9 @@ ReloadTime 50
 //The amount of gun recoil, all relative : Sten = 1, Mp40 = 3, Kar98kSniper = 20
 Recoil 2
 //Damage in half hearts
-Damage 5
+Damage 4
 //The higher this value, the more the bullets spread
-Accuracy 1
+Accuracy 3
 //Time in ticks between rounds
 ShootDelay 1
 ShootSound P90Shoot
@@ -43,3 +43,5 @@ NumGenericAttachmentSlots 1
 //Format is "Paintjob iconName textureName requiredDyeAmount requiredDyeColour" Multiple colours may be listed in order, seperated by a space
 //Dye colours are "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "lightBlue", "magenta", "orange", "white"
 Paintjob P90_Obsidian P90_Obsidian purple 2
+Paintjob P90_Periwinkle P90_Periwinkle purple 2
+Paintjob P90_Aqua P90_Aqua cyan 2

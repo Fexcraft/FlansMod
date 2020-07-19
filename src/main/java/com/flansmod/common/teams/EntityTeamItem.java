@@ -1,8 +1,8 @@
 package com.flansmod.common.teams;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -17,14 +17,15 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import com.flansmod.common.EntityItemCustomRender;
 import com.flansmod.common.PlayerHandler;
 
-public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdditionalSpawnData {
-
+public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdditionalSpawnData
+{
+	
 	public TileEntitySpawner spawner;
 	public double angle;
 	public int xCoord, yCoord, zCoord;
 	private int age;
 	
-	public EntityTeamItem(TileEntitySpawner te, int i) 
+	public EntityTeamItem(TileEntitySpawner te, int i)
 	{
 		super(te.getWorld(), te.getPos().getX() + 0.5F, te.getPos().getY() + 0.5F, te.getPos().getZ() + 0.5F, te.stacksToSpawn.get(i).copy());
 		te.itemEntities.add(this);
@@ -40,11 +41,11 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 	}
 	
 	@Override
-	public void func_180426_a(double x, double y, double z, float yaw, float pitch, int i, boolean b)
+	public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int i, boolean b)
 	{
 		
 	}
-		
+	
 	@Override
 	public void onUpdate()
 	{
@@ -54,34 +55,34 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 		prevPosZ = posZ;
 		prevRotationYaw = rotationYaw;
 		++age;
-		if(worldObj.isRemote)
+		if(world.isRemote)
 		{
 			angle += 0.05D;
 			setPosition(xCoord + 0.5F + Math.cos(angle) * 0.3F, yCoord + 0.5F, zCoord + 0.5F + Math.sin(angle) * 0.3F);
 		}
-
+		
 		//Temporary fire glitch fix
-		if(worldObj.isRemote)
+		if(world.isRemote)
 			extinguish();
 	}
-
+	
 	public boolean attackEntityFrom(DamageSource par1DamageSource, int par2)
 	{
-	 	return false;
+		return false;
 	}
-
+	
 	@Override
 	public void onCollideWithPlayer(EntityPlayer player)
 	{
-		if (!worldObj.isRemote)
+		if(!world.isRemote)
 		{
 			EntityItemPickupEvent event = new EntityItemPickupEvent(player, this);
-
-			if (MinecraftForge.EVENT_BUS.post(event))
+			
+			if(MinecraftForge.EVENT_BUS.post(event))
 			{
 				return;
 			}
-
+			
 			int spawnerTeamID = spawner.getTeamID();
 			Team spawnerTeam = TeamsManager.getInstance().getTeam(spawnerTeamID);
 			Team playerTeam = PlayerHandler.getPlayerData(player).team;
@@ -90,19 +91,19 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 				if(playerTeam != spawnerTeam)
 					return;
 			}
-
+			
 			//Getter of EntityItem
-			int var2 = getEntityItem().stackSize;
-
-			if ((event.getResult() == Result.ALLOW || var2 <= 0 || player.inventory.addItemStackToInventory(getEntityItem())))
+			int var2 = getItem().getCount();
+			
+			if((event.getResult() == Result.ALLOW || var2 <= 0 || player.inventory.addItemStackToInventory(getItem())))
 			{
-				FMLCommonHandler.instance().firePlayerItemPickupEvent(player, this);
-
-				playSound("random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+				FMLCommonHandler.instance().firePlayerItemPickupEvent(player, this, getItem().copy());
+				
+				playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 				player.onItemPickup(this, var2);
-
+				
 				//Getter of EntityItem
-				if (getEntityItem().stackSize <= 0)
+				if(getItem().getCount() <= 0)
 				{
 					spawner.itemEntities.remove(this);
 					setDead();
@@ -110,9 +111,9 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 			}
 		}
 	}
-
+	
 	@Override
-	public void writeSpawnData(ByteBuf data) 
+	public void writeSpawnData(ByteBuf data)
 	{
 		if(spawner == null)
 		{
@@ -129,18 +130,18 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 		data.writeDouble(angle);
 		NBTTagCompound tags = new NBTTagCompound();
 		//Getter of EntityItem
-		getEntityItem().writeToNBT(tags);
+		getItem().writeToNBT(tags);
 		ByteBufUtils.writeTag(data, tags);
 	}
-
+	
 	@Override
-	public void readSpawnData(ByteBuf data) 
+	public void readSpawnData(ByteBuf data)
 	{
 		xCoord = data.readInt();
 		yCoord = data.readInt();
 		zCoord = data.readInt();
 		angle = data.readDouble();
-		setEntityItemStack(ItemStack.loadItemStackFromNBT(ByteBufUtils.readTag(data)));
+		setItem(new ItemStack(ByteBufUtils.readTag(data)));
 	}
 	
 	@Override
@@ -149,12 +150,6 @@ public class EntityTeamItem extends EntityItemCustomRender implements IEntityAdd
 		setDead();
 	}
 	
-	@Override
-	public boolean canAttackWithItem()
-	{
-		return false;
-	}
-
 	@Override
 	public boolean isBurning()
 	{

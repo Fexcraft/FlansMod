@@ -5,17 +5,17 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
-import com.flansmod.client.KeyInputHandler;
+import com.flansmod.client.handlers.KeyInputHandler;
 import com.flansmod.common.FlansMod;
 
-public class GuiDriveableController extends GuiScreen 
+public class GuiDriveableController extends GuiScreen
 {
 	private IControllable plane;
 	private boolean leftMouseHeld;
@@ -31,21 +31,21 @@ public class GuiDriveableController extends GuiScreen
 	public void initGui()
 	{
 		if(mc.gameSettings.thirdPersonView == 1)
-			mc.setRenderViewEntity((plane.getCamera() == null ? mc.thePlayer : plane.getCamera()));
+			mc.setRenderViewEntity((plane.getCamera() == null ? mc.player : plane.getCamera()));
 	}
 	
 	@Override
 	public void onGuiClosed()
 	{
 		mc.mouseHelper.ungrabMouseCursor();
-		mc.setRenderViewEntity(mc.thePlayer);
-    }
+		mc.setRenderViewEntity(mc.player);
+	}
 	
 	@Override
 	public void handleMouseInput()
 	{
 		EntityPlayer player = (EntityPlayer)plane.getControllingEntity();
-		if(player != mc.thePlayer)
+		if(player != mc.player)
 		{
 			mc.displayGuiScreen(null);
 			return;
@@ -59,9 +59,9 @@ public class GuiDriveableController extends GuiScreen
 		
 		//Right mouse. Fires shells, drops bombs. Is not a holding thing
 		if(Mouse.isButtonDown(1))
-			plane.pressKey(8, player);
+			plane.pressKey(8, player, true);
 		
-		if(!leftMouseHeld&& Mouse.isButtonDown(0)) //Left mouse, for MGs. Is a holding thing
+		if(!leftMouseHeld && Mouse.isButtonDown(0)) //Left mouse, for MGs. Is a holding thing
 		{
 			leftMouseHeld = true;
 			plane.updateKeyHeldState(9, true);
@@ -81,50 +81,21 @@ public class GuiDriveableController extends GuiScreen
 			rightMouseHeld = false;
 			plane.updateKeyHeldState(8, false);
 		}
+		
+		MinecraftForge.EVENT_BUS.post(new InputEvent.MouseInputEvent());
 	}
 	
 	@Override
 	protected void keyTyped(char c, int i)
 	{
-		if(i == 1)
-		{
-			mc.displayGuiScreen(null);
-			mc.displayInGameMenu();		
-		}
-		if(i == 59)
-		{
-			mc.gameSettings.hideGUI = !mc.gameSettings.hideGUI;
-		}
-		if(i == 61)
-		{
-			mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
-		}
+
+		
 		if(i == 63)
 		{
 			mc.gameSettings.thirdPersonView = (mc.gameSettings.thirdPersonView + 1) % 3;
 			if(mc.gameSettings.thirdPersonView == 1)
-				mc.setRenderViewEntity((plane.getCamera() == null ? mc.thePlayer : plane.getCamera()));
-			else mc.setRenderViewEntity(mc.thePlayer);
-		}
-		if(i == 66)
-		{
-			mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
-		}
-		if(i == mc.gameSettings.keyBindInventory.getKeyCode())
-		{
-			mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
-		}
-		if(i == mc.gameSettings.keyBindDrop.getKeyCode())
-		{
-			//mc.thePlayer.dropCurrentItem();
-		}
-		if(i == mc.gameSettings.keyBindChat.getKeyCode())
-		{
-			mc.displayGuiScreen(new GuiChat());
-		}
-		if(i == mc.gameSettings.keyBindCommand.getKeyCode())
-		{
-			mc.displayGuiScreen(new GuiChat("/"));
+				mc.setRenderViewEntity((plane.getCamera() == null ? mc.player : plane.getCamera()));
+			else mc.setRenderViewEntity(mc.player);
 		}
 		if(i == KeyInputHandler.debugKey.getKeyCode())
 		{
@@ -134,21 +105,23 @@ public class GuiDriveableController extends GuiScreen
 		{
 			FlansModClient.reloadModels(false);
 		}
+		
+		MinecraftForge.EVENT_BUS.post(new InputEvent.KeyInputEvent());
 	}
 	
 	@Override
 	public void updateScreen()
 	{
 		if(mc.gameSettings.thirdPersonView == 1)
-			mc.setRenderViewEntity((plane.getCamera() == null ? mc.thePlayer : plane.getCamera()));
-		else mc.setRenderViewEntity(mc.thePlayer);
+			mc.setRenderViewEntity((plane.getCamera() == null ? mc.player : plane.getCamera()));
+		else mc.setRenderViewEntity(mc.player);
 	}
 	
 	@Override
 	public void handleInput()
 	{
 		EntityPlayer player = (EntityPlayer)plane.getControllingEntity();
-		if(player != mc.thePlayer)
+		if(player != mc.player)
 		{
 			mc.displayGuiScreen(null);
 			return;
@@ -158,98 +131,97 @@ public class GuiDriveableController extends GuiScreen
 			mc.mouseHelper.grabMouseCursor();
 		}
 		handleMouseInput();
-
-        for(; Keyboard.next(); ) {try {handleKeyboardInput();} catch(IOException e){} }
-        
+		
+		for(; Keyboard.next(); )
+		{
+			try
+			{
+				handleKeyboardInput();
+			}
+			catch(IOException e)
+			{
+			}
+		}
+		
 		int l = Mouse.getDX();
 		int m = Mouse.getDY();
 		
 		plane.onMouseMoved(l, m);
-
+		
 		if(plane != null && !plane.isDead() && plane.getControllingEntity() != null && plane.getControllingEntity() instanceof EntityPlayer)
 		{
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindForward.getKeyCode()))//KeyInputHandler.accelerateKey.getKeyCode()))
 			{
-				plane.pressKey(0, player);
+				plane.pressKey(0, player, true);
 			}
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindBack.getKeyCode()))//KeyInputHandler.decelerateKey.getKeyCode()))
 			{
-				plane.pressKey(1, player);
+				plane.pressKey(1, player, true);
 			}
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindLeft.getKeyCode()))//KeyInputHandler.leftKey.getKeyCode()))
 			{
-				plane.pressKey(2, player);
+				plane.pressKey(2, player, true);
 			}
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindRight.getKeyCode()))//KeyInputHandler.rightKey.getKeyCode()))
 			{
-				plane.pressKey(3, player);
-			}	
+				plane.pressKey(3, player, true);
+			}
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindJump.getKeyCode()))//KeyInputHandler.upKey.getKeyCode()))
 			{
-				plane.pressKey(4, player);
+				plane.pressKey(4, player, true);
 			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.downKey.getKeyCode()))
 			{
-				plane.pressKey(5, player);
-			}	
+				plane.pressKey(5, player, true);
+			}
 			if(FlansMod.proxy.keyDown(mc.gameSettings.keyBindSneak.getKeyCode()))//KeyInputHandler.exitKey.getKeyCode()))
 			{
-				plane.pressKey(6, player);
-			}	
-			if(FlansMod.proxy.keyDown(KeyInputHandler.inventoryKey.getKeyCode()))
+				plane.pressKey(6, player, true);
+			}
+			if(FlansMod.proxy.keyDown(KeyInputHandler.vehicleMenuKey.getKeyCode()))
 			{
-				plane.pressKey(7, player);
+				plane.pressKey(7, player, true);
 			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.bombKey.getKeyCode()))
 			{
-				plane.pressKey(8, player);
+				plane.pressKey(8, player, true);
 			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.gunKey.getKeyCode()))
 			{
-				plane.pressKey(9, player);
-			}				
+				plane.pressKey(9, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.controlSwitchKey.getKeyCode()))
 			{
-				plane.pressKey(10, player);
-			}				
+				plane.pressKey(10, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.leftRollKey.getKeyCode()))
 			{
-				plane.pressKey(11, player);
-			}				
+				plane.pressKey(11, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.rightRollKey.getKeyCode()))
 			{
-				plane.pressKey(12, player);
-			}				
+				plane.pressKey(12, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.gearKey.getKeyCode()))
 			{
-				plane.pressKey(13, player);
-			}				
+				plane.pressKey(13, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.doorKey.getKeyCode()))
 			{
-				plane.pressKey(14, player);
-			}				
+				plane.pressKey(14, player, true);
+			}
 			if(FlansMod.proxy.keyDown(KeyInputHandler.modeKey.getKeyCode()))
 			{
-				plane.pressKey(15, player);
-			}				
-			//if(FlansMod.proxy.keyDown(KeyInputHandler.trimKey.getKeyCode()))
-			//{
-			//	plane.pressKey(16, player);
-			//}				
-	
+				plane.pressKey(15, player, true);
+			}
+			
 		}
 		else
 		{
 			mc.displayGuiScreen(null);
 		}
 	}
-	   
-	@Override
-	public void drawBackground(int i)
-	{
-		//Plane gauges overlay
-	}
-
+	
 	@Override
 	public boolean doesGuiPauseGame()
 	{
